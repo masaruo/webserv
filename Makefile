@@ -6,7 +6,7 @@
 #    By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/07/18 19:26:53 by mogawa           ###   ########.fr        #
+#    Updated: 2024/07/19 10:17:42 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ INC			:=	-I./include -I./utility/include
 SRC			=	 \
 				string.cpp \
 				socket.class.cpp \
+				port.class.cpp \
 				main.cpp
 SRCDIR		:=	./src
 OBJDIR		:=	obj

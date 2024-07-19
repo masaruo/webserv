@@ -6,21 +6,38 @@
 /*   By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/18 17:47:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/19 09:36:37 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/19 19:07:50 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "port.class.hpp"
 #include <unistd.h>
+// #include <fcntl.h>
 
 static struct sockaddr_in   makeSockaddr(int port)
 {
     struct sockaddr_in  addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);//? htonsl
-    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_addr.s_addr = htons(INADDR_ANY);
     return (addr);
 }
+
+// static void  flagNonblock(int fd)
+// {
+//     int flag = 0;
+
+//     flag = fcntl(fd, F_GETFL);
+//     if (flag == -1)
+//     {
+//         //todo error
+//     }
+//     flag |= O_NONBLOCK;
+//     if (fcntl(fd, F_SETFL, flag) == -1)
+//     {
+//         //todo error
+//     }
+// }
 
 Port::Port(int port)
 :port_(port), addr_(makeSockaddr(port))

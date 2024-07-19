@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fd.class.cpp                                       :+:      :+:    :+:   */
+/*   socket.class.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 07:34:34 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/19 10:16:53 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/19 19:08:15 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,27 @@
 #include "string.hpp"
 #include <unistd.h>
 #include <cstring>
+#include <fcntl.h>
 
 #ifdef DEBUG
 #include <iostream>
 #endif
+
+static void  flagNonblock(int fd)
+{
+    int flag = 0;
+
+    flag = fcntl(fd, F_GETFL);
+    if (flag == -1)
+    {
+        //todo error
+    }
+    flag |= O_NONBLOCK;
+    if (fcntl(fd, F_SETFL, flag) == -1)
+    {
+        //todo error
+    }
+}
 
 Socket::Socket(Port const &port)
 :port_(port)
@@ -26,7 +43,7 @@ Socket::Socket(Port const &port)
 ,length_(sizeof(buffer_))
 ,flags_(0)//? MSG_DONOTWAIT
 {
-	
+	flagNonblock(accepted_fd_);
 	return ;
 }
 

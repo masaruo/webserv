@@ -2,6 +2,6 @@
 
 namespace ft
 {
-	int const	EOF = 0;
-	int const	ERR = -1;
+	int const	eof = 0;
+	int const	err = -1;
 }

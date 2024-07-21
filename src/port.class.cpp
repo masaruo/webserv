@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/18 17:47:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/19 19:07:50 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/21 11:57:48 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,15 @@ Port::Port(int port)
 	fd_ = socket(AF_INET, SOCK_STREAM, 0);
 	//todo error
 	int optval = 1;
-	if (setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == ft::ERR)
+	if (setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == ft::err)
 	{
 		//todo error
 	}
-	if (bind(fd_, (struct sockaddr *)&addr_, sizeof(addr_)) == ft::ERR)//? static_cast?
+	if (bind(fd_, (struct sockaddr *)&addr_, sizeof(addr_)) == ft::err)//? static_cast?
 	{
 		//todo error
 	}
-	// ft::Fcntl::setNonBlock(fd_);
+	ft::Fcntl::setNonBlock(fd_);
 	if (listen(fd_, SOMAXCONN))
 	{
 		//todo error
@@ -51,8 +51,8 @@ Port::~Port()
 {
 	::close (fd_);
 	return ;
-}
 
+}
 void    Port::closePort(void) const
 {
 	::close (fd_);

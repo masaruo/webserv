@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 07:34:34 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/19 19:08:15 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/21 11:52:51 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,14 @@ Socket::Socket(Port const &port)
 ,length_(sizeof(buffer_))
 ,flags_(0)//? MSG_DONOTWAIT
 {
-	// ft::Fcntl::setNonBlock(accepted_fd_);
+	ft::Fcntl::setNonBlock(accepted_fd_);
 	return ;
 }
 
 Socket::~Socket(void)
 {
 #ifdef DEBUG
-	std::cout << "fd destructor" << std::endl;
+	// std::cout << "fd destructor" << std::endl;
 #endif
 	close (accepted_fd_);
 }
@@ -45,7 +45,7 @@ int	Socket::accept(int sockfd, struct sockaddr *addr_, socklen_t *addrlen_)
 	int	accepted_fd = 0;
 
 	accepted_fd = ::accept(sockfd, addr_, addrlen_);
-	if (accepted_fd == ERR)
+	if (accepted_fd == ft::err)
 	{
 		//todo error
 	}	
@@ -56,11 +56,11 @@ ssize_t    Socket::recv(void)
 {
 	ssize_t	readBytes = 0;
 	readBytes = ::recv(accepted_fd_, buffer_, length_, flags_);
-	if (readBytes == ft::ERR)
+	if (readBytes == ft::err)
 	{
 		//todo error
 	}
-	else if (readBytes == ft::EOF)
+	else if (readBytes == ft::eof)
 	{
 		//todo eof
 	}
@@ -79,7 +79,7 @@ ssize_t    Socket::send(void) const
 {
 	ssize_t	sendBytes = 0;
 	sendBytes = ::send(accepted_fd_, buffer_, length_, flags_);
-	if (sendBytes == ERR)
+	if (sendBytes == ft::err)
 	{
 		//todo err
 	}

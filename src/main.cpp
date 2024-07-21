@@ -6,10 +6,10 @@
 int main(void)
 {
 	Port port(80);
+	Socket	fd(port);
 
   while (true)
   {
-	Socket	fd(port);
 
 	fd.recv();
   fd.updateBuf("this is return msg\n");

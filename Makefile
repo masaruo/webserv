@@ -21,6 +21,7 @@ SRC			=	 \
 				string.cpp \
 				socket.class.cpp \
 				port.class.cpp \
+				Fcntl.class.cpp \
 				main.cpp
 SRCDIR		:=	./src
 OBJDIR		:=	obj

@@ -13,29 +13,14 @@
 #include "socket.class.hpp"
 #include "port.class.hpp"
 #include "string.hpp"
+#include "Fcntl.class.hpp"
+#include "define.hpp"
 #include <unistd.h>
 #include <cstring>
-#include <fcntl.h>
 
 #ifdef DEBUG
 #include <iostream>
 #endif
-
-static void  flagNonblock(int fd)
-{
-    int flag = 0;
-
-    flag = fcntl(fd, F_GETFL);
-    if (flag == -1)
-    {
-        //todo error
-    }
-    flag |= O_NONBLOCK;
-    if (fcntl(fd, F_SETFL, flag) == -1)
-    {
-        //todo error
-    }
-}
 
 Socket::Socket(Port const &port)
 :port_(port)
@@ -43,7 +28,7 @@ Socket::Socket(Port const &port)
 ,length_(sizeof(buffer_))
 ,flags_(0)//? MSG_DONOTWAIT
 {
-	flagNonblock(accepted_fd_);
+	// ft::Fcntl::setNonBlock(accepted_fd_);
 	return ;
 }
 
@@ -71,11 +56,11 @@ ssize_t    Socket::recv(void)
 {
 	ssize_t	readBytes = 0;
 	readBytes = ::recv(accepted_fd_, buffer_, length_, flags_);
-	if (readBytes == ERR)
+	if (readBytes == ft::ERR)
 	{
 		//todo error
 	}
-	else if (readBytes == END_OF_FILE)
+	else if (readBytes == ft::EOF)
 	{
 		//todo eof
 	}

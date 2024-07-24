@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   port.class.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/18 17:47:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/21 11:57:48 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/23 11:53:38 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ static struct sockaddr_in   setSockaddr(int port)
 {
 	struct sockaddr_in  addr;
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);//? htonsl
-	addr.sin_addr.s_addr = htons(INADDR_ANY);
+	addr.sin_port = htons(port);
+	addr.sin_addr.s_addr = INADDR_ANY;
 	return (addr);
 }
 
@@ -29,7 +29,10 @@ Port::Port(int port)
 ,addr_(setSockaddr(port))
 {
 	fd_ = socket(AF_INET, SOCK_STREAM, 0);
-	//todo error
+	if (fd_ == ft::err)
+	{
+		//todo error
+	}
 	int optval = 1;
 	if (setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == ft::err)
 	{
@@ -52,16 +55,6 @@ Port::~Port()
 	::close (fd_);
 	return ;
 
-}
-void    Port::closePort(void) const
-{
-	::close (fd_);
-	return ;
-}
-
-int Port::getPort(void) const
-{
-	return (port_);
 }
 
 int	Port::getFd(void) const

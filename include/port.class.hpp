@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   port.class.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/18 17:47:26 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/19 19:02:21 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/23 12:02:35 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,5 @@ public:
 	~Port();
 	void    closePort(void) const;
 	int     getFd(void) const;
-	int		getPort(void) const;
 	//todo exceptions
 };

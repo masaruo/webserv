@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.class.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mogawa <mogawa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/19 07:34:34 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/21 11:52:51 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/24 16:36:53 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,44 +18,68 @@
 #include <unistd.h>
 #include <cstring>
 
-#ifdef DEBUG
 #include <iostream>
-#endif
+
+Socket::Socket()
+:fd_(0)
+,length_(sizeof(buffer_))
+,flags_(0)
+,is_listening(false)
+,to_delete(false)
+{
+	return ;
+}
 
 Socket::Socket(Port const &port)
-:port_(port)
-,accepted_fd_(Socket::accept(port.getFd(), &client_addr_, &addrlen_))
+:fd_(port.getFd())
 ,length_(sizeof(buffer_))
-,flags_(0)//? MSG_DONOTWAIT
+,flags_(0)
+,is_listening(true)
+,to_delete(false)
 {
-	ft::Fcntl::setNonBlock(accepted_fd_);
+	ft::Fcntl::setNonBlock(fd_);
 	return ;
+}
+
+Socket::Socket(Socket const &rhs)
+{
+	*this = rhs;
+}
+
+Socket &Socket::operator=(Socket const &rhs)
+{
+	if (this != &rhs)
+	{
+		fd_ = rhs.fd_;
+		length_ = rhs.length_;
+		flags_ = rhs.flags_;
+		is_listening = rhs.is_listening;
+	}
+	return (*this);
 }
 
 Socket::~Socket(void)
 {
-#ifdef DEBUG
-	// std::cout << "fd destructor" << std::endl;
-#endif
-	close (accepted_fd_);
+	close (fd_);
 }
 
-int	Socket::accept(int sockfd, struct sockaddr *addr_, socklen_t *addrlen_)
+Socket	Socket::accept(void) const
 {
-	int	accepted_fd = 0;
-
-	accepted_fd = ::accept(sockfd, addr_, addrlen_);
-	if (accepted_fd == ft::err)
-	{
-		//todo error
-	}	
-	return (accepted_fd);
+	Socket	client;
+	int const	listening_fd = this->fd_;
+	int	accepted = 0;
+	// accepted = ::accept(listening_fd, &client.client_addr_, &client.addrlen_);
+	accepted = ::accept(listening_fd, NULL, NULL);
+	//todo error
+	ft::Fcntl::setNonBlock(accepted);
+	client.fd_ = accepted;
+	return (client);
 }
 
 ssize_t    Socket::recv(void)
 {
 	ssize_t	readBytes = 0;
-	readBytes = ::recv(accepted_fd_, buffer_, length_, flags_);
+	readBytes = ::recv(fd_, buffer_, length_, flags_);
 	if (readBytes == ft::err)
 	{
 		//todo error
@@ -78,12 +102,12 @@ ssize_t    Socket::recv(void)
 ssize_t    Socket::send(void) const
 {
 	ssize_t	sendBytes = 0;
-	sendBytes = ::send(accepted_fd_, buffer_, length_, flags_);
+	sendBytes = ::send(fd_, buffer_, length_, flags_);
 	if (sendBytes == ft::err)
 	{
 		//todo err
 	}
-	else if (sendBytes == END_OF_FILE)
+	else if (sendBytes == ft::eof)
 	{
 		//todo eof
 	}
@@ -103,4 +127,29 @@ void	Socket::updateBuf(ft::string out)
 	buffer_[BUFSIZE - 1] = '\0'; 
 	// buffer_ = bufStr_.c_str();
 	return ;
+}
+
+int	Socket::getFd(void) const
+{
+	return (fd_);
+}
+
+bool	Socket::getSocketType(void) const
+{
+	return (is_listening);
+}
+
+bool	Socket::getToDelete(void) const
+{
+	return (to_delete);
+}
+
+void	Socket::makeToDelete(void)
+{
+	to_delete = true;
+}
+
+void	Socket::makeNoListening(void)
+{
+	is_listening = false;
 }

@@ -1,16 +1,21 @@
-#include "port.class.hpp"
-#include "socket.class.hpp"
-#include "epoller.class.hpp"
+#include "ClientSocket.class.hpp"
+#include "ListenSocket.class.hpp"
+#include "SocketHolder.class.hpp"
+// #include "epoller.class.hpp"
 #include <string>
 #include <iostream>
 
 int main(void)
 {
-	Port port(8888);
-  Socket listening(port);
-  Epoller epoll(5, -1);
-  // epoll.epollAdd(c1.clone());
-  epoll.epollAdd(listening);
-    epoll.epollLoop();
+  SocketHolder  holder;
+  ListenSocket  *port80 = new ListenSocket(8888);
+
+  holder.addSocket(port80);
+  holder.addSocket(new ClientSocket(port80->getFd()));
+  while (true)
+  {
+    ;
+  }
+  // holder.addSocket(new ListenSocket(80));
   return (0);
 }

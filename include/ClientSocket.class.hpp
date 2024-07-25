@@ -17,7 +17,7 @@ class ClientSocket : public ASocket
 {
 private:
 	//todo create buffer class
-	int	acceptHander(int listen_fd);
+	int	acceptHandler(int listen_fd);
 	ClientSocket();
 	ClientSocket(ClientSocket const &rhs);
 	ClientSocket &operator=(ClientSocket const &rhs);

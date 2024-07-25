@@ -1,0 +1,13 @@
+services:
+  dev:
+    container_name: webserv
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - type: bind
+        source: "../"
+        target: "/webserv"
+    command: /bin/sh -c "tail -f /dev/null"

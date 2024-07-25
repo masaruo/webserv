@@ -27,8 +27,8 @@ public://*typedef
 	typedef vec_socket::difference_type	difference_type;
 private:
 	vec_socket	vec_;
-	void	clearSockets(void);
-	void	deleteSockets(void);
+	// void	clearSockets(void);
+	// void	deleteSockets(void);
 	SocketHolder(SocketHolder const &rhs);
 	SocketHolder &operator=(SocketHolder const &rhs);
 public:
@@ -36,5 +36,8 @@ public:
 	~SocketHolder();
 	void	addSocket(ClientSocket *socket);
 	void	addSocket(ListenSocket *socket);
-	void	markDeleteSocket(iterator iter);
+	void	markSocketDelete(iterator iter);
+	void	clearSocketVec(void);
+	template <typename F>
+	void	foreach(F func);
 };

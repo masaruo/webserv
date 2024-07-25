@@ -19,10 +19,11 @@ GTEST_LIB	:=	-L./googletest/lib
 INC			:=	-I./include -I./utility/include
 SRC			=	 \
 				string.cpp \
-				socket.class.cpp \
-				port.class.cpp \
 				Fcntl.class.cpp \
-				epoller.class.cpp \
+				ASocket.class.cpp \
+				ClientSocket.class.cpp \
+				ListenSocket.class.cpp \
+				SocketHolder.class.cpp \
 				main.cpp
 SRCDIR		:=	./src
 OBJDIR		:=	obj

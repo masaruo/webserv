@@ -13,14 +13,20 @@
 #include <ClientSocket.class.hpp>
 #include "define.hpp"
 #include "Fcntl.class.hpp"
+#include "unistd.h"
 
 ClientSocket::ClientSocket(int listen_fd)
 {
-	fd_ = acceptHander(listen_fd);
+	fd_ = acceptHandler(listen_fd);
 	return ;
 }
 
-int	ClientSocket::acceptHander(int listen_fd)
+ClientSocket::~ClientSocket()
+{
+	close (fd_);
+}
+
+int	ClientSocket::acceptHandler(int listen_fd)
 {
 	int	fd = 0;
 

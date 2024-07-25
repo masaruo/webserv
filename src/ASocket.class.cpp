@@ -12,6 +12,11 @@
 
 #include "ASocket.class.hpp"
 
+ASocket::~ASocket()
+{
+	return ;
+}
+
 int	ASocket::getFd(void) const
 {
 	return (fd_);

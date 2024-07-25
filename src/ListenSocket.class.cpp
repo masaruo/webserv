@@ -31,7 +31,8 @@ void	ListenSocket::setSockaddr(void)
 {
 	sockaddr_t	ad = sockaddr_;
 	ad.addr.sin_family = AF_INET;
-	ad.addr.sin_port = htons(listening_port_);
+	// ad.addr.sin_port = htons(listening_port_);
+	ad.addr.sin_port = listening_port_;
 	ad.addr.sin_addr.s_addr = INADDR_ANY;
 	ad.addrlen = sizeof(ad.addr);
 }

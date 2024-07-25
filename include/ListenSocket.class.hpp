@@ -24,5 +24,5 @@ private:
 public:
 	ListenSocket(int in_port);
 	~ListenSocket();
-	void	setSockaddr(void) = 0;
+	void	setSockaddr(void);
 };

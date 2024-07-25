@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 18:45:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/24 22:09:39 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/25 20:34:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,10 @@ ListenSocket::~ListenSocket(void)
 
 void	ListenSocket::setSockaddr(void)
 {
-	sockaddr_t	ad = sockaddr_;
-	ad.addr.sin_family = AF_INET;
-	// ad.addr.sin_port = htons(listening_port_);
-	ad.addr.sin_port = listening_port_;
-	ad.addr.sin_addr.s_addr = INADDR_ANY;
-	ad.addrlen = sizeof(ad.addr);
+	addr_.addr.sin_family = AF_INET;
+	addr_.addr.sin_port = htons(static_cast<uint16_t>(listening_port_));
+	addr_.addr.sin_addr.s_addr = INADDR_ANY;
+	addr_.addrlen = sizeof(addr_.addr);
 }
 
 int	ListenSocket::makeListenSocket(void)
@@ -50,7 +48,7 @@ int	ListenSocket::makeListenSocket(void)
 	{
 		//todo error
 	}
-	if (bind(fd, (struct sockaddr *)&sockaddr_.addr, sockaddr_.addrlen) == ft::err)
+	if (bind(fd, (struct sockaddr *)&addr_.addr, addr_.addrlen) == ft::err)
 	{
 		//todo error
 	}

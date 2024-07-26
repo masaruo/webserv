@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/24 23:47:33 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/26 16:25:32 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,30 +21,36 @@ SocketHolder::SocketHolder()
 
 SocketHolder::~SocketHolder()
 {
+	allDeleteSocketHolder();
 	return ;
 }
 
-void	SocketHolder::addSocket(ClientSocket *socket)
+// void	SocketHolder::addSocket(ClientSocket *socket)
+// {
+// 	vec_sockets_.push_back(socket);
+// }
+
+void	SocketHolder::addSocket(ASocket *socket)
 {
-	vec_.push_back(socket);
+	vec_sockets_.push_back(socket);
 }
 
-void	SocketHolder::addSocket(ListenSocket *socket)
+void	SocketHolder::markSocketDelete(ASocket *socket)
 {
-	vec_.push_back(socket);
+	socket->markSocketDelete();
 }
 
-void	SocketHolder::markSocketDelete(iterator iter)
-{
-	(*iter)->markSocketDelete();
-}
+// void	SocketHolder::markSocketDelete(iterator iter)
+// {
+// 	(*iter)->markSocketDelete();
+// }
 
-static void	clearVecSocket(SocketHolder::iterator iter)
+static void	clearVecSocket__(SocketHolder::iterator iter)
 {
 	delete *iter;
 }
 
-static void	deleteSocket(SocketHolder::iterator iter)
+static void	deleteSocket__(SocketHolder::iterator iter)
 {
 	if ((*iter)->getSocketType() == ASocket::to_delete)
 	{
@@ -56,8 +62,8 @@ static void	deleteSocket(SocketHolder::iterator iter)
 template <typename F>
 void	SocketHolder::foreach(F func)
 {
-	iterator	it = vec_.begin();
-	const_iterator end = vec_.end();
+	iterator	it = vec_sockets_.begin();
+	const_iterator end = vec_sockets_.end();
 
 	while (it != end)
 	{
@@ -65,14 +71,18 @@ void	SocketHolder::foreach(F func)
 	}
 }
 
-void	SocketHolder::clearSocketVec(void)
+void	SocketHolder::allDeleteSocketHolder(void)
 {
-	foreach(clearVecSocket);
-	vec_.clear();
+	foreach(clearVecSocket__);
+	vec_sockets_.clear();
 }
 
-// void	SocketHolder::deleteSockets(void)
-// {
-// 	if ((*iter)->getSocketType() == ASocket::to_delete)
-// 		vec_.erase(iter);
-// }
+void	SocketHolder::deleteMarkedSocket(void)
+{
+	foreach(deleteSocket__);
+}
+
+int	SocketHolder::getSize() const
+{
+	return (vec_sockets_.size());
+}

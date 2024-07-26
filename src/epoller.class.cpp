@@ -6,21 +6,21 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/24 15:28:14 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/26 16:44:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "epoller.class.hpp"
-#include "unique_ptr.hpp"
+#include "SocketHolder.class.hpp"
+#include "ASocket.class.hpp"
+#include "ClientSocket.class.hpp"
 #include "define.hpp"
+#include <sys/epoll.h>
 #include <unistd.h>// close()
-#include <cerrno>//todo delete
 #include <iostream>
 
 Epoller::Epoller(int size, int timeout)
 :epfd_(epoll_create(size))
-,evlist_(epoll_vector())
-,maxevents_(0)
 ,timeout_(timeout)
 {
 	if (epfd_ == ft::err)//todo timeout minus
@@ -32,57 +32,45 @@ Epoller::Epoller(int size, int timeout)
 
 Epoller::~Epoller()
 {
-	if (epfd_ != 0)
+	close (epfd_);
+}
+
+void	Epoller::epollAdd(ASocket *socket)
+{
+	epoll_event	ev;
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP;
+	ev.data.ptr = socket;
+	int	res = 0;
+	res = epoll_ctl(epfd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
+	if (res == ft::err)
 	{
-		close (epfd_);
+		//todo error
 	}
+	SocketHolder_.addSocket(socket);
 	return ;
 }
 
-#include <utility>
-void	Epoller::epollAdd(Socket const &socket)
-{
-	sockets_.push_back(socket);
-	epoll_event	ev;
-	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP;
-	ev.data.ptr = &sockets_.back();
-	int	res = 0;
-	res = epoll_ctl(epfd_, EPOLL_CTL_ADD, sockets_.back().getFd(), &ev);
-	if (res == ft::err)
-	{
-		std::cout << "epolladd" << std::endl;
-		sockets_.pop_back();
-		//todo error
-		//todo delete sockets
-	}
-	else
-	{
-		std::cout << "max + 1" << std::endl;
-		maxevents_++;
-	}
-}
-
-void	Epoller::epollClose(Socket &socket)
+void	Epoller::epollClose(ASocket *socket)
 {
 	int res = 0;
-	// res = epoll_ctl(epfd_, EPOLL_CTL_DEL, socket.getFd(), socket.getEpollEv());
+	res = epoll_ctl(epfd_, EPOLL_CTL_DEL, socket->getFd(), NULL);
 	if (res == ft::err)
 	{
 		//todo error
 	}
-	std::cout << "epoll close" << std::endl;
-	// maxevents_--;
+	socket->markSocketDelete();
 }
 
+#include <cerrno>
 int	Epoller::epollWait(void)
 {
+	int	size = SocketHolder_.getSize();
+	res_evlist_.resize(size);
 	int	res = 0;
-	evlist_.resize(sockets_.size());
-	res = epoll_wait(epfd_, evlist_.data(), sockets_.size(), timeout_);
-	// res = epoll_wait(epfd_, evlist, maxevents_, timeout_);
+	res = epoll_wait(epfd_, res_evlist_.data(), size, timeout_);
 	if (res == ft::err)
 	{
-		if (errno == EINTR)
+		if (errno == EINTR)//forbidden
 			return (epollWait());
 		else
 			std::cout << "epoll wait failed" << std::endl;
@@ -92,27 +80,24 @@ int	Epoller::epollWait(void)
 
 void	Epoller::epollLoop(void)
 {
-	// int	nfds = epollWait();
-
 	while (true)
 	{
 		int res = 0;
 		while (res == 0)
 			res = epollWait();
-		const_iterator	it = evlist_.begin();
-		const_iterator	end = evlist_.end();
+		const_iterator	it = res_evlist_.begin();
+		const_iterator	end = res_evlist_.end();
 
 		while (it != end)
 		{
 			uint32_t	ev = it->events;
-			Socket		*socket = static_cast<Socket*>(it->data.ptr);
-			if (socket->getSocketType() == true)//* refactor
+			ASocket		*socket = static_cast<ASocket*>(it->data.ptr);
+			// if (socket->getSocketType() == true)//* refactor
+			if (socket->getSocketType() == ASocket::listening)
 			{
+				ASocket *new_socket = new ClientSocket(socket->getFd());
+				epollAdd(new_socket);
 				std::cout << "accept" << std::endl;
-				Socket	client = socket->accept();
-				client.makeNoListening();
-				epollAdd(client);
-				std::cout << "accept 2" << std::endl;
 			}
 			else if (ev & EPOLLIN)
 			{
@@ -128,9 +113,11 @@ void	Epoller::epollLoop(void)
 			{
 				// break ;
 				std::cout << "HUP" << std::endl;
+				socket->markSocketDelete();
 				// epollClose(*socket);
 			}
 			it++;
+			SocketHolder_.deleteMarkedSocket();
 		}
 	}
 }

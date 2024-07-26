@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 17:36:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/25 20:32:53 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/26 15:20:21 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ public:
 		
 	}	sockaddr_t;
 protected:
-	int				fd_;
+	int				fd_;//todo const
 	socket_type_t	type_;
 	sockaddr_t		addr_;
 public:

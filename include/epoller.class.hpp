@@ -6,35 +6,28 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:23:52 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/24 13:22:15 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/26 16:43:52 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-// #include "socket.class.hpp"
+#include <vector>
+#include "SocketHolder.class.hpp"
 
-namespace ft{
-	template <typename T>
-	class unique_ptr;
-}
-
-class Port;
+class SocketHolder;
 
 class Epoller
 {
 public:
-	// typedef std::vector<ft::unique_ptr<Socket> > sockets_vector;
-	typedef std::vector<Socket>				sockets_vector;
-	typedef std::vector<struct epoll_event> epoll_vector;
-	typedef epoll_vector::iterator			iterator;
-	typedef epoll_vector::const_iterator	const_iterator;
-	typedef epoll_vector::difference_type	difference_type;
-	typedef epoll_vector::size_type			size_type;
+	typedef std::vector<struct epoll_event>	ev_vec;
+	typedef ev_vec::iterator				iterator;
+	typedef ev_vec::const_iterator			const_iterator;
+	typedef ev_vec::difference_type			difference_type;
+	typedef ev_vec::size_type				size_type;
 private:
 	int const			epfd_;
-	epoll_vector		evlist_;
-	sockets_vector		sockets_;
-	int					maxevents_;
+	SocketHolder		SocketHolder_;
+	ev_vec				res_evlist_;
 	int					timeout_;
 	int					epollWait(void);
 
@@ -43,9 +36,10 @@ private:
 	Epoller(Epoller const &rhs);
 	Epoller &operator=(Epoller const &rhs);
 public:
-	Epoller(int size, int timeout);
+	Epoller(int size = 1, int timeout = -1);
 	~Epoller();
-	void	epollAdd(Socket const &socket);
-	void	epollClose(Socket &socket);
+	// void	epollAdd(Socket const &socket);
+	void	epollAdd(ASocket *socket);
+	void	epollClose(ASocket *socket);
 	void	epollLoop(void);
 };

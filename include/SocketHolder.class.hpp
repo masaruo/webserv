@@ -6,14 +6,15 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:38:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/24 23:47:49 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/26 16:24:55 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#include "ASocket.class.hpp"
+// #include "ASocket.class.hpp"
 #include <vector>
 
+class ASocket;
 class ClientSocket;
 class ListenSocket;
 
@@ -26,7 +27,7 @@ public://*typedef
 	typedef vec_socket::size_type		size_type;
 	typedef vec_socket::difference_type	difference_type;
 private:
-	vec_socket	vec_;
+	vec_socket	vec_sockets_;
 	// void	clearSockets(void);
 	// void	deleteSockets(void);
 	SocketHolder(SocketHolder const &rhs);
@@ -34,10 +35,14 @@ private:
 public:
 	SocketHolder();
 	~SocketHolder();
-	void	addSocket(ClientSocket *socket);
-	void	addSocket(ListenSocket *socket);
-	void	markSocketDelete(iterator iter);
-	void	clearSocketVec(void);
+	// void	addSocket(ClientSocket *socket);
+	// void	addSocket(ListenSocket *socket);
+	void	addSocket(ASocket *socket);
+	void	markSocketDelete(ASocket *socket);
+	// void	markSocketDelete(iterator iter);
+	void	allDeleteSocketHolder(void);
+	void	deleteMarkedSocket(void);
+	int		getSize(void) const;
 	template <typename F>
 	void	foreach(F func);
 };

@@ -6,7 +6,7 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/07/23 14:49:23 by mogawa           ###   ########.fr        #
+#    Updated: 2024/07/26 16:39:33 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,7 @@ SRC			=	 \
 				ClientSocket.class.cpp \
 				ListenSocket.class.cpp \
 				SocketHolder.class.cpp \
+				epoller.class.cpp \
 				main.cpp
 SRCDIR		:=	./src
 OBJDIR		:=	obj

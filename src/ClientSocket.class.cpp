@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:10:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 13:06:16 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/28 14:18:54 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,14 +48,17 @@ void	ClientSocket::setSockaddr(void)
 #include <iostream>
 ssize_t	ClientSocket::recv_handler(void)
 {
-	char * buf[10];
-	int n = recv(fd_, buf, sizeof(buf), MSG_DONTWAIT);
+	std::string	buf;
+	buf.resize(1000);
+	// char * buf[1000];
+	int n = recv(fd_, (void *)buf.data(), sizeof(buf), MSG_DONTWAIT);
+	std::cout << "received: " << buf << std::endl;
 	if (n < 0)
 		return (-1) ;
 	else
 	{
-		std::cout << "recv handler" << std::endl;
-		send(fd_, buf, sizeof(buf), MSG_DONTWAIT);
+		std::string ret = "sent back by server: " + buf;
+		send(fd_, ret.data(), ret.size(), MSG_DONTWAIT);
 	}
 	return (0);
 }

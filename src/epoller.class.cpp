@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 12:58:16 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/28 13:43:58 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,40 +66,34 @@ int	Epoller::epollWait(void)
 {
 	int	size = SocketHolder_.getSize();
 	res_evlist_.resize(size);
-	int	res = 0;
-	res = epoll_wait(epfd_, res_evlist_.data(), size, timeout_);
-	if (res == ft::err)
+	int	numEvents = 0;
+	numEvents = epoll_wait(epfd_, res_evlist_.data(), size, timeout_);
+	if (numEvents == ft::err)
 	{
 		if (errno == EINTR)//forbidden
 			return (epollWait());
 		else
 			std::cout << "epoll wait failed" << std::endl;
 	}
-	return (res);
+	return (numEvents);
 }
 
 void	Epoller::epollLoop(void)
 {
 	while (true)
 	{
-		int res = 0;
-		while (res == 0)
-			res = epollWait();
+		int numEvents = 0;
+		while (numEvents == 0)
+			numEvents = epollWait();
 		const_iterator	it = res_evlist_.begin();
 		const_iterator	end = res_evlist_.begin();
-		std::advance(end, res);
+		std::advance(end, numEvents);
 
 		while (it != end)
 		{
 			uint32_t	ev = it->events;
 			ASocket		*socket = static_cast<ASocket*>(it->data.ptr);
-			// if (socket->getSocketType() == true)//* refactor
-			if (ev == 0)
-			{
-				it++;
-				continue ;
-			}
-			else if (socket->getSocketType() == ASocket::listening)
+			if (socket->getSocketType() == ASocket::listening)
 			{
 				ASocket *new_socket = new ClientSocket(socket->getFd());
 				epollAdd(new_socket);
@@ -116,17 +110,14 @@ void	Epoller::epollLoop(void)
 					break ;
 				}
 				client->recv_handler();
-				continue ;
 			}
-			else // epoll send
+			else // epoll send?
 			{
 				//todo error
 			}
 			if (ev & (EPOLLRDHUP | EPOLLHUP))
 			{
-				// break ;
 				std::cout << "HUP" << std::endl;
-				socket->markSocketDelete();
 				epollClose(socket);
 			}
 			it++;

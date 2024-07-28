@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 11:06:00 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/28 14:00:05 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,9 @@ SocketHolder::SocketHolder()
 
 SocketHolder::~SocketHolder()
 {
-	allDeleteSocketHolder();
+	deleteSocketHolder();
 	return ;
 }
-
-// void	SocketHolder::addSocket(ClientSocket *socket)
-// {
-// 	vec_sockets_.push_back(socket);
-// }
 
 void	SocketHolder::addSocket(ASocket *socket)
 {
@@ -40,50 +35,44 @@ void	SocketHolder::markSocketDelete(ASocket *socket)
 	socket->markSocketDelete();
 }
 
-// void	SocketHolder::markSocketDelete(iterator iter)
-// {
-// 	(*iter)->markSocketDelete();
-// }
-
 static void	clearVecSocket__(SocketHolder::iterator iter)
 {
 	delete *iter;
 }
 
-static void	deleteSocket__(SocketHolder::iterator iter)
+int	SocketHolder::getSize() const
 {
-	if ((*iter)->getSocketType() == ASocket::to_delete)
-	{
-		delete *iter;
-	}
-
+	return (vec_sockets_.size());
 }
 
-template <typename F>
-void	SocketHolder::foreach(F func)
+void	SocketHolder::deleteSocketHolder(void)
 {
-	iterator	it = vec_sockets_.begin();
-	const_iterator end = vec_sockets_.end();
+	iterator		it = vec_sockets_.begin();
+	const_iterator	end = vec_sockets_.end();
 
 	while (it != end)
 	{
-		func(it);
+		delete *it;
 		it++;
 	}
-}
-
-void	SocketHolder::allDeleteSocketHolder(void)
-{
-	foreach(clearVecSocket__);
 	vec_sockets_.clear();
 }
 
 void	SocketHolder::deleteMarkedSocket(void)
 {
-	foreach(deleteSocket__);
-}
+	iterator		it = vec_sockets_.begin();
+	const_iterator	end = vec_sockets_.end();
 
-int	SocketHolder::getSize() const
-{
-	return (vec_sockets_.size());
+	while (it != end)
+	{
+		if ((*it)->getSocketType() == ASocket::to_delete)
+		{
+			iterator tmp = it;
+			it++;
+			delete *tmp;
+			vec_sockets_.erase(tmp);
+		}
+		else
+			it++;
+	}
 }

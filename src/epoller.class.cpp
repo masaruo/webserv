@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/26 16:44:28 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/28 12:58:16 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ Epoller::~Epoller()
 void	Epoller::epollAdd(ASocket *socket)
 {
 	epoll_event	ev;
-	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP;
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLET;
 	ev.data.ptr = socket;
 	int	res = 0;
 	res = epoll_ctl(epfd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
@@ -86,14 +86,20 @@ void	Epoller::epollLoop(void)
 		while (res == 0)
 			res = epollWait();
 		const_iterator	it = res_evlist_.begin();
-		const_iterator	end = res_evlist_.end();
+		const_iterator	end = res_evlist_.begin();
+		std::advance(end, res);
 
 		while (it != end)
 		{
 			uint32_t	ev = it->events;
 			ASocket		*socket = static_cast<ASocket*>(it->data.ptr);
 			// if (socket->getSocketType() == true)//* refactor
-			if (socket->getSocketType() == ASocket::listening)
+			if (ev == 0)
+			{
+				it++;
+				continue ;
+			}
+			else if (socket->getSocketType() == ASocket::listening)
 			{
 				ASocket *new_socket = new ClientSocket(socket->getFd());
 				epollAdd(new_socket);
@@ -101,11 +107,18 @@ void	Epoller::epollLoop(void)
 			}
 			else if (ev & EPOLLIN)
 			{
-				std::cout << "EPOLLIN" << std::endl;
-				// socket->recv();
+				// std::cout << "EPOLLIN" << std::endl;
+				ClientSocket *client;
+				client = dynamic_cast<ClientSocket*>(socket);
+				if (client == NULL)
+				{
+					//todo error
+					break ;
+				}
+				client->recv_handler();
 				continue ;
 			}
-			else
+			else // epoll send
 			{
 				//todo error
 			}
@@ -114,7 +127,7 @@ void	Epoller::epollLoop(void)
 				// break ;
 				std::cout << "HUP" << std::endl;
 				socket->markSocketDelete();
-				// epollClose(*socket);
+				epollClose(socket);
 			}
 			it++;
 			SocketHolder_.deleteMarkedSocket();

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/26 16:25:32 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/28 11:06:00 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	SocketHolder::foreach(F func)
 	while (it != end)
 	{
 		func(it);
+		it++;
 	}
 }
 

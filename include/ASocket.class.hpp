@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 17:36:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/26 15:20:21 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/07/28 10:48:24 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ protected:
 	int				fd_;//todo const
 	socket_type_t	type_;
 	sockaddr_t		addr_;
+	ASocket(socket_type_t type);
 public:
 	virtual			~ASocket() = 0;
 	virtual void	setSockaddr(void) = 0;

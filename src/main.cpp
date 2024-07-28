@@ -20,7 +20,7 @@ int main(void)
   // }
   // holder.addSocket(new ListenSocket(80));
 
-  Epoller poller(1, -1);
+  Epoller poller(1, 0);
 
   poller.epollAdd(new ListenSocket(8888));
   poller.epollAdd(new ListenSocket(7777));

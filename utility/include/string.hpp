@@ -26,6 +26,8 @@ public:
 	static const std::string	UPPER;
 	static const std::string	ALPHA;
 	static const std::string	ALNUM;
+	static const std::string	WHITESPACE;
+	static const std::string	CRLF;
 	typedef std::string::iterator 			iterator;
 	typedef std::string::const_iterator		const_iterator;
 	typedef std::string::size_type			size_type;

@@ -15,7 +15,9 @@
 #include "SocketHolder.class.hpp"
 
 class SocketHolder;
-
+/*
+ @brief wait for connecting sockets. 
+*/
 class Epoller
 {
 public:
@@ -38,7 +40,6 @@ private:
 public:
 	Epoller(int size = 1, int timeout = -1);
 	~Epoller();
-	// void	epollAdd(Socket const &socket);
 	void	epollAdd(ASocket *socket);
 	void	epollClose(ASocket *socket);
 	void	epollLoop(void);

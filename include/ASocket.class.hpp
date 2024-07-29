@@ -14,7 +14,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdexcept>
-
+/*
+ @brief Abstruct Socket Class to be inherited by Listen & Client sockets.
+*/
 class ASocket
 {
 public:

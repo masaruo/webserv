@@ -11,12 +11,15 @@
 /* ************************************************************************** */
 
 #include "string.hpp"
+#include "define.hpp"
 
 const std::string	ft::string::NUMBER = "0123456789";
 const std::string	ft::string::LOWER = "abcdefghijklmnopqrstuvwxyz";
 const std::string	ft::string::UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const std::string	ft::string::ALPHA = ft::string::LOWER + ft::string::UPPER;
 const std::string	ft::string::ALNUM = ft::string::NUMBER + ft::string::ALPHA;
+const std::string	ft::string::WHITESPACE = ft::SP + ft::HTAB + ft::VT + ft::FF + ft::CR;
+const std::string	ft::string::CRLF = ft::CRLF;
 
 ft::string::string()
 :std::string()

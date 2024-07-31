@@ -5,7 +5,7 @@
 
 TEST(RequestLineTest, ConstructorWithValidGetRequest)
 {
-	ft::string	valid = "GET /index.html HTTP/1.1";
+	ft::string	valid = "	 GET 	/index.html HTTP/1.1";
 	RequestLine	req(valid);
 
 	EXPECT_THAT(req.getMethod(), RequestLine::GET);

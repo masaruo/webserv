@@ -42,6 +42,7 @@ RUN apt-get update && apt-get upgrade -y && \
     libc++-dev \
     libc++abi-dev \
     libstdc++-12-dev \
+    rr \
     lsof \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

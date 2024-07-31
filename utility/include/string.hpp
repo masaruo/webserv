@@ -21,13 +21,18 @@ namespace ft
 class string : public std::string
 {
 public:
-	static const std::string	NUMBER;
-	static const std::string	LOWER;
-	static const std::string	UPPER;
-	static const std::string	ALPHA;
-	static const std::string	ALNUM;
-	static const std::string	WHITESPACE;
-	static const std::string	CRLF;
+	static std::string const	NUMBER;
+	static std::string const	LOWER_ALPHA;
+	static std::string const	UPPER_ALPHA;
+	static std::string const	ALPHA;
+	static std::string const	SP;
+	static std::string const	HTAB;
+	static std::string const	VT;
+	static std::string const	FF;
+	static std::string const	CR;
+	static std::string const	LF;
+	static std::string const	WHITESPACE;
+	static std::string const	CRLF;
 	typedef std::string::iterator 			iterator;
 	typedef std::string::const_iterator		const_iterator;
 	typedef std::string::size_type			size_type;

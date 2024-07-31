@@ -5,7 +5,7 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     ports:
-      - "80:80"
+      - "8888:8888"
     volumes:
       - type: bind
         source: "../"

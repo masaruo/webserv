@@ -11,16 +11,18 @@
 /* ************************************************************************** */
 
 #include "string.hpp"
-#include "define.hpp"
-
-const std::string	ft::string::NUMBER = "0123456789";
-const std::string	ft::string::LOWER = "abcdefghijklmnopqrstuvwxyz";
-const std::string	ft::string::UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const std::string	ft::string::ALPHA = ft::string::LOWER + ft::string::UPPER;
-const std::string	ft::string::ALNUM = ft::string::NUMBER + ft::string::ALPHA;
-const std::string	ft::string::WHITESPACE = ft::SP + ft::HTAB + ft::VT + ft::FF + ft::CR;
-const std::string	ft::string::CRLF = ft::CRLF;
-
+	std::string const	NUMBER = "0123456789";
+	std::string const	LOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
+	std::string const	UPPER_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	std::string const	ALPHA = LOWER_ALPHA + UPPER_ALPHA;
+	std::string const	SP = std::string(1, 32);
+	std::string const	HTAB = std::string(1, 9);
+	std::string const	VT = std::string(1, 11);
+	std::string const	FF = std::string(1, 12);
+	std::string const	CR = std::string(1, 13);
+	std::string const	LF = std::string(1, 10);
+	std::string const	WHITESPACE = SP + HTAB + VT + FF + CR;
+	std::string const	CRLF = CR + LF;
 ft::string::string()
 :std::string()
 {

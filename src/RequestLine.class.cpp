@@ -2,6 +2,7 @@
 
 RequestLine::RequestLine(ft::string const &line)
 {
+	parse_line(line);
 	// if (line.size() > 8000)
 	// {
 	// 	//todo 501 error

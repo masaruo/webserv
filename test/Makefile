@@ -13,7 +13,7 @@ GTEST_LIBS = -L$(GTEST_DIR)/lib -lgtest -lgtest_main -lgmock -lgmock_main
 # Source files
 SOURCES = $(wildcard ../src/*.cpp)
 SOURCES := $(filter-out ../src/main.cpp, $(SOURCES))
-TESTSRC = RequestLine.test.cpp
+TESTSRC = Request.test.cpp
 
 # Output executable
 TARGET = run_tests
@@ -38,5 +38,6 @@ re: clean
 # Run tests rule
 run: $(TARGET)
 	./$(TARGET)
+	rm -f ./$(TARGET)
 
 .PHONY: clean run

@@ -11,18 +11,21 @@
 /* ************************************************************************** */
 
 #include "string.hpp"
-	std::string const	NUMBER = "0123456789";
-	std::string const	LOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
-	std::string const	UPPER_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	std::string const	ALPHA = LOWER_ALPHA + UPPER_ALPHA;
-	std::string const	SP = std::string(1, 32);
-	std::string const	HTAB = std::string(1, 9);
-	std::string const	VT = std::string(1, 11);
-	std::string const	FF = std::string(1, 12);
-	std::string const	CR = std::string(1, 13);
-	std::string const	LF = std::string(1, 10);
-	std::string const	WHITESPACE = SP + HTAB + VT + FF + CR;
-	std::string const	CRLF = CR + LF;
+#include <cctype>
+
+std::string const	ft::string::DIGIT = "0123456789";
+std::string const	ft::string::LOALPHA = "abcdefghijklmnopqrstuvwxyz";
+std::string const	ft::string::UPALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+std::string const	ft::string::ALPHA = LOALPHA + UPALPHA;
+std::string const	ft::string::SP = std::string(1, ' ');
+std::string const	ft::string::HTAB = std::string(1, '\t');
+std::string const	ft::string::VT = std::string(1, '\v');
+std::string const	ft::string::FF = std::string(1, '\f');
+std::string const	ft::string::CR = std::string(1, '\r');
+std::string const	ft::string::LF = std::string(1, '\n');
+std::string const	ft::string::WHITESPACE = SP + HTAB + VT + FF + CR;
+std::string const	ft::string::CRLF = CR + LF;
+
 ft::string::string()
 :std::string()
 {
@@ -47,13 +50,13 @@ ft::string::~string()
 	return ;
 }
 
-ft::string::string(string const &rhs)
+ft::string::string(ft::string const &rhs)
 :std::string(rhs)
 {
 	
 }
 
-ft::string &ft::string::operator=(string const &rhs)
+ft::string &ft::string::operator=(ft::string const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -151,12 +154,44 @@ void	ft::string::trim(std::string const &target)
 		this->pop_back();
 }
 
+void	ft::string::trim(ft::string const &target)
+{
+	while (start_with(target))
+		this->pop();
+	while (end_with(target))
+		this->pop_back();
+}
+
 void	ft::string::trim(char const &target)
 {
 	while (start_with(target))
 		this->pop();
 	while (end_with(target))
 		this->pop_back();
+}
+
+void	ft::string::to_lower(void)
+{
+	iterator		it = this->begin();
+	const_iterator	end = this->end();
+	while (it != end)
+	{
+		int	c = static_cast<int>(*it);
+		if (isupper(c))
+			*it = tolower(c);
+	}
+}
+
+void	ft::string::to_upper(void)
+{
+	iterator		it = this->begin();
+	const_iterator	end = this->end();
+	while (it != end)
+	{
+		int	c = static_cast<int>(*it);
+		if (islower(c))
+			*it = toupper(c);
+	}
 }
 
 ft::string::string_vector	ft::string::split(std::string const &delims) const

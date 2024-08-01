@@ -21,9 +21,9 @@ namespace ft
 class string : public std::string
 {
 public:
-	static std::string const	NUMBER;
-	static std::string const	LOWER_ALPHA;
-	static std::string const	UPPER_ALPHA;
+	static std::string const	DIGIT;
+	static std::string const	LOALPHA;
+	static std::string const	UPALPHA;
 	static std::string const	ALPHA;
 	static std::string const	SP;
 	static std::string const	HTAB;
@@ -33,10 +33,12 @@ public:
 	static std::string const	LF;
 	static std::string const	WHITESPACE;
 	static std::string const	CRLF;
-	typedef std::string::iterator 			iterator;
-	typedef std::string::const_iterator		const_iterator;
-	typedef std::string::size_type			size_type;
-	typedef std::vector<ft::string>			string_vector;
+	typedef std::string::iterator 				iterator;
+	typedef std::string::const_iterator			const_iterator;
+	typedef std::string::reverse_iterator		reverse_iterator;
+	typedef std::string::const_reverse_iterator	const_reverse_iterator;
+	typedef std::string::size_type				size_type;
+	typedef std::vector<ft::string>				string_vector;
 
 	string();
 	string(std::string const &str);
@@ -57,7 +59,10 @@ public:
 	void		pop(void);
 	void		pop_back(void);
 	void		trim(std::string const &target);
+	void		trim(ft::string const &target);
 	void		trim(char const &target);
+	void		to_lower(void);
+	void		to_upper(void);
 	string_vector		split(std::string const &to_split) const;
 };
 

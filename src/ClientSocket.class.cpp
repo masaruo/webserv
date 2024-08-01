@@ -46,7 +46,7 @@ void	ClientSocket::setSockaddr(void)
 }
 
 #include <iostream>
-ssize_t	ClientSocket::recv_handler(void)
+ssize_t	ClientSocket::recv_handler(void)//! create request class and return response class?
 {
 	std::string	buf;
 	buf.resize(1000);

@@ -13,13 +13,14 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <ostream>
 
 namespace ft
 {
 
-class string : public std::string
+class string
 {
+private:
+	std::string	base_;
 public:
 	static std::string const	DIGIT;
 	static std::string const	LOALPHA;
@@ -48,7 +49,25 @@ public:
 	~string();
 	string(string const &rhs);
 	string &operator=(string const &rhs);
-	//! wrapper functions
+	operator std::string&();
+	operator const std::string&() const;
+
+	//! iterator
+	iterator		begin();
+	const_iterator	begin() const;
+	iterator		end();
+	const_iterator	end() const;
+
+	//! wrapper
+	size_type	size() const;
+	bool		empty() const;
+	char const	*c_str() const;
+
+	//! provide access to base
+	std::string	&str();
+	std::string const &str() const;
+
+	//! added functions
 	bool		has_only(std::string const &to_search, size_type start = 0, size_type end = std::string::npos) const;
 	bool		start_with(std::string const &to_search) const;
 	bool		start_with(char const to_search) const;

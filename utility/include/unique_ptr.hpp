@@ -12,9 +12,20 @@
 
 #pragma once
 
+/**
+ * @file unique_ptr.hpp
+ * @brief C++98標準に準拠した独自のユニークポインタ実装
+ */
 namespace ft
 {
-
+/**
+ * @brief 単一の所有権を持つスマートポインタ
+ *
+ * このクラスは、動的に割り当てられたオブジェクトの単一の所有権を管理します。
+ * リソースは自動的に解放され、コピーは禁止されていますが、所有権の移動は可能です。
+ *
+ * @tparam T 管理対象のオブジェクトの型
+ */
 template <typename T>
 class unique_ptr
 {
@@ -24,34 +35,63 @@ private:
 	unique_ptr &operator=(unique_ptr const &rhs){ (void) rhs; return (*this); }// hidden
 public:
 	unique_ptr();
-	unique_ptr(T *inPtr);
+	explicit unique_ptr(T *inPtr);
 	~unique_ptr();
 	unique_ptr(unique_ptr &rhs);
 	unique_ptr &operator=(unique_ptr &rhs);
-	unique_ptr &operator*(void) const;
-	unique_ptr *operator->(void) const;
+	/**
+	* @brief デリファレンス演算子
+	* @return T& 管理対象オブジェクトへの参照
+	*/
+	T &operator*(void) const;
+	/**
+	 * @brief メンバアクセス演算子
+	 *
+	 * @return T* 管理対象オブジェクトへのポインタ
+	*/
+	T *operator->(void) const;
 
 	// class functions
+	/**
+	 * @brief 管理しているポインタを取得
+	 *
+	 * @return T* 管理対象オブジェクトへのポインタ
+	*/
 	T		*get(void) const;
+
+	/**
+	 * @brief 管理しているポインタをリセット
+	 *
+	 * 現在のリソースを解放し、新しいポインタを設定します。
+	 *
+	 * @param inPtr 新しく管理対象とするポインタ（デフォルトはNULL）
+	*/
 	void	reset(T *inPtr = NULL);
+
+	/**
+	 * @brief 管理しているポインタの所有権を放棄
+	 *
+	 * ポインタの所有権を放棄し、NULLに設定します。
+	 *
+	 * @return T* 以前管理していたポインタ
+	*/
 	T		*release(void);
 };
 
 template <typename T>
 void	unique_ptr<T>::reset(T *inPtr)
 {
-	if (ptr_ != inPtr)
-	{
-		delete ptr_;
-		ptr_ = inPtr;
-	}
+	T	*old;
+	old = ptr_;
+	ptr_ = inPtr;
+	delete old;
 }
 
 template <typename T>
 T	*unique_ptr<T>::release(void)
 {
-	unique_ptr	*tmp = ptr_;
-	delete ptr_;
+	T *tmp = ptr_;
+	ptr_ = NULL;
 	return (tmp);
 }
 
@@ -99,13 +139,13 @@ unique_ptr<T>	&unique_ptr<T>::operator=(unique_ptr &rhs)
 }
 
 template <typename T>
-unique_ptr<T>	&unique_ptr<T>::operator*(void) const
+T	&unique_ptr<T>::operator*(void) const
 {
 	return (*ptr_);
 }
 
 template <typename T>
-unique_ptr<T>	*unique_ptr<T>::operator->(void) const
+T	*unique_ptr<T>::operator->(void) const
 {
 	return (ptr_);
 }

@@ -264,19 +264,19 @@ ft::string::string_vector	ft::string::split(std::string const &delims) const
 
 	while (true)
 	{
-		cp_end = std::string::find_first_of(delims, cp_end);
+		cp_end = base_.find_first_of(delims, cp_end);
 		if (cp_end == std::string::npos)
 		{
 			break ;
 		}
 		else
 		{
-			split_v.push_back(std::string::substr(cp_begin, cp_end - cp_begin));
-			cp_end = std::string::find_first_not_of(delims, cp_end);
+			split_v.push_back(base_.substr(cp_begin, cp_end - cp_begin));
+			cp_end = base_.find_first_not_of(delims, cp_end);
 			cp_begin = cp_end;
 		}
 	}
-	if (cp_begin < std::string::size())
-		split_v.push_back(std::string::substr(cp_begin, std::string::size() - cp_begin));
+	if (cp_begin < base_.size())
+		split_v.push_back(base_.substr(cp_begin, base_.size() - cp_begin));
 	return (split_v);
 }

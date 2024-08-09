@@ -1,35 +1,57 @@
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "Request.class.hpp"
-#include "string.hpp"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include "ARequest.hpp"
 
-TEST(RequestLineTest, ConstructorWithValidWhitespacesInBetween)
-{
-	ft::string	valid = "GET 	\r \t \v \f /index.html  	\r \t \v \f  HTTP/1.1 \r\n";
-	RequestLine	req(valid);
+class ARequestTest : public ::testing::Test {
+protected:
+    ft::string::string_vector startline;
 
-	EXPECT_THAT(req.getMethod(), RequestLine::GET);
+    virtual void SetUp() {
+        startline.push_back("GET");
+        startline.push_back("/index.html");
+        startline.push_back("HTTP/1.1");
+    }
+};
+
+TEST_F(ARequestTest, LineAttributeTest) {
+    ARequest request(startline);
+
+    // line_属性はprotectedなので、直接アクセスできません
+    // テスト用のpublicメソッドを追加するか、フレンドクラスを使用する必要があります
+    // ここでは、テスト用のpublicメソッドを追加したと仮定します
+
+    EXPECT_THAT(request.getMethod(), "GET");
+    EXPECT_THAT(request.getTarget(), "/index.html");
+    EXPECT_THAT(request.getVersion(), "HTTP/1.1");
 }
 
-TEST(RequestLineTest, ConstructorWithValidWhiteSpacesBeforeAndAfter)
-{
-	ft::string	valid = "  	\r \t \v \f GET 	\r \t \v \f /index.html  	\r \t \v \f  HTTP/1.1 	\r \t \v \f \r\n";
-	RequestLine	req(valid);
+TEST_F(ARequestTest, FieldsAttributeTest) {
+    ARequest request(startline);
 
-	EXPECT_THAT(req.getMethod(), RequestLine::GET);
+    ft::string::string_vector fields;
+    fields.push_back("Host: example.com");
+    fields.push_back("User-Agent: Mozilla/5.0");
+
+    request.parseFields(fields);
+
+    // fields_属性もprotectedなので、直接アクセスできません
+    // テスト用のpublicメソッドを追加したと仮定します
+
+    EXPECT_THAT(request.getField("Host"), "example.com");
+    EXPECT_THAT(request.getField("User-Agent"), "Mozilla/5.0");
 }
 
-TEST(RequestLineTest, ConstructorWithInvalidValidWhiteSpacesBeforeAndAfter)
-{
-	ft::string	invalid = "  abc	\r \t \v \f GET 	\r \t \v \f /index.html  	\r \t \v \f  HTTP/1.1 	\r \t \v \f \r\n";
-	RequestLine	req(invalid);
+TEST_F(ARequestTest, FieldsAttributeTestOfBrokenFields) {
+    ARequest request(startline);
 
-	EXPECT_THAT(req.getMethod(), RequestLine::ERROR);
-}
+    ft::string::string_vector fields;
+    fields.push_back("Host: example");
+    fields.push_back(".com");
 
-TEST(RequestLineTest, ConstructorWithArgsNotEndWithCRLF)
-{
-	ft::string	invalid = "  abc	\r \t \v \f GET 	\r \t \v \f /index.html  	\r \t \v \f  HTTP/1.1 	\r \t \v \f ";
+    request.parseFields(fields);
 
-	EXPECT_THROW({RequestLine rq(invalid);}, std::runtime_error);
+    // fields_属性もprotectedなので、直接アクセスできません
+    // テスト用のpublicメソッドを追加したと仮定します
+
+    EXPECT_THAT(request.getField("Host"), "example.com");
 }

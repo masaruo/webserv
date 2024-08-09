@@ -32,7 +32,6 @@ RUN apt-get update && apt-get upgrade -y && \
     git \
     make \
     gdb \
-    lldb \
     build-essential \
     cmake \
     tar \
@@ -43,6 +42,7 @@ RUN apt-get update && apt-get upgrade -y && \
     libc++abi-dev \
     libstdc++-12-dev \
     rr \
+    tree \
     lsof \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

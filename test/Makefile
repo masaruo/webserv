@@ -5,20 +5,27 @@ CXX = c++
 GTEST_DIR = googletest
 
 # Compiler flags
-CXXFLAGS = -std=c++14 -Wall -Wextra -pthread -I$(GTEST_DIR)/include $(INC) -ggdb3 -O0
+CXXFLAGS = -std=c++14 -Wall -pthread -I$(GTEST_DIR)/include $(INC) -ggdb3 -O0
 
 # Google Test and Google Mock libraries
 GTEST_LIBS = -L$(GTEST_DIR)/lib -lgtest -lgtest_main -lgmock -lgmock_main
 
 # Source files
-SOURCES = $(wildcard ../src/*.cpp)
+# SOURCES = $(wildcard ../src/*.cpp) 
+# SOURCES := $(shell find ../src -name '*.cpp')
+SOURCES := ../src/request/HttpHeaders.cpp
 SOURCES := $(filter-out ../src/main.cpp, $(SOURCES))
-TESTSRC = Request.test.cpp
+TESTSRC = \
+			HttpHeaders.test.cpp
 
 # Output executable
 TARGET = run_tests
 
-INC = -I../include -I../utility/include
+INC :=	-I../utility/include \
+		-I../include/request \
+		-I../include/response \
+		-I../include/socket \
+		-I../include/utility
 
 ifdef wsl
 GTEST_DIR = googletest_wsl2

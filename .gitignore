@@ -10,3 +10,4 @@ obj/*
 !.gitignore
 !.devcontainer/*
 !.gdbinit
+!.pretty_printer.py

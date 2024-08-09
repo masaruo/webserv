@@ -12,17 +12,18 @@
 
 #include "string.hpp"
 #include <cctype>
+#include <algorithm>
 
 std::string const	ft::string::DIGIT = "0123456789";
 std::string const	ft::string::LOALPHA = "abcdefghijklmnopqrstuvwxyz";
 std::string const	ft::string::UPALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 std::string const	ft::string::ALPHA = LOALPHA + UPALPHA;
-std::string const	ft::string::SP = std::string(1, ' ');
-std::string const	ft::string::HTAB = std::string(1, '\t');
-std::string const	ft::string::VT = std::string(1, '\v');
-std::string const	ft::string::FF = std::string(1, '\f');
-std::string const	ft::string::CR = std::string(1, '\r');
-std::string const	ft::string::LF = std::string(1, '\n');
+std::string const	ft::string::SP = " ";
+std::string const	ft::string::HTAB = "\t";
+std::string const	ft::string::VT = "\v";
+std::string const	ft::string::FF = "\f";
+std::string const	ft::string::CR = "\r";
+std::string const	ft::string::LF = "\n";
 std::string const	ft::string::WHITESPACE = SP + HTAB + VT + FF + CR;
 std::string const	ft::string::CRLF = CR + LF;
 
@@ -53,7 +54,7 @@ ft::string::~string()
 ft::string::string(ft::string const &rhs)
 :std::string(rhs)
 {
-	
+	return ;
 }
 
 ft::string &ft::string::operator=(ft::string const &rhs)
@@ -179,6 +180,7 @@ void	ft::string::to_lower(void)
 		int	c = static_cast<int>(*it);
 		if (isupper(c))
 			*it = tolower(c);
+		it++;
 	}
 }
 
@@ -191,6 +193,7 @@ void	ft::string::to_upper(void)
 		int	c = static_cast<int>(*it);
 		if (islower(c))
 			*it = toupper(c);
+		it++;
 	}
 }
 

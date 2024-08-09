@@ -32,7 +32,8 @@ Epoller::Epoller(int size, int timeout)
 
 Epoller::~Epoller()
 {
-	close (epfd_);
+	if (epfd_ != ft::err)
+		close (epfd_);
 }
 
 void	Epoller::epollAdd(ASocket *socket)
@@ -109,7 +110,7 @@ void	Epoller::epollLoop(void)
 					//todo error
 					break ;
 				}
-				client->recv_handler();
+				client->recv_handler();//! once EPOLIN than pass to client socket
 			}
 			else // epoll send?
 			{

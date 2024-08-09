@@ -13,9 +13,14 @@
 #pragma once
 #include "ASocket.class.hpp"
 
+class ARequest;
+class AResponse;
+
 class ClientSocket : public ASocket
 {
 private:
+	ARequest	*request_;
+	AResponse	*response_;
 	//todo create buffer class
 	int	acceptHandler(int listen_fd);
 	ClientSocket();

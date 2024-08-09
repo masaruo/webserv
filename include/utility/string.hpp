@@ -39,6 +39,8 @@ public:
 	typedef std::string::const_reverse_iterator	const_reverse_iterator;
 	typedef std::string::size_type				size_type;
 	typedef std::vector<ft::string>				string_vector;
+	typedef string_vector::iterator				string_vector_iterator;
+	typedef string_vector::const_iterator		string_vector_const_iterator;
 
 	string();
 	string(std::string const &str);

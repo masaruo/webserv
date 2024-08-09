@@ -29,10 +29,14 @@ OBJDIR		:=	obj
 OBJ			:=	$(SRC:%.cpp=$(OBJDIR)/%.o)
 DEP			:=	$(SRC:%.cpp=$(OBJDIR)/%.d)
 
+#todo add vpath for multiple src & include for better maintainance
+# vpath %.cpp $(src) $(SRC)/request $(SRC)/response $(SRC)/socket $(SRC)/utility
+# vpath %.hpp ./include ./utility/include ./include/request ./include/response ./include/socket ./include/utility
+
 ifdef WITH_ASAN
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
-CXXFLAGS	+=	-ggdb3 -Ogdb -fsanitize=address,undefined -Wshadow -Wconversion -Wno-sign-conversion -pedantic-errors -DDEBUG
-LDFLAGS		:=	-fsanitize=address,undefined
+CXXFLAGS	+=	-ggdb3 -Ogdb -fsanitize=address,undefined,leak -Wshadow -Wconversion -Wno-sign-conversion -pedantic-errors -DDEBUG
+LDFLAGS		:=	-fsanitize=address,undefined,leak
 endif
 
 all: $(TARGET)

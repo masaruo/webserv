@@ -67,6 +67,34 @@ ft::string &ft::string::operator=(ft::string const &rhs)
 	return (*this);
 }
 
+ft::string &ft::string::operator=(std::string const &rhs)
+{
+	this->base_ = rhs;
+	return (*this);
+}
+
+ft::string &ft::string::operator=(char const *ch)
+{
+	std::string tmp(ch);
+	this->base_ = tmp;
+	return (*this);
+}
+
+bool	ft::string::operator==(char const *rhs) const
+{
+	return (base_ == rhs);
+}
+
+bool	ft::string::operator==(std::string const &rhs) const
+{
+	return (base_ == rhs);
+}
+
+bool	ft::string::operator==(string const &rhs) const
+{
+	return (base_ == rhs.base_);
+}
+
 ft::string::operator std::string &()
 {
 	return (base_);
@@ -264,19 +292,19 @@ ft::string::string_vector	ft::string::split(std::string const &delims) const
 
 	while (true)
 	{
-		cp_end = std::string::find_first_of(delims, cp_end);
+		cp_end = base_.find_first_of(delims, cp_end);
 		if (cp_end == std::string::npos)
 		{
 			break ;
 		}
 		else
 		{
-			split_v.push_back(std::string::substr(cp_begin, cp_end - cp_begin));
-			cp_end = std::string::find_first_not_of(delims, cp_end);
+			split_v.push_back(base_.substr(cp_begin, cp_end - cp_begin));
+			cp_end = base_.find_first_not_of(delims, cp_end);
 			cp_begin = cp_end;
 		}
 	}
-	if (cp_begin < std::string::size())
-		split_v.push_back(std::string::substr(cp_begin, std::string::size() - cp_begin));
+	if (cp_begin < base_.size())
+		split_v.push_back(base_.substr(cp_begin, base_.size() - cp_begin));
 	return (split_v);
 }

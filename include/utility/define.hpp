@@ -12,4 +12,12 @@ namespace ft
 	std::string const	CR = "13";
 	std::string const	LF = "10";
 	std::string const	CRLF = CR + LF;
+
+	typedef enum 
+	{
+		GET,
+		POST,
+		DELETE,
+		ERROR
+	}	http_method_t;
 }

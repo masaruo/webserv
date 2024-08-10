@@ -9,7 +9,8 @@ GTEST_LIBS = -L$(GTEST_DIR)/lib -lgtest -lgtest_main -lgmock -lgmock_main
 # Source files
 SOURCES = $(wildcard ../src/request/*.cpp ../src/utility/*.cpp)
 SOURCES := $(filter-out ../src/main.cpp, $(SOURCES))
-TESTSRC = RequestLine.test.cpp
+TESTSRC = $(wildcard ./*.test.cpp)
+# TESTSRC = RequestLine.test.cpp
 # Output executable
 TARGET = run_tests
 INC :=  -I../utility/include \

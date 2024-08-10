@@ -1,7 +1,14 @@
 #include "RequestLine.hpp"
 #include "string.hpp"
 
+RequestLine::RequestLine()
+:method_str_(), uri_(), ver_(), method_type(ft::ERROR)
+{
+	return ;
+}
+
 RequestLine::RequestLine(std::string const &line)
+:method_str_(), uri_(), ver_(), method_type(ft::ERROR)
 {
 	parse_line(line);
 	method_type = get_method(method_str_);

@@ -13,8 +13,8 @@ private:
 	void				parse_line(std::string const &line);
 	ft::http_method_t	get_method(std::string const &method_str) const;
 
-	RequestLine();
 public:
+	RequestLine();
 	RequestLine(std::string const &line);
 	// RequestLine(ft::string inMethod, ft::string inUri, ft::string inVer);//? may not needed
 	~RequestLine();

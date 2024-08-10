@@ -12,8 +12,8 @@ public:
 private:
 	header_map	headers_;
 	void	make_headers(ft::string::string_vector const &str_vec);
-	RequestHeader();
 public:
+	RequestHeader();
 	RequestHeader(ft::string::string_vector const &str_vec);
 	~RequestHeader();
 	RequestHeader(RequestHeader const &rhs);

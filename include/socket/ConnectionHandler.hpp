@@ -1,5 +1,5 @@
 #pragma once
-#include "string.hpp"
+#include <string>
 
 
 class ConnectionHandler
@@ -10,6 +10,7 @@ private:
 	ConnectionHandler(ConnectionHandler const &rhs);
 	ConnectionHandler &operator=(ConnectionHandler const &rhs);
 public:
-	static	ft::string	recvData(int sock_fd, std::size_t buf_size);
-	static	bool		sendData(int sock_fd, ft::string const &data);
+	static	std::string	recvData(int sock_fd, std::size_t buf_size);
+	static	bool		sendData(int sock_fd, std::string const &data);
+	//todo recvBody
 };

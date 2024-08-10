@@ -1,6 +1,12 @@
 #include "RequestHeader.hpp"
 #include <utility>
 
+RequestHeader::RequestHeader()
+:headers_()
+{
+	return ;
+}
+
 RequestHeader::RequestHeader(ft::string::string_vector const &str_vec)
 :headers_()
 {

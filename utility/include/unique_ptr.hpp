@@ -33,7 +33,7 @@ class unique_ptr
 private:
 	T	*ptr_;
 	unique_ptr &operator=(unique_ptr const &rhs){ (void) rhs; return (*this); }// hidden
-	unique_ptr(unique_ptr const &rhs){ return ;}
+	unique_ptr(unique_ptr const &rhs){ (void)rhs ;}
 public:
 	unique_ptr();
 	explicit unique_ptr(T *inPtr);

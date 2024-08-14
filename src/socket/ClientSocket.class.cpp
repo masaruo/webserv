@@ -10,13 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <ClientSocket.class.hpp>
+#include "ClientSocket.class.hpp"
 #include "define.hpp"
 #include "Fcntl.class.hpp"
 #include "unistd.h"
+#include "ConnectionHandler.hpp"
+#include "RequestFactory.hpp"
 
 ClientSocket::ClientSocket(int listen_fd)
 :ASocket(ASocket::accepted)
+,request_()
 {
 	fd_ = acceptHandler(listen_fd);
 	return ;
@@ -48,18 +51,24 @@ void	ClientSocket::setSockaddr(void)
 #include <iostream>
 ssize_t	ClientSocket::recv_handler(void)//! create request class and return response class?
 {
-	std::string	buf;
-	buf.resize(1000);
-	// char * buf[1000];
-	int n = recv(fd_, (void *)buf.data(), sizeof(buf), MSG_DONTWAIT);
-	std::cout << "received: " << buf << std::endl;
-	if (n < 0)
-		return (-1) ;
-	else
-	{
-		std::string ret = "sent back by server: " + buf;
-		send(fd_, ret.data(), ret.size(), MSG_DONTWAIT);
-	}
+	// std::string	buf;
+	// buf.resize(1000);
+	// // char * buf[1000];
+	// int n = recv(fd_, (void *)buf.data(), sizeof(buf), MSG_DONTWAIT);
+	// std::cout << "received: " << buf << std::endl;
+	// if (n < 0)
+	// 	return (-1) ;
+	// else
+	// {
+	// 	std::string ret = "sent back by server: " + buf;
+	// 	send(fd_, ret.data(), ret.size(), MSG_DONTWAIT);
+	// }
+	// return (0);
+	std::string	raw_data = ConnectionHandler::recvData(fd_, 8000);
+	ft::unique_ptr<ARequest>new_socket(RequestFactory::createRequest(raw_data));
+	request_ = new_socket;
+	request_->createMockResponse(fd_);
+	ConnectionHandler::sendData(fd_, request_->dummy_res);
 	return (0);
 }
 

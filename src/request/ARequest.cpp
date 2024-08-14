@@ -47,6 +47,7 @@ void	ARequest::parse(std::string const &raw_data)
 	RequestLine new_line(split_by_lf.at(0).str());
 	line_ = new_line;
 	split_by_lf.erase(split_by_lf.begin());
+	//? error if split_by_lf.size() == 0?
 	RequestHeader new_header(split_by_lf);
 	header_ = new_header;
 }

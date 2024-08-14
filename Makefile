@@ -14,34 +14,32 @@ TARGET		:=	webserv
 CXX			:=	c++
 CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
 LDFLAGS		:=	
-INC			:=	-I./include -I./utility/include
-SRC			=	 \
-				string.cpp \
-				Fcntl.class.cpp \
-				ASocket.class.cpp \
-				ClientSocket.class.cpp \
-				ListenSocket.class.cpp \
-				SocketHolder.class.cpp \
-				epoller.class.cpp \
-				main.cpp
-SRCDIR		:=	./src
+INC			:=	-I./include \
+				-I./include/request \
+				-I./include/response \
+				-I./include/socket \
+				-I./include/utility \
+				-I./utility/include
+SRC			:=	$(wildcard src/*.cpp) \
+				$(wildcard src/*/*.cpp)
+SRCDIR		:=	$(sort $(dir $(SRC)))
+VPATH		:=	$(SRCDIR)
 OBJDIR		:=	obj
-OBJ			:=	$(SRC:%.cpp=$(OBJDIR)/%.o)
-DEP			:=	$(SRC:%.cpp=$(OBJDIR)/%.d)
-
-#todo add vpath for multiple src & include for better maintainance
-# vpath %.cpp $(src) $(SRC)/request $(SRC)/response $(SRC)/socket $(SRC)/utility
-# vpath %.hpp ./include ./utility/include ./include/request ./include/response ./include/socket ./include/utility
+# OBJ			:=	$(SRC:%.cpp=$(OBJDIR)/%.o)
+OBJ			:=	$(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
+DEP			:=	$(OBJ:.o=.d)
 
 ifdef WITH_ASAN
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
-CXXFLAGS	+=	-ggdb3 -Ogdb -fsanitize=address,undefined,leak -Wshadow -Wconversion -Wno-sign-conversion -pedantic-errors -DDEBUG
+CXXFLAGS	+=	-ggdb3 -O0 -fsanitize=address,undefined,leak
 LDFLAGS		:=	-fsanitize=address,undefined,leak
 endif
 
+$(info OBJ=$(OBJ))
+
 all: $(TARGET)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+$(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
 

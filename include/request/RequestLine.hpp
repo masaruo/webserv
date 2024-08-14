@@ -21,6 +21,7 @@ public:
 	RequestLine(RequestLine const &rhs);
 	RequestLine &operator=(RequestLine const &rhs);
 	ft::http_method_t	get_method(void) const;
+	std::string			get_methodStr(void) const;
 	std::string			get_uri(void) const;
 	std::string			get_ver(void) const;
 	//todo ERROR and Verification

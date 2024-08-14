@@ -24,20 +24,18 @@
 // 	return (ptr);
 // }
 
-ft::unique_ptr<ARequest>	RequestFactory::createRequest(std::string const &raw_request)
+ARequest	*RequestFactory::createRequest(std::string const &raw_request)
 {
 	ft::string					tmp(raw_request);
-	ft::string::string_vector	split_by_lf = tmp.split(ft::string::LF);
-	std::string const			method = split_by_lf.at(0).str();
-	ft::unique_ptr<ARequest>	ptr;
+	ft::string::string_vector	split_by_spaces = tmp.split(ft::string::WHITESPACE);
+	std::string const			method = split_by_spaces.at(0).str();
 
 	if (method == "GET")
-		ptr.reset(new Get(raw_request));
+		return (new Get(raw_request));
 	else if (method == "POST")
-		;//todo
+		return (NULL);
 	else if (method == "DELETE")
-		;//todo
+		return (NULL);
 	else
-		;
-	return (ptr); 
+		return (NULL);
 }

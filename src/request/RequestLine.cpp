@@ -68,6 +68,11 @@ ft::http_method_t	RequestLine::get_method(void) const
 	return (method_type);
 }
 
+std::string	RequestLine::get_methodStr(void) const
+{
+	return (method_str_);
+}
+
 std::string	RequestLine::get_uri(void) const
 {
 	return (uri_);

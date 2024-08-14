@@ -41,10 +41,17 @@ void	RequestHeader::make_headers(ft::string::string_vector const &str_vec)
 
 	while (iter != end)
 	{
-		ft::string::string_vector	split_by_doubleColon = iter->split(":");
-		//todo ERROR and verfication
-		split_by_doubleColon.at(1).trim(ft::string::SP);
-		headers_.insert(std::make_pair(split_by_doubleColon.at(0), split_by_doubleColon.at(1)));
+		if (iter->str() == ft::string::CR)
+		{
+			iter++;
+			continue ;
+		}
+		ft::string	to_split(iter->str());
+		to_split.trim(ft::string::CRLF);
+		std::string::size_type	found_idx = to_split.str().find_first_of(':');
+		std::string	first = to_split.str().substr(0, found_idx);
+		std::string	second = to_split.str().substr(found_idx + 2);
+		headers_.insert(std::make_pair(first, second));
 		iter++;
 	}
 }
@@ -63,4 +70,19 @@ RequestHeader::iterator	RequestHeader::get_pair(std::string const &key)
 
 	found = headers_.find(key);
 	return (found);
+}
+
+std::string	RequestHeader::printHeader(void) const
+{
+	const_iterator	it = headers_.begin();
+	const_iterator	end = headers_.end();
+	std::string		res = "";
+
+	while (it != end)
+	{
+		res += "first " + it->first + " and ";
+		res += "second " + it->second + "\n";
+		it++;
+	}
+	return (res);
 }

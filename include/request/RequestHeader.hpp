@@ -20,6 +20,7 @@ public:
 	RequestHeader &operator=(RequestHeader const &rhs);
 	iterator		get_pair(std::string const &key);
 	const_iterator	get_pair(std::string const &key) const;
+	std::string		printHeader(void) const;
 	//todo error
 	//todo duplicate key
 };

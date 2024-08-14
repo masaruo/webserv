@@ -17,5 +17,6 @@ private:
 	~RequestFactory();
 public:
 	// static ft::unique_ptr<ARequest>	createRequest(RequestLine const &line);
-	static ft::unique_ptr<ARequest> createRequest(std::string const &raw_request);
+	static	ARequest	*createRequest(std::string const &raw_request);
+	// static ft::unique_ptr<ARequest> createRequest(std::string const &raw_request);
 };

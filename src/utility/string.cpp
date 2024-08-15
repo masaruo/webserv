@@ -67,6 +67,34 @@ ft::string &ft::string::operator=(ft::string const &rhs)
 	return (*this);
 }
 
+ft::string &ft::string::operator=(std::string const &rhs)
+{
+	this->base_ = rhs;
+	return (*this);
+}
+
+ft::string &ft::string::operator=(char const *ch)
+{
+	std::string tmp(ch);
+	this->base_ = tmp;
+	return (*this);
+}
+
+bool	ft::string::operator==(char const *rhs) const
+{
+	return (base_ == rhs);
+}
+
+bool	ft::string::operator==(std::string const &rhs) const
+{
+	return (base_ == rhs);
+}
+
+bool	ft::string::operator==(string const &rhs) const
+{
+	return (base_ == rhs.base_);
+}
+
 ft::string::operator std::string &()
 {
 	return (base_);

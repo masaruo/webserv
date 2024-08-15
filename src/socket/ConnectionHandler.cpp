@@ -3,10 +3,10 @@
 #include <cerrno>//todo delete
 #include "define.hpp"
 
-ft::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
+std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 {
-	ft::string	buffer(buffer_size, '\0');
-	ft::string	received_data;
+	std::string	buffer(buffer_size, '\0');
+	std::string	received_data;
 	ssize_t		bytes_received;
 
 	while (true)
@@ -15,7 +15,7 @@ ft::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 
 		if (bytes_received == ft::err)
 		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
+			if (errno == EAGAIN || errno == EWOULDBLOCK)//todo change
 			{
 				break ;
 			}
@@ -32,7 +32,7 @@ ft::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 		{
 			received_data.append(buffer, 0, bytes_received);
 
-			if(received_data.find("\r\n\r\n") != ft::string::npos)
+			if(received_data.find("\r\n\r\n") != std::string::npos)
 			{
 				break ;
 			}
@@ -41,7 +41,7 @@ ft::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 	return (received_data);
 }
 
-bool	ConnectionHandler::sendData(int sock_fd, ft::string const &data)
+bool	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 {
 	std::size_t				total_sent = 0;
 	ssize_t					bytes_sent;

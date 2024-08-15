@@ -49,6 +49,11 @@ public:
 	~string();
 	string(string const &rhs);
 	string &operator=(string const &rhs);
+	string &operator=(std::string const &rhs);
+	string &operator=(char const *ch);
+	bool operator==(char const *rhs) const;
+	bool operator==(std::string const &rhs) const;
+	bool operator==(string const &rhs) const;
 	operator std::string&();
 	operator const std::string&() const;
 

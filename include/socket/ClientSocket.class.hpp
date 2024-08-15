@@ -12,16 +12,18 @@
 
 #pragma once
 #include "ASocket.class.hpp"
+#include "unique_ptr.hpp"
+#include "ARequest.hpp"
 
-class ARequest;
-class AResponse;
+// class ARequest;
+// class AResponse;
 
 class ClientSocket : public ASocket
 {
 private:
-	ARequest	*request_;
-	AResponse	*response_;
-	//todo create buffer class
+	ft::unique_ptr<ARequest>	request_;
+	// ARequest	*request_;
+	// AResponse	*response_;
 	int	acceptHandler(int listen_fd);
 	ClientSocket();
 	ClientSocket(ClientSocket const &rhs);
@@ -29,7 +31,7 @@ private:
 public:
 	ClientSocket(int listen_fd);
 	~ClientSocket();
-	void setSockaddr(void);
+	void setSockaddr(void);//?
 	ssize_t	recv_handler(void);
 	ssize_t	send_hander(void) const;
 };

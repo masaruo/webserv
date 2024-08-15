@@ -12,29 +12,35 @@
 
 TARGET		:=	webserv
 CXX			:=	c++
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
-LDFLAGS		=	
-SRCDIR		:=	./src
-INC			:=	-I./include -I./include/request -I./include/response -I./include/socket -I./include/utility
-SRC			:=	$(wildcard $(SRCDIR)/*.cpp) \
-				$(wildcard $(SRCDIR)/socket/*.cpp) \
-				$(wildcard $(SRCDIR)/utility/*.cpp) \
-				$(wildcard $(SRCDIR)/request/*.cpp) \
-				$(wildcard $(SRCDIR)/response/*.cpp)
+CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
+LDFLAGS		:=	
+INC			:=	-I./include \
+				-I./include/request \
+				-I./include/response \
+				-I./include/socket \
+				-I./include/utility \
+				-I./utility/include
+SRC			:=	$(wildcard src/*.cpp) \
+				$(wildcard src/*/*.cpp)
+SRCDIR		:=	$(sort $(dir $(SRC)))
+VPATH		:=	$(SRCDIR)
 OBJDIR		:=	obj
-OBJ			:=	$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRC))
+# OBJ			:=	$(SRC:%.cpp=$(OBJDIR)/%.o)
+OBJ			:=	$(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 DEP			:=	$(OBJ:.o=.d)
 
 ifdef WITH_ASAN
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
 CXXFLAGS	+=	-ggdb3 -O0 -fsanitize=address,undefined,leak
-LDFLAGS		+=	-fsanitize=address,undefined,leak
+LDFLAGS		:=	-fsanitize=address,undefined,leak
 endif
+
+$(info OBJ=$(OBJ))
 
 all: $(TARGET)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(@D)
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
 
 $(TARGET):	$(OBJ)

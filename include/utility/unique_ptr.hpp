@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #pragma once
+#include <cstddef>
 
 /**
  * @file unique_ptr.hpp
@@ -31,8 +32,8 @@ class unique_ptr
 {
 private:
 	T	*ptr_;
-	unique_ptr(unique_ptr const &rhs){ (void) rhs; }// hidden
 	unique_ptr &operator=(unique_ptr const &rhs){ (void) rhs; return (*this); }// hidden
+	unique_ptr(unique_ptr const &rhs){ (void)rhs ;}
 public:
 	unique_ptr();
 	explicit unique_ptr(T *inPtr);
@@ -63,18 +64,22 @@ public:
 	 * @brief 管理しているポインタをリセット
 	 *
 	 * 現在のリソースを解放し、新しいポインタを設定します。
+	 * 現在のリソースと新しいポインタが同じでない場合のみ、
+	 * 現在のリソースは削除されます。
 	 *
 	 * @param inPtr 新しく管理対象とするポインタ（デフォルトはNULL）
-	*/
+	 */
 	void	reset(T *inPtr = NULL);
 
 	/**
 	 * @brief 管理しているポインタの所有権を放棄
 	 *
-	 * ポインタの所有権を放棄し、NULLに設定します。
+	 * ポインタの所有権を放棄し、内部ポインタをNULLに設定します。
+	 * このメソッドはリソースを解放しません。返されたポインタは
+	 * 呼び出し元が適切に管理（必要に応じて解放）する必要があります。
 	 *
 	 * @return T* 以前管理していたポインタ
-	*/
+	 */
 	T		*release(void);
 };
 
@@ -151,3 +156,29 @@ T	*unique_ptr<T>::operator->(void) const
 }
 
 } // end of namespace ft
+
+/**
+ * @brief unique_ptrの使用例
+ *
+ * @code
+ * // unique_ptrの作成
+ * ft::unique_ptr<int> ptr1(new int(42));
+ *
+ * // リソースへのアクセス
+ * int value = *ptr1;
+ * 
+ * // 所有権の移動
+ * ft::unique_ptr<int> ptr2 = ptr1;  // ptr1はNULLになる
+ * 
+ * // リセット
+ * ptr2.reset(new int(10));
+ *
+ * // リソースの解放
+ * int* raw_ptr = ptr2.release();
+ * delete raw_ptr;
+ * 
+ * or
+ * 
+ * ptr1.reset();
+ * @endcode
+ */

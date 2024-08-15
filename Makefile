@@ -25,7 +25,6 @@ SRC			:=	$(wildcard src/*.cpp) \
 SRCDIR		:=	$(sort $(dir $(SRC)))
 VPATH		:=	$(SRCDIR)
 OBJDIR		:=	obj
-# OBJ			:=	$(SRC:%.cpp=$(OBJDIR)/%.o)
 OBJ			:=	$(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 DEP			:=	$(OBJ:.o=.d)
 

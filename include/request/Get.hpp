@@ -11,4 +11,5 @@ public:
 	Get(Get const &rhs);
 	Get &operator=(Get const &rhs);
 	void	createMockResponse(int sockfd);
+	AResponse	*createResponse(int sockfd) const;
 };

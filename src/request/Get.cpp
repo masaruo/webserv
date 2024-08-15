@@ -1,4 +1,5 @@
 #include "Get.hpp"
+#include "GetResponse.hpp"
 
 Get::Get()
 :ARequest()
@@ -52,4 +53,9 @@ void Get::createMockResponse(int sockfd)
 	response << body;
 
 	dummy_res = response.str();
+}
+
+AResponse	*Get::createResponse(int sockfd) const
+{
+	return (new GetResponse());
 }

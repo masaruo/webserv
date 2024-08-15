@@ -29,4 +29,5 @@ public:
 	RequestLine	const	&getRequestLine(void) const;
 	RequestHeader const	&getRequestHeader(void) const;
 	virtual void		createMockResponse(int sockfd) = 0;
+	virtual	AResponse	*createResponse(int sockfd) const = 0;
 };

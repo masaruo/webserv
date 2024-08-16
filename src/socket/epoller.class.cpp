@@ -71,11 +71,13 @@ int	Epoller::epollWait(void)
 	numEvents = epoll_wait(epfd_, res_evlist_.data(), size, timeout_);
 	if (numEvents == ft::err)
 	{
-		if (errno == EINTR)//forbidden
-			return (epollWait());
-		else
-			std::cout << "epoll wait failed" << std::endl;
+		// if (errno == EINTR)//forbidden
+		// 	return (epollWait());
+		// else
+			std::cout << "epoll wait failed" << std::endl;//! delete
 	}
+	SocketHolder_.checkTimeout();
+	SocketHolder_.deleteMarkedSocket();
 	return (numEvents);
 }
 
@@ -86,6 +88,7 @@ void	Epoller::epollLoop(void)
 		int numEvents = 0;
 		while (numEvents == 0)
 			numEvents = epollWait();
+
 		const_iterator	it = res_evlist_.begin();
 		const_iterator	end = res_evlist_.begin();
 		std::advance(end, numEvents);
@@ -98,7 +101,7 @@ void	Epoller::epollLoop(void)
 			{
 				ASocket *new_socket = new ClientSocket(socket->getFd());
 				epollAdd(new_socket);
-				std::cout << "accept" << std::endl;
+				std::cout << "accept" << std::endl;//! delete
 			}
 			else if (ev & EPOLLIN)
 			{
@@ -116,13 +119,13 @@ void	Epoller::epollLoop(void)
 			{
 				//todo error
 			}
-			if (ev & (EPOLLRDHUP | EPOLLHUP))
+			if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
 			{
-				std::cout << "HUP" << std::endl;
+				std::cout << "CLOSE" << std::endl;//! delete
 				epollClose(socket);
 			}
 			it++;
-			SocketHolder_.deleteMarkedSocket();
 		}
+		SocketHolder_.deleteMarkedSocket();
 	}
 }

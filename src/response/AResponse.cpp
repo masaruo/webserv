@@ -1,6 +1,6 @@
 #include "AResponse.hpp"
 
-AResponse::uri_map_t	uri_map_;
+// AResponse::uri_map_t	uri_map_;
 
 AResponse::AResponse()
 :status_code_(0), line_(), header_(), body_()

@@ -22,7 +22,7 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 }
 
 #include <sstream>
-void	GetResponse::createBody(void)
+void	GetResponse::createBody(std::string const &path)
 {
 	// line_ = RequestLine(" GET / HTTP/1.1 \n");
 	// std::string body;
@@ -34,13 +34,16 @@ void	GetResponse::createBody(void)
 
 	//! below is the real code
 	std::string mockPath("/webserv/www/index.html");
+	if (path == "/test")
+		mockPath = "/webserv/www/test.html";
 	std::string body = FileReader::readTextFile(mockPath);
 
 	std::ostringstream response;
-	response << "HTTP/1.1 200 OK\r\n";
-	response << "Content-Type: text/plain\r\n";
-	response << "Content-Length: " << body.length() << "\r\n";
-	response << "\r\n"; // ヘッダーとボディの区切り
+    response << "HTTP/1.1 200 OK\r\n";
+    response << "Content-Type: text/html; charset=UTF-8\r\n";
+    response << "Content-Length: " << body.length() << "\r\n";
+    response << "Connection: keep-alive\r\n";
+    response << "\r\n";  // ヘッダーとボディを区切る空行
 	response << body;
 
 	body_ = response.str();

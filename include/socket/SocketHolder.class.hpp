@@ -34,6 +34,7 @@ public:
 	SocketHolder();
 	~SocketHolder();
 	void	addSocket(ASocket *socket);
+	void	checkTimeout(void);
 	void	markSocketDelete(ASocket *socket);
 	void	deleteSocketHolder(void);
 	void	deleteMarkedSocket(void);

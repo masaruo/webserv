@@ -22,6 +22,8 @@
 ClientSocket::ClientSocket(int listen_fd)
 :ASocket(ASocket::accepted)
 ,request_()
+,last_activity_(std::time(NULL))
+,timeout_(1000)// config
 {
 	fd_ = acceptHandler(listen_fd);
 	return ;
@@ -58,8 +60,9 @@ ssize_t	ClientSocket::recv_handler(void)//! create request class and return resp
 	request_ = req_tmp;
 	//request_->createMockResponse(fd_);
 	ft::unique_ptr<AResponse>res(request_->createResponse(fd_));
-	res->createBody();
+	res->createBody(request_->getRequestLine().get_uri());
 	ConnectionHandler::sendData(fd_, res->str());
+	set_time();
 	return (0);
 }
 
@@ -67,4 +70,24 @@ ssize_t	ClientSocket::send_hander(void) const
 {
 	std::cout << "send hander" << std::endl;
 	return (0);
+}
+
+void	ClientSocket::set_time(void)
+{
+	std::time_t	now = std::time(NULL);
+	last_activity_ = now;
+}
+
+std::time_t	ClientSocket::get_time(void) const
+{
+	return (last_activity_);
+}
+
+void	ClientSocket::check_timeouts(void)
+{
+	std::time_t	now = std::time(NULL);
+	if (now - last_activity_ > timeout_)
+	{
+		this->markSocketDelete();
+	}
 }

@@ -12,4 +12,5 @@ public:
 	Get &operator=(Get const &rhs);
 	void	createMockResponse(int sockfd);
 	AResponse	*createResponse(int sockfd) const;
+	std::string	get_path(void) const;
 };

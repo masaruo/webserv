@@ -30,6 +30,24 @@ void	SocketHolder::addSocket(ASocket *socket)
 	vec_sockets_.push_back(socket);
 }
 
+void	SocketHolder::checkTimeout(void)
+{
+	if (vec_sockets_.empty())
+		return ;
+	iterator		it = vec_sockets_.begin();
+	const_iterator	end = vec_sockets_.end();
+
+	while (it != end)
+	{
+		if ((*it)->getSocketType() == ASocket::accepted)
+		{
+			ClientSocket *client = dynamic_cast<ClientSocket*>(*it);
+			client->check_timeouts();
+		}
+		it++;
+	}
+}
+
 void	SocketHolder::markSocketDelete(ASocket *socket)
 {
 	socket->markSocketDelete();

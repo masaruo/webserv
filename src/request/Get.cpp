@@ -59,3 +59,8 @@ AResponse	*Get::createResponse(int sockfd) const
 {
 	return (new GetResponse());
 }
+
+std::string	Get::get_path(void) const
+{
+	return (line_.get_uri());
+}

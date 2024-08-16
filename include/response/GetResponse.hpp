@@ -10,6 +10,6 @@ public:
 	~GetResponse();
 	GetResponse(GetResponse const &rhs);
 	GetResponse &operator=(GetResponse const &rhs);
-	void		createBody();
+	void		createBody(std::string const &path);
 	std::string	str(void) const;
 };

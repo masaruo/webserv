@@ -7,7 +7,7 @@
 
 int main(void)
 {
-  Epoller poller(1, 0);
+  Epoller poller(1, 1000);
 
   poller.epollAdd(new ListenSocket(8888));
   poller.epollAdd(new ListenSocket(7777));

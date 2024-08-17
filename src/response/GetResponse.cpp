@@ -24,7 +24,7 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 #include <sstream>
 void	GetResponse::createBody(std::string const &path)
 {
-	// line_ = RequestLine(" GET / HTTP/1.1 \n");
+	// line_ = HttpLine(" GET / HTTP/1.1 \n");
 	// std::string body;
 	// body = "リクエスト情報:\n";
 	// body += std::string("メソッド: ") + line_.get_methodStr() + "\n";

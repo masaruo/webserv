@@ -3,10 +3,10 @@
 #include <string>
 
 class ARequest;
-// class Get;
+// class GetRequest;
 // class Post;
 // class Delete;
-// class RequestLine;
+// class HttpLine;
 
 class RequestFactory
 {
@@ -16,7 +16,7 @@ private:
 	RequestFactory &operator=(RequestFactory const &rhs);
 	~RequestFactory();
 public:
-	// static ft::unique_ptr<ARequest>	createRequest(RequestLine const &line);
+	// static ft::unique_ptr<ARequest>	createRequest(HttpLine const &line);
 	static	ARequest	*createRequest(std::string const &raw_request);
 	// static ft::unique_ptr<ARequest> createRequest(std::string const &raw_request);
 };

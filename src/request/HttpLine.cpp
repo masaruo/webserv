@@ -1,13 +1,13 @@
-#include "RequestLine.hpp"
+#include "HttpLine.hpp"
 #include "string.hpp"
 
-RequestLine::RequestLine()
+HttpLine::HttpLine()
 :method_str_(), uri_(), ver_(), method_type(ft::ERROR)
 {
 	return ;
 }
 
-RequestLine::RequestLine(std::string const &line)
+HttpLine::HttpLine(std::string const &line)
 :method_str_(), uri_(), ver_(), method_type(ft::ERROR)
 {
 	parse_line(line);
@@ -15,12 +15,12 @@ RequestLine::RequestLine(std::string const &line)
 	//todo ERRORCHECK / HTTPERROR
 }
 
-RequestLine::~RequestLine()
+HttpLine::~HttpLine()
 {
 	return ;
 }
 
-RequestLine::RequestLine(RequestLine const &rhs)
+HttpLine::HttpLine(HttpLine const &rhs)
 :method_str_(rhs.method_str_)
 ,uri_(rhs.uri_)
 ,ver_(rhs.ver_)
@@ -29,7 +29,7 @@ RequestLine::RequestLine(RequestLine const &rhs)
 	return ;
 }
 
-RequestLine &RequestLine::operator=(RequestLine const &rhs)
+HttpLine &HttpLine::operator=(HttpLine const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -41,7 +41,7 @@ RequestLine &RequestLine::operator=(RequestLine const &rhs)
 	return (*this);
 }
 
-void	RequestLine::parse_line(std::string const &line)
+void	HttpLine::parse_line(std::string const &line)
 {
 	ft::string	to_split = line;
 	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WHITESPACE);
@@ -51,7 +51,7 @@ void	RequestLine::parse_line(std::string const &line)
 	ver_ = split_by_sp.at(2).str();
 }
 
-ft::http_method_t	RequestLine::get_method(std::string const &method_str) const
+ft::http_method_t	HttpLine::get_method(std::string const &method_str) const
 {
 	if (method_str == "GET")
 		return (ft::GET);
@@ -63,22 +63,22 @@ ft::http_method_t	RequestLine::get_method(std::string const &method_str) const
 		return (ft::ERROR);
 }
 
-ft::http_method_t	RequestLine::get_method(void) const
+ft::http_method_t	HttpLine::get_method(void) const
 {
 	return (method_type);
 }
 
-std::string	RequestLine::get_methodStr(void) const
+std::string	HttpLine::get_methodStr(void) const
 {
 	return (method_str_);
 }
 
-std::string	RequestLine::get_uri(void) const
+std::string	HttpLine::get_uri(void) const
 {
 	return (uri_);
 }
 
-std::string	RequestLine::get_ver(void) const
+std::string	HttpLine::get_ver(void) const
 {
 	return (ver_);
 }

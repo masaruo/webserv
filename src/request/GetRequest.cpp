@@ -1,30 +1,30 @@
-#include "Get.hpp"
+#include "GetRequest.hpp"
 #include "GetResponse.hpp"
 
-Get::Get()
+GetRequest::GetRequest()
 :ARequest()
 {
 	return ;
 }
 
-Get::Get(std::string const &raw_request)
+GetRequest::GetRequest(std::string const &raw_request)
 :ARequest(raw_request)
 {
 	return ;
 }
 
-Get::~Get()
+GetRequest::~GetRequest()
 {
 	return ;
 }
 
-Get::Get(Get const &rhs)
+GetRequest::GetRequest(GetRequest const &rhs)
 :ARequest(rhs)
 {
 
 }
 
-Get &Get::operator=(Get const &rhs)
+GetRequest &GetRequest::operator=(GetRequest const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -34,7 +34,7 @@ Get &Get::operator=(Get const &rhs)
 }
 
 #include <sstream>
-void Get::createMockResponse(int sockfd)
+void GetRequest::createMockResponse(int sockfd)
 {
 	(void)sockfd; // 未使用の引数を無視
 
@@ -55,12 +55,12 @@ void Get::createMockResponse(int sockfd)
 	dummy_res = response.str();
 }
 
-AResponse	*Get::createResponse(int sockfd) const
+AResponse	*GetRequest::createResponse(int sockfd) const
 {
 	return (new GetResponse());
 }
 
-std::string	Get::get_path(void) const
+std::string	GetRequest::get_path(void) const
 {
 	return (line_.get_uri());
 }

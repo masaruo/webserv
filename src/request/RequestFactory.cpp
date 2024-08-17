@@ -1,7 +1,7 @@
 #include "RequestFactory.hpp"
-#include "RequestLine.hpp"
+#include "HttpLine.hpp"
 #include "define.hpp"
-#include "Get.hpp"
+#include "GetRequest.hpp"
 
 // ft::unique_ptr<ARequest>	RequestFactory::createRequest(RequestLine const &line)
 // {
@@ -11,7 +11,7 @@
 // 	switch (type)
 // 	{		
 // 		case (ft::GET):
-// 			ptr.reset(new Get(line));
+// 			ptr.reset(new GetRequest(line));
 // 			break ;
 // 		case (ft::POST):
 // 			//todo post
@@ -31,7 +31,7 @@ ARequest	*RequestFactory::createRequest(std::string const &raw_request)
 	std::string const			method = split_by_spaces.at(0).str();
 
 	if (method == "GET")
-		return (new Get(raw_request));
+		return (new GetRequest(raw_request));
 	else if (method == "POST")
 		return (NULL);
 	else if (method == "DELETE")

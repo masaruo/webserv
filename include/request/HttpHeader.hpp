@@ -1,26 +1,27 @@
 #pragma once
 #include <map>
+#include <vector>
 #include <string>
-#include "string.hpp"
+#include "define.hpp"
 
 class HttpHeader
 {
 public:
-	typedef std::map<std::string, std::string>	header_map_t;
-	typedef header_map_t::const_iterator		const_iterator;
-	typedef header_map_t::iterator				iterator;
+	typedef std::map<std::string, std::vector<std::string> >	map_vec_t;
+	typedef map_vec_t::iterator									iterator;
+	typedef map_vec_t::const_iterator							const_iterator;
+	typedef map_vec_t::size_type								size_type;
+	typedef map_vec_t::difference_type							difference_type;
 private:
-	header_map_t	headers_;
-	void	make_headers(ft::string::string_vector const &str_vec);
+	map_vec_t	headers_;
 public:
 	HttpHeader();
-	HttpHeader(ft::string::string_vector const &str_vec);
 	~HttpHeader();
 	HttpHeader(HttpHeader const &rhs);
 	HttpHeader &operator=(HttpHeader const &rhs);
-	iterator		get_pair(std::string const &key);
-	const_iterator	get_pair(std::string const &key) const;
-	std::string		printHeader(void) const;
-	//todo error
-	//todo duplicate key
+	void		setHeader(std::string const &line);//todo
+	void		setHeader(std::string const &key, std::string const &value);
+	std::string	getHeader(std::string const &key) const;
+	ft::str_vec	getHeaders(std::string const &key) const;
+	bool		hasHeader(std::string const &key) const;
 };

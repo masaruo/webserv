@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <map>
-#include "HttpLine.hpp"
+
 #include "HttpHeader.hpp"
 
 class ARequest;
@@ -14,8 +14,8 @@ public:
 	// typedef uri_map_t::const_iterator			const_iterator;
 protected:
 	int					status_code_;
-	HttpLine			line_;
-	HttpHeader		header_;
+	// HttpLine			line_;
+	// HttpHeader			header_;
 	std::string			body_;
 	// static uri_map_t	uri_map_;
 public:

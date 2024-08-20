@@ -1,41 +1,48 @@
 #include "RequestFactory.hpp"
-#include "HttpLine.hpp"
-#include "define.hpp"
+#include "ARequest.hpp"
 #include "GetRequest.hpp"
-
-// ft::unique_ptr<ARequest>	RequestFactory::createRequest(RequestLine const &line)
-// {
-// 	ft::http_method_t			type = line.get_method();
-// 	ft::unique_ptr<ARequest>	ptr;
-
-// 	switch (type)
-// 	{		
-// 		case (ft::GET):
-// 			ptr.reset(new GetRequest(line));
-// 			break ;
-// 		case (ft::POST):
-// 			//todo post
-// 			break ;
-// 		case (ft::DELETE):
-// 			//todo delete
-// 			break ;		default:
-// 			//todo error
-// 	}
-// 	return (ptr);
-// }
+#include "PostRequest.hpp"
+// #include "DeleteRequest.hpp"
+#include "string.hpp"
+#include "RequestLine.hpp"
+#include "HttpHeader.hpp"
+#include <sstream>
+#include "AHttpBody.hpp"
 
 ARequest	*RequestFactory::createRequest(std::string const &raw_request)
 {
-	ft::string					tmp(raw_request);
-	ft::string::string_vector	split_by_spaces = tmp.split(ft::string::WHITESPACE);
-	std::string const			method = split_by_spaces.at(0).str();
+	std::istringstream	requestStream(raw_request);
+	std::string			line;
+	std::getline(requestStream, line);
+	RequestLine	requestLine(line);
+	HttpHeader	header;
+	while (true)
+	{
+		std::getline(requestStream, line);
+		if (line.empty() || line == ft::string::CR)
+			break ;
+		header.setHeader(line);
+	}
 
+	std::string	method = requestLine.getMethod();
 	if (method == "GET")
-		return (new GetRequest(raw_request));
+	{
+		return (new GetRequest(requestLine, header));
+	}
 	else if (method == "POST")
-		return (NULL);
+	{
+		//body
+		// return (new PostRequest(requestline, header, body));
+		AHttpBody body(requestStream, header);
+		return (new PostRequest(requestLine, header, body));
+	}
 	else if (method == "DELETE")
+	{
+		//body
 		return (NULL);
+	}
 	else
+	{
 		return (NULL);
+	}
 }

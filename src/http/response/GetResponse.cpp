@@ -28,6 +28,8 @@ void	GetResponse::createBody(std::string const &path)
 	std::string mockPath("/webserv/www/index.html");
 	if (path == "/test")
 		mockPath = "/webserv/www/test.html";
+	else if (path == "/cgi")
+		mockPath = "/webserv/www/hello.cgi";
 	std::string body = FileReader::readTextFile(mockPath);
 
 	std::ostringstream response;

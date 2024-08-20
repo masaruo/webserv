@@ -15,13 +15,15 @@ CXX			:=	c++
 CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
 LDFLAGS		:=	
 INC			:=	-I./include \
-				-I./include/request \
-				-I./include/response \
+				-I.include/http/utility \
+				-I./include/http/request \
+				-I./include/http/response \
 				-I./include/socket \
 				-I./include/utility \
 				-I./utility/include
 SRC			:=	$(wildcard src/*.cpp) \
-				$(wildcard src/*/*.cpp)
+				$(wildcard src/*/*.cpp) \
+				$(wildcard src/*/*/*.cpp)
 SRCDIR		:=	$(sort $(dir $(SRC)))
 VPATH		:=	$(SRCDIR)
 OBJDIR		:=	obj

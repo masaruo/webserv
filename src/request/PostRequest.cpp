@@ -7,6 +7,13 @@ PostRequest::PostRequest()
 	return ;
 }
 
+PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, AHttpBody const &body)
+:ARequest(line, header)
+,body_(body)
+{
+	return ;
+}
+
 PostRequest::~PostRequest()
 {
 	return ;

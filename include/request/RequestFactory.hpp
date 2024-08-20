@@ -16,7 +16,5 @@ private:
 	RequestFactory &operator=(RequestFactory const &rhs);
 	~RequestFactory();
 public:
-	// static ft::unique_ptr<ARequest>	createRequest(HttpLine const &line);
 	static	ARequest	*createRequest(std::string const &raw_request);
-	// static ft::unique_ptr<ARequest> createRequest(std::string const &raw_request);
 };

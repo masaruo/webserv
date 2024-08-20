@@ -24,14 +24,6 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 #include <sstream>
 void	GetResponse::createBody(std::string const &path)
 {
-	// line_ = HttpLine(" GET / HTTP/1.1 \n");
-	// std::string body;
-	// body = "リクエスト情報:\n";
-	// body += std::string("メソッド: ") + line_.get_methodStr() + "\n";
-	// body += std::string("URI: ") + line_.get_uri() + "\n";
-	// body += std::string("バージョン: ") + line_.get_ver() + "\n";
-	// body += std::string("ヘッダー:\n") + header_.printHeader() + "\n";
-
 	//! below is the real code
 	std::string mockPath("/webserv/www/index.html");
 	if (path == "/test")

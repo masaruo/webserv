@@ -1,8 +1,21 @@
 #include "RequestLine.hpp"
+#include "string.hpp"
 
 RequestLine::RequestLine()
+:method_(), uri_(), version_()
 {
 	return ;
+}
+
+RequestLine::RequestLine(std::string const &line)
+:method_(), uri_(), version_()
+{
+	ft::string	to_split(line);
+	to_split.trim(ft::string::CRLF);
+	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WHITESPACE);
+	setMethod(split_by_sp.at(0));
+	setUri(split_by_sp.at(1));
+	setVersion(split_by_sp.at(2));
 }
 
 RequestLine::~RequestLine()
@@ -31,16 +44,19 @@ RequestLine &RequestLine::operator=(RequestLine const &rhs)
 
 void	RequestLine::setMethod(std::string const &inMethod)
 {
+	//todo verification
 	method_ = inMethod;
 }
 
 void	RequestLine::setUri(std::string const &inUri)
 {
+	//todo verification
 	uri_ = inUri;
 }
 
 void	RequestLine::setVersion(std::string const &inVer)
 {
+	//todo verification
 	version_ = inVer;
 }
 

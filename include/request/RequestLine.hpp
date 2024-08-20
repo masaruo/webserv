@@ -9,6 +9,7 @@ private:
 	std::string	version_;
 public:
 	RequestLine();
+	RequestLine(std::string const &line);//todo
 	~RequestLine();
 	RequestLine(RequestLine const &rhs);
 	RequestLine &operator=(RequestLine const &rhs);

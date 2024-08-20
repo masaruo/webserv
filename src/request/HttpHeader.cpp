@@ -1,16 +1,9 @@
 #include "HttpHeader.hpp"
 #include <utility>
+#include "string.hpp"
 
 HttpHeader::HttpHeader()
-:headers_()
 {
-	return ;
-}
-
-HttpHeader::HttpHeader(ft::string::string_vector const &str_vec)
-:headers_()
-{
-	make_headers(str_vec);
 	return ;
 }
 
@@ -34,55 +27,41 @@ HttpHeader &HttpHeader::operator=(HttpHeader const &rhs)
 	return (*this);
 }
 
-void	HttpHeader::make_headers(ft::string::string_vector const &str_vec)
+void	HttpHeader::setHeader(std::string const &line)
 {
-	ft::string::string_vector_const_iterator iter = str_vec.begin();
-	ft::string::string_vector_const_iterator end = str_vec.end();
-
-	while (iter != end)
-	{
-		if (iter->str() == ft::string::CR)
-		{
-			iter++;
-			continue ;
-		}
-		ft::string	to_split(iter->str());
-		to_split.trim(ft::string::CRLF);
-		std::string::size_type	found_idx = to_split.str().find_first_of(':');
-		std::string	first = to_split.str().substr(0, found_idx);
-		std::string	second = to_split.str().substr(found_idx + 2);
-		headers_.insert(std::make_pair(first, second));
-		iter++;
-	}
+	if (line == ft::string::CR)
+		return ;
+	ft::string	to_mod(line);
+	ft::string::string_vector	split_by_dcolon = to_mod.split(":");
+	std::string	key = split_by_dcolon.at(0);
+	split_by_dcolon.at(1).trim(ft::string::SP + ft::string::CR);
+	std::string value = split_by_dcolon.at(1);
+	//todo verification
+	setHeader(key, value);
+	
 }
 
-HttpHeader::const_iterator HttpHeader::get_pair(std::string const &key) const
+void	HttpHeader::setHeader(std::string const &key, std::string const &value)
 {
-	HttpHeader::const_iterator	found;
-
-	found = headers_.find(key);
-	return (found);
+	headers_[key].push_back(value);
 }
 
-HttpHeader::iterator	HttpHeader::get_pair(std::string const &key)
+std::string	HttpHeader::getHeader(std::string const &key) const
 {
-	HttpHeader::iterator	found;
-
-	found = headers_.find(key);
-	return (found);
+	return (headers_.at(key).front());
+	//todo error - out_of_range will be thrown
 }
 
-std::string	HttpHeader::printHeader(void) const
+ft::str_vec	HttpHeader::getHeaders(std::string const &key) const
 {
-	const_iterator	it = headers_.begin();
-	const_iterator	end = headers_.end();
-	std::string		res = "";
+	return (headers_.at(key));
+	//todo error - this will throw out_of_range if no key
+}
 
-	while (it != end)
-	{
-		res += "first " + it->first + " and ";
-		res += "second " + it->second + "\n";
-		it++;
-	}
-	return (res);
+bool	HttpHeader::hasHeader(std::string const &key) const
+{
+	if (headers_.find(key) == headers_.end())
+		return (false);
+	else
+		return (true);
 }

@@ -58,9 +58,8 @@ ssize_t	ClientSocket::recv_handler(void)//! create request class and return resp
 	std::string	raw_data = ConnectionHandler::recvData(fd_, 8000);
 	ft::unique_ptr<ARequest>req_tmp(RequestFactory::createRequest(raw_data));
 	request_ = req_tmp;
-	//request_->createMockResponse(fd_);
 	ft::unique_ptr<AResponse>res(request_->createResponse(fd_));
-	res->createBody(request_->getRequestLine().get_uri());
+	res->createBody(request_->getRequestLine().getUri());
 	ConnectionHandler::sendData(fd_, res->str());
 	set_time();
 	return (0);

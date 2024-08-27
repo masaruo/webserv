@@ -1,11 +1,5 @@
 #include "PostRequest.hpp"
-#include "AResponse.hpp"
-
-PostRequest::PostRequest()
-:ARequest()
-{
-	return ;
-}
+#include "PostResponse.hpp"
 
 PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, AHttpBody const &body)
 :ARequest(line, header)
@@ -20,7 +14,8 @@ PostRequest::~PostRequest()
 }
 
 PostRequest::PostRequest(PostRequest const &rhs)
-:ARequest()
+:ARequest(rhs)
+,body_(rhs.body_)
 {
 	return ;
 }
@@ -29,13 +24,13 @@ PostRequest &PostRequest::operator=(PostRequest const &rhs)
 {
 	if (this != &rhs)
 	{
-		//todo 
+		ARequest::operator=(rhs);
+		body_ = rhs.body_;
 	}
 	return (*this);
 }
 
-#include "GetResponse.hpp"//todo change to post response
-AResponse	*PostRequest::createResponse(int sockfd) const
+AResponse	*PostRequest::createResponse(void) const
 {
-	return (new GetResponse());//todo change to PostResponse;
+	return (new PostResponse(getLine().getUri(), getHeader()));
 }

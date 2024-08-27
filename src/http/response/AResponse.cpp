@@ -1,9 +1,11 @@
 #include "AResponse.hpp"
 
-// AResponse::uri_map_t	uri_map_;
-
-AResponse::AResponse()
-// :status_code_(0), line_(), header_(), body_()
+AResponse::AResponse(std::string const &uri, HttpHeader const &req_header)
+:uri_(uri)
+,request_header_(req_header)
+,line_()
+,response_header_()
+,body_()
 {
 	return ;
 }
@@ -14,10 +16,11 @@ AResponse::~AResponse()
 }
 
 AResponse::AResponse(AResponse const &rhs)
-:status_code_(rhs.status_code_)
-// ,line_(rhs.line_)
-// ,header_(rhs.header_)
-// ,body_(rhs.body_)
+:uri_(rhs.uri_)
+,request_header_(rhs.request_header_)
+,line_(rhs.line_)
+,response_header_(rhs.response_header_)
+,body_(rhs.body_)
 {
 	return ;
 }
@@ -26,10 +29,47 @@ AResponse &AResponse::operator=(AResponse const &rhs)
 {
 	if (this != &rhs)
 	{
-		status_code_ = rhs.status_code_;
-		// line_ = rhs.line_;
-		// header_ = rhs.header_;
-		// body_ = rhs.body_;
+		uri_ = rhs.uri_;
+		request_header_ = rhs.request_header_;
+		line_ = rhs.line_;
+		response_header_ = rhs.response_header_;
+		body_ = rhs.body_;
 	}
 	return (*this);
+}
+
+void	AResponse::setLine(StatusLine const &inLine)
+{
+	line_ = inLine;
+}
+
+void	AResponse::setHeader(HttpHeader const &inHeader)
+{
+	response_header_ = inHeader;
+}
+
+void	AResponse::setBody(ft::bytes_vec const &body)
+{
+	body_ = body;
+}
+
+void	AResponse::setBody(std::string const &body)
+{
+	ft::bytes_vec	tmp(body.begin(), body.end());
+	body_ = tmp;
+}
+
+StatusLine	AResponse::getLine(void) const
+{
+	return (line_);
+}
+
+HttpHeader	AResponse::getHeader(void) const
+{
+	return (response_header_);
+}
+
+ft::bytes_vec	AResponse::getBody(void) const
+{
+	return (body_);
 }

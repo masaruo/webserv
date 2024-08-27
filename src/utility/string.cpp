@@ -295,6 +295,7 @@ ft::string::string_vector	ft::string::split(std::string const &delims) const
 		cp_end = base_.find_first_of(delims, cp_end);
 		if (cp_end == std::string::npos)
 		{
+			// split_v.push_back(base_);
 			break ;
 		}
 		else

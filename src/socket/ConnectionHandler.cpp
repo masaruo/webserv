@@ -65,3 +65,28 @@ bool	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 	}
 	return (true);
 }
+
+bool	ConnectionHandler::sendData(int sock_fd, ft::bytes_vec const &data)
+{
+	std::size_t				total_sent = 0;
+	ssize_t					bytes_sent;
+
+	while (total_sent < data.size())
+	{
+		bytes_sent = send(sock_fd, data.data() + total_sent, data.size() - total_sent, 0);
+		if (bytes_sent == ft::err)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+			{
+				continue ;
+			}
+			else
+			{
+				//todo error
+				return (false);
+			}
+		}
+		total_sent += bytes_sent;
+	}
+	return (true);
+}

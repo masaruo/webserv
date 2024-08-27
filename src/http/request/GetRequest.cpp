@@ -1,12 +1,6 @@
 #include "GetRequest.hpp"
 #include "GetResponse.hpp"
 
-GetRequest::GetRequest()
-:ARequest()
-{
-	return ;
-}
-
 GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header)
 :ARequest(line, header)
 {
@@ -28,17 +22,12 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 {
 	if (this != &rhs)
 	{
-		*this = rhs;
+		ARequest::operator=(rhs);
 	}
 	return (*this);
 }
 
-GetResponse	*GetRequest::createResponse(int sockfd) const
+GetResponse	*GetRequest::createResponse(void) const
 {
-	return (new GetResponse());
-}
-
-std::string	GetRequest::get_path(void) const
-{
-	return (line_.getUri());
+	return (new GetResponse(getLine().getUri(), getHeader()));
 }

@@ -5,11 +5,11 @@ class GetResponse : public AResponse
 {
 private:
 
+	GetResponse();//=delete
 public:
-	GetResponse();
+	GetResponse(std::string const &uri, HttpHeader const &req_header);
 	~GetResponse();
 	GetResponse(GetResponse const &rhs);
 	GetResponse &operator=(GetResponse const &rhs);
-	void		createBody(std::string const &path);
-	std::string	str(void) const;
+	ft::bytes_vec	generateResponse(void);
 };

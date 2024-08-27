@@ -61,7 +61,7 @@ static ft::str_map	parseUrlEncoded(std::istringstream &iss, std::size_t len)
 ft::str_map	AHttpBody::parseBodies(std::istringstream &iss, HttpHeader const &header)
 {
 	std::string	type = header.getHeader("Content-Type");
-	std::size_t	length = ft::stosizet(header.getHeader("Content-Length"));
+	std::size_t	length = ft::stonum<std::size_t>(header.getHeader("Content-Length"));
 
 	if (type == "application/x-www-form-urlencoded")
 		return (parseUrlEncoded(iss, length));

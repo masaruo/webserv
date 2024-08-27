@@ -1,7 +1,10 @@
-set print pretty on
-set print object on
-set print static-members on
-set print vtbl on
-set print demangle on
-set demangle-style gnu-v3
-set print sevenbit-strings off
+# プロジェクトディレクトリの.gdbinit
+
+# カスタムプリティプリンタの読み込み
+source ./response_printer.py
+
+# プロジェクト固有のブレークポイント設定
+# break main
+# break AResponse::generateResponse
+
+# その他のプロジェクト固有の設定やコマンド

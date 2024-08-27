@@ -1,13 +1,6 @@
 #include "ARequest.hpp"
 #include "string.hpp"
 
-ARequest::ARequest()
-:line_()
-,header_()
-{
-	return ;
-}
-
 ARequest::ARequest(RequestLine const &line, HttpHeader const &header)
 :line_(line)
 ,header_(header)
@@ -37,12 +30,12 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 	return (*this);
 }
 
-RequestLine const &ARequest::getRequestLine(void) const
+RequestLine	ARequest::getLine(void) const
 {
 	return (line_);
 }
 
-HttpHeader const &ARequest::getRequestHeader(void) const
+HttpHeader	ARequest::getHeader(void) const
 {
 	return (header_);
 }

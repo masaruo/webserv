@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <stdint.h> // uint8_t
 
 namespace ft
 {
@@ -31,5 +32,36 @@ namespace ft
 	typedef str_map::size_type					str_map_size_type;
 	typedef str_map::difference_type			str_map_diff_type;
 
-	std::size_t	stosizet(std::string const &numStr);
+//! vec_for_bin_data
+	typedef std::vector<uint8_t>		bytes_vec;
+	typedef bytes_vec::iterator			bytes_vec_iter;
+	typedef bytes_vec::const_iterator	bytes_vec_const_iter;
+	typedef bytes_vec::size_type		bytes_vec_size_type;
+	typedef bytes_vec::difference_type	bytes_vec_diff_type;
+
+	template <typename T>
+	T stonum(std::string const &str)
+	{
+		std::stringstream	ss(str);
+		T					num = 0;
+		ss >> num;
+		if (ss.fail() || !ss.eof())
+		{
+			//todo error?
+		}
+		return (num);
+	}
+
+	template <typename T>
+	std::string	to_string(T num)
+	{
+		std::stringstream	numStr;
+		numStr << num;
+		if (numStr.failbit)
+		{
+			//todo error?
+		}
+		return (numStr.str());
+	}
+
 }

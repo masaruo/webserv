@@ -1,7 +1,8 @@
 #include "GetResponse.hpp"
 #include "FileHandler.hpp"
 
-GetResponse::GetResponse()
+GetResponse::GetResponse(std::string const &uri, HttpHeader const &req_header)
+:AResponse(uri, req_header)
 {
 	return ;
 }
@@ -12,22 +13,28 @@ GetResponse::~GetResponse()
 }
 
 GetResponse::GetResponse(GetResponse const &rhs)
+:AResponse(rhs)
 {
 	return ;
 }
 
 GetResponse &GetResponse::operator=(GetResponse const &rhs)
 {
+	if (this != &rhs)
+	{
+		AResponse::operator=(rhs);
+	}
 	return (*this);
 }
 
 #include <sstream>
-void	GetResponse::createBody(std::string const &path)
+ft::bytes_vec	GetResponse::generateResponse(void)
 {
-	//! below is the real code
 	std::string mockPath("/webserv/www/index.html");
-	if (path == "/test")
-		mockPath = "/webserv/www/test.html";
+	// if (path == "/test")
+	// 	mockPath = "/webserv/www/test.html";
+	// else if (path == "/cgi")
+	// 	mockPath = "/webserv/www/hello.cgi";
 	std::string body = FileReader::readTextFile(mockPath);
 
 	std::ostringstream response;
@@ -38,11 +45,6 @@ void	GetResponse::createBody(std::string const &path)
     response << "\r\n";  // ヘッダーとボディを区切る空行
 	response << body;
 
-	body_ = response.str();
-	
-}
-
-std::string	GetResponse::str(void) const
-{
-	return (body_);
+	setBody(response.str());
+	return (getBody());
 }

@@ -44,6 +44,7 @@ RUN apt-get update && apt-get upgrade -y && \
     rr \
     tree \
     lsof \
+    vim \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

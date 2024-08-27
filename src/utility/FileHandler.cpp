@@ -1,5 +1,6 @@
 #include "FileHandler.hpp"
 #include <fstream>
+#include <unistd.h>
 
 std::string FileReader::readTextFile(std::string const &path)
 {
@@ -18,4 +19,29 @@ std::string FileReader::readTextFile(std::string const &path)
 		//todo error?
 	}
 	return (buf);
+}
+
+ft::bytes_vec	FileReader::readFdFile(int fd)
+{
+	const std::size_t BUFFSIZE = 4096;
+	ft::bytes_vec	buf(BUFFSIZE);//todo buffer size
+	ft::bytes_vec	result;
+
+	while (true)
+	{
+		ssize_t	bytesRead = read(fd, buf.data(), buf.size());
+		if (bytesRead == ft::err)
+		{
+			//todo err
+		}
+		else if (bytesRead == ft::eof)
+		{
+			break ;
+		}
+		else
+		{
+			result.insert(result.end(), buf.begin(), buf.begin() + bytesRead);
+		}
+	}
+	return (result);
 }

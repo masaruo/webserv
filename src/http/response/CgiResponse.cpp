@@ -11,7 +11,7 @@ int const	CgiResponse::CHILD_PID = 0;
 
 CgiResponse::CgiResponse(std::string const &uri, HttpHeader const &req_header)
 :AResponse(uri, req_header)
-,env_()
+,env_(uri, req_header)
 ,body_()
 {
 	return ;
@@ -39,11 +39,6 @@ CgiResponse &CgiResponse::operator=(CgiResponse const &rhs)
 		body_ = rhs.body_;
 	}
 	return (*this);
-}
-
-void	CgiResponse::createEnv(void)
-{
-	//todo
 }
 
 void	CgiResponse::execute(void)
@@ -92,6 +87,7 @@ static char **create_argv(std::string const &uri)
 	argv = new char*[2]();
 	//todo exceptions - bad alloc
 	argv[0] = new char[uri.size() + 1]();
+	if (argv[0] == NULL)
 	{
 		delete_argv(argv);
 		//todo exception
@@ -109,7 +105,6 @@ static char **create_argv(std::string const &uri)
 
 void	CgiResponse::exec_child(int pipefd[2]) const
 {
-	extern char** environ;//todo delete
 	if (close(pipefd[READ_FD]) == ft::err)
 	{
 		//todo error
@@ -122,9 +117,12 @@ void	CgiResponse::exec_child(int pipefd[2]) const
 	{
 		//todo error
 	}
-	char **argv = create_argv("/webserv/cgi-bin/getTime_cgi");
-	execve(argv[0], argv, environ);
+	// char **argv = create_argv("/webserv/cgi-bin/getTime_cgi");
+	char **argv = create_argv("/webserv/cgi-bin/process.cgi");
+	char **env = env_.to_cenv();
+	execve(argv[0], argv, env);
 	delete_argv(argv);
+	//todo delelete env?
 	//todo error
 }
 

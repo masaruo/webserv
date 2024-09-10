@@ -22,11 +22,11 @@ class ARequest;
 class AResponse
 {
 private:
-	std::string		uri_;              ///< リクエストURI
-	HttpHeader		request_header_;   ///< リクエストヘッダ
-	StatusLine		line_;             ///< ステータスライン
-	HttpHeader		response_header_;  ///< レスポンスヘッダ
-	ft::bytes_vec	body_;             ///< レスポンスボディ
+	std::string		uri_;				///< リクエストURI
+	HttpHeader		request_header_;	///< リクエストヘッダ
+	StatusLine		line_;				///< ステータスライン
+	HttpHeader		response_header_;	///< レスポンスヘッダ
+	ft::bytes_vec	body_;				///< レスポンスボディ
 
 	AResponse(); ///< デフォルトコンストラクタ（private）
 

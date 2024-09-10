@@ -1,14 +1,14 @@
 #pragma once
 #include "AResponse.hpp"
 #include "unique_ptr.hpp"
+#include "env.hpp"
 
 //todo environ
 class CgiResponse : public AResponse
 {
 private:
-	ft::str_map		env_;
+	Env				env_;
 	ft::bytes_vec	body_;
-	void	createEnv(void);//todo
 	void	execute(void);
 	void	exec_child(int pipefd[2]) const;
 	void	exec_parent(int pipefd[2], pid_t child_pid);

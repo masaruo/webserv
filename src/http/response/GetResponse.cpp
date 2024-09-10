@@ -1,5 +1,6 @@
 #include "GetResponse.hpp"
 #include "FileHandler.hpp"
+#include "define.hpp"
 
 GetResponse::GetResponse(std::string const &uri, HttpHeader const &req_header)
 :AResponse(uri, req_header)
@@ -30,19 +31,27 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 #include <sstream>
 ft::bytes_vec	GetResponse::generateResponse(void)
 {
-	std::string mockPath("/webserv/www/index.html");
-	// if (path == "/test")
-	// 	mockPath = "/webserv/www/test.html";
-	// else if (path == "/cgi")
-	// 	mockPath = "/webserv/www/hello.cgi";
-	std::string body = FileReader::readTextFile(mockPath);
+	//todo need to make it dynamic
+	std::string mockPath("/webserv/www/upload.html");//! hardcoded route
+	//!try - catch readTextFile
+	std::string	body = FileReader::readTextFile(mockPath);
+
+	StatusLine	line;
+	line.setStatusCode(StatusCode::OK);
+	line.setVersion("HTTP/1.1");
+	setLine(line);
+
+	HttpHeader	header;
+	header.setHeader("Content-Type:", " text/html\r\n");
+	header.setHeader("Content-Length", body.size() + "\r\n");
+	header.setHeader("Connection", " keep-alive\r\n");
 
 	std::ostringstream response;
-    response << "HTTP/1.1 200 OK\r\n";
-    response << "Content-Type: text/html; charset=UTF-8\r\n";
-    response << "Content-Length: " << body.length() << "\r\n";
-    response << "Connection: keep-alive\r\n";
-    response << "\r\n";  // ヘッダーとボディを区切る空行
+	response << "HTTP/1.1 200 OK\r\n";
+	response << "Content-Type: text/html; charset=UTF-8\r\n";
+	response << "Content-Length: " << body.length() << "\r\n";
+	response << "Connection: keep-alive\r\n";
+	response << "\r\n";  // ヘッダーとボディを区切る空行
 	response << body;
 
 	setBody(response.str());

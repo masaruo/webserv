@@ -71,5 +71,6 @@ HttpHeader	AResponse::getHeader(void) const
 
 ft::bytes_vec	AResponse::getBody(void) const
 {
+	ft::bytes_vec	res;
 	return (body_);
 }

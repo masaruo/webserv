@@ -30,6 +30,7 @@ ARequest	*RequestFactory::createRequest(int fd, std::string const &raw_request)
 	std::string	method = requestLine.getMethod();
 	if (method == "GET")
 	{
+		//todo messy -> refactor
 		//クエリがあるか？
 		std::string 			uri = requestLine.getUri();
 		std::string::size_type	question_pos = uri.find("?");
@@ -53,8 +54,8 @@ ARequest	*RequestFactory::createRequest(int fd, std::string const &raw_request)
 		//body
 		// return (new PostRequest(requestline, header, body));
 		AHttpBody body(requestStream, header);
-		return (new PostRequest(requestLine, header, body));
-		// return (new CgiRequest(requestLine, header, body));//todoe delete
+		// return (new PostRequest(requestLine, header, body));
+		return (new CgiRequest(requestLine, header, body));//todoe delete
 
 	}
 	else if (method == "DELETE")

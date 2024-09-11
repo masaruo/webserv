@@ -1,10 +1,13 @@
 #include "ARequest.hpp"
+#include "define.hpp"
 #include "GetResponse.hpp"
 
 class GetRequest : public ARequest
 {
 private:
-	GetRequest();
+	ft::str_map	query_;
+	ft::str_map	parseQuery(std::string const &uri);
+	GetRequest();//=delete
 public:
 	GetRequest(RequestLine const &line, HttpHeader const &header);
 	~GetRequest();

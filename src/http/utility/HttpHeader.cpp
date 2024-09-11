@@ -3,8 +3,21 @@
 #include "string.hpp"
 
 HttpHeader::HttpHeader()
+:headers_()
 {
 	return ;
+}
+
+HttpHeader::HttpHeader(std::istringstream &iss)
+{
+	std::string	line;
+	while (true)
+	{
+		std::getline(iss, line);
+		if (line.empty() || line == ft::string::CRLF)
+			break ;
+		setHeader(line);
+	}
 }
 
 HttpHeader::~HttpHeader()

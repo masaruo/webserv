@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <Binary.hpp>
 
 class StatusCode
 {
@@ -10,12 +11,13 @@ public:
 private:
 	int			code_;
 	std::string	message_;
+	// Binary		binary_;
 	StatusCode(int code, std::string msg);
 	//setter
 	void	setCode(int inCode);
 	void	setMessage(std::string const &inMsg);
 public:
-	StatusCode();
+	explicit StatusCode();
 	~StatusCode();
 	StatusCode(StatusCode const &rhs);
 	StatusCode &operator=(StatusCode const &rhs);

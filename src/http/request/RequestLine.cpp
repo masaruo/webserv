@@ -1,15 +1,12 @@
 #include "RequestLine.hpp"
 #include "string.hpp"
 
-RequestLine::RequestLine()
-:method_(), uri_(), version_()
-{
-	return ;
-}
 
-RequestLine::RequestLine(std::string const &line)
+RequestLine::RequestLine(std::istringstream &iss)
 :method_(), uri_(), version_()
 {
+	std::string	line;
+	std::getline(iss, line);
 	ft::string	to_split(line);
 	to_split.trim(ft::string::CRLF);
 	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WHITESPACE);

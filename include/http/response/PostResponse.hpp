@@ -10,5 +10,5 @@ public:
 	~PostResponse();
 	PostResponse(PostResponse const &rhs);
 	PostResponse &operator=(PostResponse const &rhs);
-	ft::bytes_vec	generateResponse(void);
+	void	generateResponse(void);
 };

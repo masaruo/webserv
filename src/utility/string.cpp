@@ -95,6 +95,18 @@ bool	ft::string::operator==(string const &rhs) const
 	return (base_ == rhs.base_);
 }
 
+ft::string	&ft::string::operator+=(ft::string const &rhs)
+{
+	base_ += rhs.base_;
+	return (*this);
+}
+
+ft::string	&ft::string::operator+=(std::string const &rhs)
+{
+	base_ += rhs;
+	return (*this);
+}
+
 ft::string::operator std::string &()
 {
 	return (base_);
@@ -168,6 +180,8 @@ bool	ft::string::has_only(std::string const &to_search, size_type start, size_ty
 
 bool	ft::string::start_with(std::string const &to_search) const
 {
+	if (base_.empty())
+		return (false);
 	size_type pos = base_.find_first_of(to_search);
 	if (pos == 0)
 		return (true);
@@ -177,6 +191,8 @@ bool	ft::string::start_with(std::string const &to_search) const
 
 bool	ft::string::start_with(char const to_search) const
 {
+	if (base_.empty())
+		return (false);
 	size_type pos = base_.find_first_of(to_search);
 	if (pos == 0)
 		return (true);
@@ -186,6 +202,8 @@ bool	ft::string::start_with(char const to_search) const
 
 bool	ft::string::end_with(std::string const &to_search) const
 {
+	if (base_.empty())
+		return (false);
 	size_type pos = base_.find_last_of(to_search);
 	if (pos + 1 == base_.size())
 		return (true);
@@ -195,6 +213,8 @@ bool	ft::string::end_with(std::string const &to_search) const
 
 bool	ft::string::end_with(char const to_search) const
 {
+	if (base_.empty())
+		return (false);
 	size_type pos = base_.find_last_of(to_search);
 	if (pos + 1 == base_.size())
 		return (true);
@@ -226,12 +246,16 @@ void	ft::string::pop(void)
 {
 	if (base_.size() > 0)
 		base_.erase(0, 1);
+	else
+		base_.clear();
 }
 
 void	ft::string::pop_back(void)
 {
 	if (base_.size() > 0)
 		base_.erase(base_.size() - 1, 1);
+	else
+		base_.clear();
 }
 
 void	ft::string::trim(std::string const &target)
@@ -282,6 +306,20 @@ void	ft::string::to_upper(void)
 			*it = toupper(c);
 		it++;
 	}
+}
+
+ft::bytes_vec	ft::string::to_binary(void) const
+{
+	const_iterator	iter = base_.begin();
+	const_iterator	end = base_.end();
+	ft::bytes_vec	binary;
+
+	while (iter != end)
+	{
+		binary.push_back(static_cast<u_int8_t>(*iter));
+		iter++;
+	}
+	return (binary);
 }
 
 ft::string::string_vector	ft::string::split(std::string const &delims) const

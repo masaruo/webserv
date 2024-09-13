@@ -28,7 +28,7 @@ PostResponse &PostResponse::operator=(PostResponse const &rhs)
 }
 
 #include <sstream>
-ft::bytes_vec	PostResponse::generateResponse(void)
+void	PostResponse::generateResponse(void)
 {
 	std::string mockPath("/webserv/www/index.html");
 	// if (path == "/test")

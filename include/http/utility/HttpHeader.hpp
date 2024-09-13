@@ -2,8 +2,9 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <sstream>
+// #include <sstream>
 #include "define.hpp"
+#include "Binary.hpp"
 
 class HttpHeader
 {
@@ -24,6 +25,7 @@ public:
 	HttpHeader &operator=(HttpHeader const &rhs);
 	void		setHeader(std::string const &key, std::string const &value);
 	std::string	getHeader(std::string const &key) const;
-	ft::str_vec	getHeaders(std::string const &key) const;
+	map_vec_t	data(void) const;
 	bool		hasHeader(std::string const &key) const;
+	ft::string	str(void) const;
 };

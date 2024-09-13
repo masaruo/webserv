@@ -7,8 +7,9 @@
 class CgiResponse : public AResponse
 {
 private:
+	HttpBody		request_body_;
 	Env				env_;
-	ft::bytes_vec	body_;
+	// ft::bytes_vec	body_;
 	void	execute(void);
 	void	exec_child(int pipefd[2]) const;
 	void	exec_parent(int pipefd[2], pid_t child_pid);
@@ -17,9 +18,9 @@ private:
 	static int const	CHILD_PID;
 	CgiResponse();// = delete
 public:
-	explicit CgiResponse(std::string const &uri, HttpHeader const &req_header);
+	explicit CgiResponse(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body);
 	~CgiResponse();
 	CgiResponse(CgiResponse const &rhs);
 	CgiResponse &operator=(CgiResponse const &rhs);
-	ft::bytes_vec	generateResponse(void);
+	void	generateResponse(void);
 };

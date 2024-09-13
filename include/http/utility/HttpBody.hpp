@@ -1,17 +1,24 @@
 #pragma once
 #include "define.hpp"
-#include <sstream>
+#include "Binary.hpp"
+#include <string>
+// #include <sstream>
 
 class HttpBody
 {
 private:
-	ft::bytes_vec	body_;
-	ft::bytes_vec	parseBody(std::istringstream &iss, std::size_t len);
+	Binary		body_;
+	std::size_t	size_;
+	Binary	parseBody(std::istringstream &iss, std::size_t len);
+	Binary	parseBody(std::string const &str);
 public:
 	HttpBody();
 	HttpBody(std::istringstream &iss, std::size_t len);
+	HttpBody(std::string const &str);
+	HttpBody(Binary const &binary);
 	~HttpBody();
 	HttpBody(HttpBody const &rhs);
 	HttpBody &operator=(HttpBody const &rhs);
-	ft::bytes_vec	getBody(void) const;
+	std::string	str(void) const;
+	std::size_t	getSize(void) const;
 };

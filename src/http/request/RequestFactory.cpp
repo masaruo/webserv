@@ -24,13 +24,8 @@ ARequest	*RequestFactory::createRequest(int fd, std::string const &raw_request)
 	}
 	else if (method == "POST")
 	{
-		//body
-		// return (new PostRequest(requestline, header, body));
-		// AHttpBody body(requestStream, header);
-		// return (new PostRequest(requestLine, header, body));
 		std::size_t len = ft::stonum<std::size_t>(header.getHeader("Content-Length"));
 		HttpBody body(requestStream, len);
-		// return (new CgiRequest(requestLine, header, body));//todoe delete
 		return (new PostRequest(requestLine, header, body));
 
 	}

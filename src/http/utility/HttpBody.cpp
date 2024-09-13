@@ -1,30 +1,42 @@
 #include "HttpBody.hpp"
 
-ft::bytes_vec	HttpBody::parseBody(std::istringstream &iss, std::size_t len)
+Binary	HttpBody::parseBody(std::istringstream &iss, std::size_t len)
 {
-	ft::bytes_vec	bytes;
 	std::string		str(iss.str().substr(iss.tellg()));
-	
-	std::string::const_iterator it = str.begin();
-	std::string::const_iterator end = str.end();
-	std::size_t i = 0;
+	Binary	bin(str);
+	return (bin);
+}
 
-	while (it != end && i < len)
-	{
-		bytes.push_back(*it);
-		it++, i++;
-	}
-	return (bytes);
+Binary	HttpBody::parseBody(std::string const &str)
+{
+	Binary	bin(str);
+	return (bin);
 }
 
 HttpBody::HttpBody()
 :body_()
+,size_(0)
 {
 	return ;
 }
 
 HttpBody::HttpBody(std::istringstream &iss, std::size_t len)
 :body_(parseBody(iss, len))
+,size_(len)
+{
+	return ;
+}
+
+HttpBody::HttpBody(std::string const &str)
+:body_(parseBody(str))
+,size_(str.size())
+{
+	return ;
+}
+
+HttpBody::HttpBody(Binary const &binary)
+:body_(binary)
+,size_(binary.data().size())
 {
 	return ;
 }
@@ -36,6 +48,7 @@ HttpBody::~HttpBody()
 
 HttpBody::HttpBody(HttpBody const &rhs)
 :body_(rhs.body_)
+,size_(rhs.size_)
 {
 	return ;
 }
@@ -45,11 +58,17 @@ HttpBody &HttpBody::operator=(HttpBody const &rhs)
 	if (this != &rhs)
 	{
 		body_ = rhs.body_;
+		size_ = rhs.size_;
 	}
 	return (*this);
 }
 
-ft::bytes_vec	HttpBody::getBody(void) const
+std::string	HttpBody::str(void) const
 {
-	return (body_);
+	return (body_.toStr());
+}
+
+std::size_t	HttpBody::getSize(void) const
+{
+	return (size_);
 }

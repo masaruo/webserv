@@ -9,10 +9,10 @@ int const	CgiResponse::READ_FD = 0;
 int const	CgiResponse::WRITE_FD = 1;
 int const	CgiResponse::CHILD_PID = 0;
 
-CgiResponse::CgiResponse(std::string const &uri, HttpHeader const &req_header)
+CgiResponse::CgiResponse(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body)
 :AResponse(uri, req_header)
-,env_(uri, req_header)
-,body_()
+,request_body_(req_body)
+,env_(uri, req_header, req_body)
 {
 	return ;
 }
@@ -24,8 +24,8 @@ CgiResponse::~CgiResponse()
 
 CgiResponse::CgiResponse(CgiResponse const &rhs)//todo
 :AResponse(rhs)
+,request_body_(rhs.request_body_)
 ,env_(rhs.env_)
-,body_(rhs.body_)
 {
 	return ;
 }
@@ -35,8 +35,8 @@ CgiResponse &CgiResponse::operator=(CgiResponse const &rhs)
 	if (this != &rhs)
 	{
 		AResponse::operator=(rhs);
+		request_body_ = rhs.request_body_;
 		env_ = rhs.env_;
-		body_ = rhs.body_;
 	}
 	return (*this);
 }
@@ -103,6 +103,7 @@ static char **create_argv(std::string const &uri)
 	return (argv);
 }
 
+#include "mockpath.hpp"//todo delete
 void	CgiResponse::exec_child(int pipefd[2]) const
 {
 	if (close(pipefd[READ_FD]) == ft::err)
@@ -117,8 +118,9 @@ void	CgiResponse::exec_child(int pipefd[2]) const
 	{
 		//todo error
 	}
-	// char **argv = create_argv("/webserv/cgi-bin/getTime_cgi");
-	char **argv = create_argv("/webserv/cgi-bin/process.cgi");
+	MockPath mock;
+	char **argv = create_argv(mock.getPath(getUri()));
+	// char **argv = create_argv("/webserv/cgi-bin/process.cgi");
 	char **env = env_.to_cenv();
 	execve(argv[0], argv, env);
 	delete_argv(argv);
@@ -140,14 +142,15 @@ void	CgiResponse::exec_parent(int pipefd[2], pid_t child_pid)
 	else if (WIFEXITED(status))
 	{
 		ft::bytes_vec	result = FileReader::readFdFile(pipefd[READ_FD]);
-		setBody(result);
+		Binary	bin(result);
+		HttpBody body(bin);
+		setBody(body);
 	}
 	close(pipefd[READ_FD]);
 }
 
-ft::bytes_vec	CgiResponse::generateResponse(void)
+void	CgiResponse::generateResponse(void)
 {
-	//todo
 	execute();
-	return(getBody());
+	return ;
 }

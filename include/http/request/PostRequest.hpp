@@ -9,7 +9,7 @@ class PostRequest : public ARequest
 {
 private:
 	HttpBody	body_;
-	// AHttpBody	body_;
+	// void	createTempFile(void) const;
 	PostRequest();//=delete
 public:
 	PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);

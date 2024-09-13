@@ -13,6 +13,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "define.hpp"
 
 namespace ft
 {
@@ -51,6 +52,8 @@ public:
 	string &operator=(string const &rhs);
 	string &operator=(std::string const &rhs);
 	string &operator=(char const *ch);
+	string &operator+=(string const &rhs);
+	string &operator+=(std::string const &rhs);
 	bool operator==(char const *rhs) const;
 	bool operator==(std::string const &rhs) const;
 	bool operator==(string const &rhs) const;
@@ -89,7 +92,8 @@ public:
 	void		trim(char const &target);
 	void		to_lower(void);
 	void		to_upper(void);
-	string_vector		split(std::string const &to_split) const;
+	ft::bytes_vec	to_binary(void) const;
+	string_vector	split(std::string const &to_split) const;
 };
 
 } //end of namespace ft

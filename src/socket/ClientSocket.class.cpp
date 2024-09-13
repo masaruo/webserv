@@ -59,7 +59,8 @@ ssize_t	ClientSocket::recv_handler(void)//! create request class and return resp
 	ft::unique_ptr<ARequest>req_tmp(RequestFactory::createRequest(fd_, raw_data));
 	request_ = req_tmp;//todo how to directly copy unique_ptr
 	ft::unique_ptr<AResponse>res(request_->createResponse());
-	ConnectionHandler::sendData(fd_, res->generateResponse());
+	res->generateResponse();
+	ConnectionHandler::sendData(fd_, res->getResponse());
 	set_time();
 	return (0);
 }

@@ -3,12 +3,10 @@
 #include "ARequest.hpp"
 #include "GetRequest.hpp"
 #include "PostRequest.hpp"
-// #include "DeleteRequest.hpp"
-// #include "CgiRequest.hpp"
 #include "string.hpp"
 #include "RequestLine.hpp"
 #include "HttpHeader.hpp"
-// #include "AHttpBody.hpp"
+#include "PutRequest.hpp"
 #include "define.hpp"
 
 ARequest	*RequestFactory::createRequest(int fd, std::string const &raw_request)
@@ -34,6 +32,12 @@ ARequest	*RequestFactory::createRequest(int fd, std::string const &raw_request)
 		//body
 		//todo implement
 		return (NULL);
+	}
+	else if (method == "PUT")
+	{
+		std::size_t len = ft::stonum<std::size_t>(header.getHeader("Content-Length"));
+		HttpBody body(requestStream, len);
+		return (new PutRequest(requestLine, header, body));	
 	}
 	else
 	{

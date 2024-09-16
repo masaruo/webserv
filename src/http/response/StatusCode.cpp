@@ -4,6 +4,7 @@
 //todo FULL LIST to be added
 // List of StatusCode
 StatusCode const StatusCode::OK(200, "OK\r\n");
+StatusCode const StatusCode::OK_NOCONTENT(204, "No Content\r\n");
 StatusCode const StatusCode::NOT_FOUND(404, "Not Found\r\n");
 StatusCode const StatusCode::INTERNAL_SERVER_ERROR(500, "Internal Server Error\r\n");
 

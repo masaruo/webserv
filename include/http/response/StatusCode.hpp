@@ -6,6 +6,7 @@ class StatusCode
 {
 public:
 	static const StatusCode	OK;
+	static const StatusCode OK_NOCONTENT;
 	static const StatusCode	NOT_FOUND;
 	static const StatusCode	INTERNAL_SERVER_ERROR;
 private:

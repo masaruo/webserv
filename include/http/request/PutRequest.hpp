@@ -15,5 +15,5 @@ public:
 	PutRequest(PutRequest const &rhs);
 	PutRequest &operator=(PutRequest const &rhs);
 	~PutRequest();
-	AResponse *createResponse(void) const;
+	AResponse	*createResponse(void) const;
 };

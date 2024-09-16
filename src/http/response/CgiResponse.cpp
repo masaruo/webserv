@@ -152,5 +152,7 @@ void	CgiResponse::exec_parent(int pipefd[2], pid_t child_pid)
 void	CgiResponse::generateResponse(void)
 {
 	execute();
+	StatusCode status(StatusCode::OK_NOCONTENT);
+	setCode(status);
 	return ;
 }

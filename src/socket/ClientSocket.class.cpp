@@ -55,8 +55,8 @@ void	ClientSocket::setSockaddr(void)
 #include <iostream>
 ssize_t	ClientSocket::recv_handler(void)//! create request class and return response class?
 {
-	std::string	raw_data = ConnectionHandler::recvData(fd_, 8000);
-	ft::unique_ptr<ARequest>req_tmp(RequestFactory::createRequest(fd_, raw_data));
+	// std::string	raw_data = ConnectionHandler::recvData(fd_, 800000);
+	ft::unique_ptr<ARequest>req_tmp(RequestFactory::createRequest(fd_));
 	request_ = req_tmp;//todo how to directly copy unique_ptr
 	ft::unique_ptr<AResponse>res(request_->createResponse());
 	res->generateResponse();

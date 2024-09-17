@@ -16,5 +16,5 @@ private:
 	RequestFactory &operator=(RequestFactory const &rhs);
 	~RequestFactory();
 public:
-	static	ARequest	*createRequest(int fd, std::string const &raw_request);
+	static	ARequest	*createRequest(int fd);
 };

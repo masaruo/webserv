@@ -41,7 +41,7 @@ void	PostResponse::generateResponse(void)
 	response << "HTTP/1.1 200 OK\r\n";
 	response << "Content-Type: text/html; charset=UTF-8\r\n";
 	response << "Content-Length: " << body.length() << "\r\n";
-	response << "Connection: keep-alive\r\n";
+	// response << "Connection: keep-alive\r\n";
 	response << "\r\n";  // ヘッダーとボディを区切る空行
 	response << body;
 

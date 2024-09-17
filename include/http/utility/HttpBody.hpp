@@ -9,11 +9,11 @@ class HttpBody
 private:
 	Binary		body_;
 	std::size_t	size_;
-	Binary	parseBody(std::istringstream &iss, std::size_t len);
+	Binary	parseBody(std::istringstream &iss);
 	Binary	parseBody(std::string const &str);
 public:
 	HttpBody();
-	HttpBody(std::istringstream &iss, std::size_t len);
+	HttpBody(std::istringstream &iss);
 	HttpBody(std::string const &str);
 	HttpBody(Binary const &binary);
 	~HttpBody();

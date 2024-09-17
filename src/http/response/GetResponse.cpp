@@ -44,7 +44,7 @@ void	GetResponse::generateResponse(void)
 	header.setHeader("Content-Type", " text/html\r\n");
 	std::string size_str = ft::to_string<std::size_t>(body.getSize());
 	header.setHeader("Content-Length", size_str + "\r\n");
-	header.setHeader("Connection", " keep-alive\r\n");
+	// header.setHeader("Connection", " keep-alive\r\n");
 	setHeader(header);
 
 	setBody(body);

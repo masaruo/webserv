@@ -9,9 +9,11 @@
 #include "PutRequest.hpp"
 #include "define.hpp"
 #include "DeleteRequest.hpp"
+#include "ConnectionHandler.hpp"
 
-ARequest	*RequestFactory::createRequest(int fd, std::string const &raw_request)
+ARequest	*RequestFactory::createRequest(int fd)
 {
+	std::string	raw_request = ConnectionHandler::recvData(fd, 6000);//todo buff size
 	std::istringstream	requestStream(raw_request);
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
@@ -21,21 +23,18 @@ ARequest	*RequestFactory::createRequest(int fd, std::string const &raw_request)
 	{
 		return (new GetRequest(requestLine, header));
 	}
-	else if (method == "POST" || method == "DELETE")
+	else if (method == "POST" || method == "DELETE" || method == "PUT")
 	{
 		std::size_t len = ft::stonum<std::size_t>(header.getHeader("Content-Length"));
-		HttpBody body(requestStream, len);
+		std::string bodyStr = ConnectionHandler::recvData(fd, 6000, len);
+		std::istringstream	bodyStream(bodyStr);
+		HttpBody body(bodyStream);
 		if (method == "POST")
 			return (new PostRequest(requestLine, header, body));
-		else
+		else if (method == "DELETE")
 			return (new DeleteRequest(requestLine, header, body));
-
-	}
-	else if (method == "PUT")
-	{
-		std::size_t len = ft::stonum<std::size_t>(header.getHeader("Content-Length"));
-		HttpBody body(requestStream, len);
-		return (new PutRequest(requestLine, header, body));	
+		else
+			return (new PutRequest(requestLine, header, body));
 	}
 	else
 	{

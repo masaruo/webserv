@@ -1,6 +1,6 @@
 #include "HttpBody.hpp"
 
-Binary	HttpBody::parseBody(std::istringstream &iss, std::size_t len)
+Binary	HttpBody::parseBody(std::istringstream &iss)
 {
 	std::string		str(iss.str().substr(iss.tellg()));
 	Binary	bin(str);
@@ -20,9 +20,9 @@ HttpBody::HttpBody()
 	return ;
 }
 
-HttpBody::HttpBody(std::istringstream &iss, std::size_t len)
-:body_(parseBody(iss, len))
-,size_(len)
+HttpBody::HttpBody(std::istringstream &iss)
+:body_(parseBody(iss))
+,size_(body_.data().size())
 {
 	return ;
 }

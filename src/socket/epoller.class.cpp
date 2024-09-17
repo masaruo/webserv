@@ -39,7 +39,8 @@ Epoller::~Epoller()
 void	Epoller::epollAdd(ASocket *socket)
 {
 	epoll_event	ev;
-	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLET;
+	// ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLET;
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR | EPOLLOUT;
 	ev.data.ptr = socket;
 	int	res = 0;
 	res = epoll_ctl(epfd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
@@ -114,6 +115,7 @@ void	Epoller::epollLoop(void)
 					break ;
 				}
 				client->recv_handler();//! once EPOLIN than pass to client socket
+				epollClose(socket);
 			}
 			else // epoll send?
 			{

@@ -31,11 +31,51 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 		else
 		{
 			received_data.append(buffer, 0, bytes_received);
-
 			if(received_data.find("\r\n\r\n") != std::string::npos)
 			{
 				break ;
 			}
+		}
+	}
+	return (received_data);
+}
+
+std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size, ssize_t max_read)
+{
+	std::string	buffer(buffer_size, '\0');
+	std::string	received_data;
+	ssize_t		bytes_received;
+
+	while (true)
+	{
+		bytes_received = recv(sock_fd, &buffer[0], buffer_size, 0);
+
+		if (bytes_received == ft::err)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)//todo change
+			{
+				break ;
+			}
+			else
+			{
+				//todo error handle
+			}
+		}
+		else if (bytes_received == ft::eof)
+		{
+			break ;
+		}
+		else
+		{
+			std::string::value_type	readSize = received_data.size() + bytes_received;
+			if (readSize > max_read)
+			{
+				ssize_t appendSize = max_read - received_data.size();
+				received_data.append(buffer, 0, appendSize);
+				break ;
+			}
+			else
+				received_data.append(buffer, 0, bytes_received);
 		}
 	}
 	return (received_data);

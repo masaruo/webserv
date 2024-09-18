@@ -104,10 +104,16 @@ static char **create_argv(std::string const &uri)
 }
 
 #include "mockpath.hpp"//todo delete
+#include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <cerrno>
 void	CgiResponse::exec_child(int pipefd[2]) const
 {
-	if (close(pipefd[READ_FD]) == ft::err)
+	if (dup2(pipefd[READ_FD], STDIN_FILENO) == ft::err)
 	{
+		std::cerr << "error" << std::endl;
 		//todo error
 	}
 	if (dup2(pipefd[WRITE_FD], STDOUT_FILENO) == ft::err)
@@ -118,9 +124,12 @@ void	CgiResponse::exec_child(int pipefd[2]) const
 	{
 		//todo error
 	}
+	if (close(pipefd[READ_FD]) == ft::err)
+	{
+		//todo error
+	}
 	MockPath mock;
 	char **argv = create_argv(mock.getPath(getUri()));
-	// char **argv = create_argv("/webserv/cgi-bin/process.cgi");
 	char **env = env_.to_cenv();
 	execve(argv[0], argv, env);
 	delete_argv(argv);
@@ -130,21 +139,49 @@ void	CgiResponse::exec_child(int pipefd[2]) const
 
 void	CgiResponse::exec_parent(int pipefd[2], pid_t child_pid)
 {
-	close(pipefd[WRITE_FD]);
-
-	int status = 0;
-	pid_t	wpid = waitpid(child_pid, &status, 0);//todo refactor
-	//todo while loop?
-	if (wpid == ft::err)
+	ssize_t		total_written = 0;
+	char const	*data = request_body_.str().data();
+	std::size_t	remaining = request_body_.getSize();
+	while (remaining > 0)
 	{
-		//todo error
+		// ssize_t	bytesWritten = write(pipefd[WRITE_FD], data + total_written, remaining);
+		ssize_t	bytesWritten = write(pipefd[WRITE_FD], request_body_.str().data() + total_written, remaining);
+		if (bytesWritten == ft::err)
+		{
+			if (errno == EINTR)
+				continue;
+			//todo error
+		}
+		total_written += bytesWritten;
+		remaining -= bytesWritten;
 	}
-	else if (WIFEXITED(status))
+	close(pipefd[WRITE_FD]);
+	int status = 0;
+	while (true)
 	{
+		pid_t	wpid = waitpid(child_pid, &status, 0);//todo refactor
+		if (wpid != ft::err)
+			break ;
+	}
+	if (WIFEXITED(status))
+	{
+		int exit_status = WEXITSTATUS(status);
+		if (exit_status != 0)
+		{
+			//todo error
+		}
 		ft::bytes_vec	result = FileReader::readFdFile(pipefd[READ_FD]);
 		Binary	bin(result);
 		HttpBody body(bin);
 		setBody(body);
+	}
+	else if (WIFSIGNALED(status))
+	{
+		//todo error child process terminated by signal
+	}
+	else
+	{
+		//todo error child processs terminated abnormally
 	}
 	close(pipefd[READ_FD]);
 }

@@ -26,7 +26,8 @@ ARequest	*RequestFactory::createRequest(int fd)
 	else if (method == "POST" || method == "DELETE" || method == "PUT")
 	{
 		std::size_t len = ft::stonum<std::size_t>(header.getHeader("Content-Length"));
-		std::string bodyStr = ConnectionHandler::recvData(fd, 6000, len);
+		std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
+		bodyStr += ConnectionHandler::recvData(fd, 6000, len);
 		std::istringstream	bodyStream(bodyStr);
 		HttpBody body(bodyStream);
 		if (method == "POST")

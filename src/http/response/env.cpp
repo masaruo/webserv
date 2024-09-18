@@ -38,8 +38,8 @@ ft::str_map	Env::createEnv(std::string const &uri, HttpHeader const &req_header,
 	env["GATEWAY_INTERFACE"] = "testCGI/x.x";
 	env["SERVER_PROTOCOL"] = "testProtocol/x.x";
 	env["SERVER_PORT"] = "7777";
-	// env["REQUEST_METHOD"] = req_header.getHeader("METHOD");//todo set proper key name
-	env["REQUEST_METHOD"] = "POST";//todo delete
+	// env["REQUEST_METHOD"] = req_header.getHeader("METHOD");//*
+	env["REQUEST_METHOD"] = "POST";
 	env["PATH_INFO"] = uri;
 	env["PATH_TRANSLATED"] = uri;//?
 	env["SCRIPT_NAME"] = "echo.cgi";
@@ -49,8 +49,8 @@ ft::str_map	Env::createEnv(std::string const &uri, HttpHeader const &req_header,
 	env["AUTH_TYPE"] = "TEST";//?
 	env["REMOTE_USER"] = "Is it necessary?";//?
 	env["REMOTE_IDENT"] = "Is it necessary?";//?
-	// env["CONTENT_TYPE"] = req_header.getHeader("Content-type");
-	// env["CONTENT_LENGTH"] = req_header.getHeader("Content-Length");
+	env["CONTENT_TYPE"] = req_header.getHeader("Content-Type");
+	env["CONTENT_LENGTH"] = req_header.getHeader("Content-Length");
 	env["XBODY"] = req_body.str();
 	return (env);
 }

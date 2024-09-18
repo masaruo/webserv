@@ -5,6 +5,8 @@
 
 class ConnectionHandler
 {
+public:
+	const ssize_t	NOLIMIT = 0;
 private:
 	ConnectionHandler(){};
 	~ConnectionHandler(){};

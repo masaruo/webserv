@@ -41,7 +41,7 @@ int	ClientSocket::acceptHandler(int listen_fd)
 	fd = accept(listen_fd, NULL, NULL);//todo sockaddr_t
 	if (fd == ft::err)
 	{
-		//todo error
+		throw(SocketException("accept failed at ClientSocket.class.cpp at 44."));
 	}
 	ft::Fcntl::setNonBlock(fd);
 	return (fd);
@@ -53,22 +53,14 @@ void	ClientSocket::setSockaddr(void)
 }
 
 #include <iostream>
-ssize_t	ClientSocket::recv_handler(void)//! create request class and return response class?
+void	ClientSocket::recv_handler(void)
 {
-	// std::string	raw_data = ConnectionHandler::recvData(fd_, 800000);
 	ft::unique_ptr<ARequest>req_tmp(RequestFactory::createRequest(fd_));
-	request_ = req_tmp;//todo how to directly copy unique_ptr
+	request_ = req_tmp;
 	ft::unique_ptr<AResponse>res(request_->createResponse());
 	res->generateResponse();
 	ConnectionHandler::sendData(fd_, res->getResponse());
 	set_time();
-	return (0);
-}
-
-ssize_t	ClientSocket::send_hander(void) const
-{
-	std::cout << "send hander" << std::endl;
-	return (0);
 }
 
 void	ClientSocket::set_time(void)

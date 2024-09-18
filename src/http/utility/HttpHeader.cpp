@@ -98,9 +98,14 @@ ft::string 	HttpHeader::str(void) const
 			combined += "; " + values.at(i);
 			i++;
 		}
-		// combined += "\r\n";
 		ans += combined;
 		iter++;
 	}
 	return (ans);
+}
+
+HttpHeader::HttpHeaderException::HttpHeaderException(std::string const &msg)
+:std::runtime_error(msg)
+{
+	return ;
 }

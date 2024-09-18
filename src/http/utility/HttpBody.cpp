@@ -72,3 +72,9 @@ std::size_t	HttpBody::getSize(void) const
 {
 	return (size_);
 }
+
+HttpBody::HttpBodyException::HttpBodyException(std::string const &msg)
+:std::runtime_error(msg)
+{
+	return ;
+}

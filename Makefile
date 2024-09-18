@@ -12,7 +12,7 @@
 
 TARGET		:=	webserv
 CXX			:=	c++
-CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
+CXXFLAGS	:=	-Wall -Wextra -Werror -Wconversion -std=c++98 -MMD -MP
 LDFLAGS		:=	
 INC			:=	-I./include \
 				-I./include/http/utility \
@@ -32,7 +32,7 @@ DEP			:=	$(OBJ:.o=.d)
 
 ifdef WITH_ASAN
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
-CXXFLAGS	+=	-ggdb3 -O0 -fsanitize=address,undefined,leak
+CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined,leak
 LDFLAGS		:=	-fsanitize=address,undefined,leak
 endif
 

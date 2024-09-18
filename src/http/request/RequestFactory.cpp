@@ -42,3 +42,9 @@ ARequest	*RequestFactory::createRequest(int fd)
 		return (NULL);
 	}
 }
+
+// RequestFactory::RequestFactoryException::RequestFactoryException(std::string const &msg)
+// :std::runtime_error(msg)
+// {
+// 	return ;
+// }

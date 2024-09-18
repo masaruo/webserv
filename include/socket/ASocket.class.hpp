@@ -13,10 +13,9 @@
 #pragma once
 #include <sys/socket.h>
 #include <netinet/in.h>
-// #include <stdexcept>
-/*
- @brief Abstruct Socket Class to be inherited by Listen & Client sockets.
-*/
+#include <stdexcept>
+#include <string>
+
 class ASocket
 {
 public:
@@ -38,10 +37,9 @@ public:
 	int				getFd(void) const;
 	socket_type_t	getSocketType(void) const;
 	void			markSocketDelete(void);
-	//todo errors
-	// class ASocketError : public std::runtime_error
-	// {
-	// public:
-	// 	char const *what() const throw();
-	// };
+	class SocketException : public std::runtime_error
+	{
+	public:
+		SocketException(std::string const &msg);
+	};
 };

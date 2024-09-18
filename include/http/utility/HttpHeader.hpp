@@ -2,7 +2,7 @@
 #include <map>
 #include <vector>
 #include <string>
-// #include <sstream>
+#include <stdexcept>
 #include "define.hpp"
 #include "Binary.hpp"
 
@@ -28,4 +28,9 @@ public:
 	map_vec_t	data(void) const;
 	bool		hasHeader(std::string const &key) const;
 	ft::string	str(void) const;
+	class HttpHeaderException : public std::runtime_error
+	{
+	public:
+		HttpHeaderException(std::string const &rhs);
+	};
 };

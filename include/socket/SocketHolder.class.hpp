@@ -11,12 +11,11 @@
 /* ************************************************************************** */
 
 #pragma once
-// #include "ASocket.class.hpp"
 #include <vector>
+#include <stdexcept>
+#include <string>
 
 class ASocket;
-class ClientSocket;
-class ListenSocket;
 
 class SocketHolder
 {
@@ -39,4 +38,9 @@ public:
 	void	deleteSocketHolder(void);
 	void	deleteMarkedSocket(void);
 	int		getSize(void) const;
+	class SocketHolderException : public std::runtime_error
+	{
+	public:
+		SocketHolderException(std::string const &msg);
+	};
 };

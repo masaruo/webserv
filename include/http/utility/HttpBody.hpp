@@ -2,7 +2,7 @@
 #include "define.hpp"
 #include "Binary.hpp"
 #include <string>
-// #include <sstream>
+#include <stdexcept>
 
 class HttpBody
 {
@@ -21,4 +21,9 @@ public:
 	HttpBody &operator=(HttpBody const &rhs);
 	std::string	str(void) const;
 	std::size_t	getSize(void) const;
+	class HttpBodyException : public std::runtime_error
+	{
+	public:
+		HttpBodyException(std::string const &msg);
+	};
 };

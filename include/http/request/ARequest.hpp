@@ -2,6 +2,7 @@
 #include "RequestLine.hpp"
 #include "HttpHeader.hpp"
 #include "RequestFactory.hpp"
+#include <stdexcept>
 
 class AResponse;
 
@@ -19,4 +20,10 @@ public:
 	RequestLine 		getLine(void) const;
 	HttpHeader 			getHeader(void) const;
 	virtual	AResponse	*createResponse(void) const = 0;
+	//ERROR CLASS
+	class RequestException : public std::runtime_error
+	{
+	public:
+		RequestException(std::string const &msg);
+	};
 };

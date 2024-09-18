@@ -39,3 +39,10 @@ HttpHeader	ARequest::getHeader(void) const
 {
 	return (header_);
 }
+
+//Error
+ARequest::RequestException::RequestException(std::string const &msg)
+:std::runtime_error(msg)
+{
+	return ;
+}

@@ -16,16 +16,16 @@
 #include "ClientSocket.class.hpp"
 #include "define.hpp"
 #include <sys/epoll.h>
-#include <unistd.h>// close()
-#include <iostream>
+#include <unistd.h>
+// #include <iostream>
 
 Epoller::Epoller(int size, int timeout)
 :epfd_(epoll_create(size))
 ,timeout_(timeout)
 {
-	if (epfd_ == ft::err)//todo timeout minus
+	if (epfd_ == ft::err)
 	{
-		//todo erro
+		throw(EpollerException("epoll class initialization failed at 28."));
 	}
 	return ;
 }
@@ -39,14 +39,14 @@ Epoller::~Epoller()
 void	Epoller::epollAdd(ASocket *socket)
 {
 	epoll_event	ev;
-	// ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLET;
+	// ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLET;//!
 	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR | EPOLLOUT;
 	ev.data.ptr = socket;
 	int	res = 0;
 	res = epoll_ctl(epfd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
 	if (res == ft::err)
 	{
-		//todo error
+		throw (EpollerException("epoll add failed at 49."));
 	}
 	SocketHolder_.addSocket(socket);
 	return ;
@@ -58,7 +58,7 @@ void	Epoller::epollClose(ASocket *socket)
 	res = epoll_ctl(epfd_, EPOLL_CTL_DEL, socket->getFd(), NULL);
 	if (res == ft::err)
 	{
-		//todo error
+		throw (EpollerException("epoll close failed at 61."));
 	}
 	socket->markSocketDelete();
 }
@@ -72,10 +72,8 @@ int	Epoller::epollWait(void)
 	numEvents = epoll_wait(epfd_, res_evlist_.data(), size, timeout_);
 	if (numEvents == ft::err)
 	{
-		// if (errno == EINTR)//forbidden
-		// 	return (epollWait());
-		// else
-			std::cout << "epoll wait failed" << std::endl;//! delete
+		//? if (errno == EINTR)//forbidden
+		throw (EpollerException("epoll wait failed at 79."));
 	}
 	SocketHolder_.checkTimeout();
 	SocketHolder_.deleteMarkedSocket();
@@ -102,32 +100,35 @@ void	Epoller::epollLoop(void)
 			{
 				ASocket *new_socket = new ClientSocket(socket->getFd());
 				epollAdd(new_socket);
-				std::cout << "accept" << std::endl;//! delete
 			}
 			else if (ev & EPOLLIN)
 			{
-				// std::cout << "EPOLLIN" << std::endl;
 				ClientSocket *client;
 				client = dynamic_cast<ClientSocket*>(socket);
 				if (client == NULL)
 				{
-					//todo error
-					break ;
+					throw (EpollerException("epoll to get client socket failed at 111."));
 				}
-				client->recv_handler();//! once EPOLIN than pass to client socket
+				client->recv_handler();
 				epollClose(socket);
 			}
-			else // epoll send?
+			else
 			{
-				//todo error
+				throw (EpollerException("epoll with unknown error at 118."));
 			}
 			if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
 			{
-				std::cout << "CLOSE" << std::endl;//! delete
 				epollClose(socket);
 			}
 			it++;
 		}
 		SocketHolder_.deleteMarkedSocket();
 	}
+}
+
+//exception
+Epoller::EpollerException::EpollerException(std::string const &msg)
+:std::runtime_error(msg)
+{
+	return ;
 }

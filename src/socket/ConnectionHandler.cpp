@@ -1,6 +1,6 @@
 #include "ConnectionHandler.hpp"
 #include <sys/socket.h>
-#include <cerrno>//todo delete
+#include <cerrno>
 #include "define.hpp"
 
 std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
@@ -15,13 +15,13 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 
 		if (bytes_received == ft::err)
 		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)//todo change
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
 			{
 				break ;
 			}
 			else
 			{
-				//todo error handle
+				throw (ConnectionHandlerException("ConnectionHandlerException at 24"));
 			}
 		}
 		else if (bytes_received == ft::eof)
@@ -52,13 +52,13 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size, ss
 
 		if (bytes_received == ft::err)
 		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)//todo change
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
 			{
 				break ;
 			}
 			else
 			{
-				//todo error handle
+				throw (ConnectionHandlerException("ConnectionHandlerException at 61."));
 			}
 		}
 		else if (bytes_received == ft::eof)
@@ -81,7 +81,7 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size, ss
 	return (received_data);
 }
 
-bool	ConnectionHandler::sendData(int sock_fd, std::string const &data)
+void	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 {
 	std::size_t				total_sent = 0;
 	ssize_t					bytes_sent;
@@ -97,16 +97,14 @@ bool	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 			}
 			else
 			{
-				//todo error
-				return (false);
+				throw(ConnectionHandlerException("ConnectionHandlerException at 100."));
 			}
 		}
 		total_sent += bytes_sent;
 	}
-	return (true);
 }
 
-bool	ConnectionHandler::sendData(int sock_fd, ft::bytes_vec const &data)
+void	ConnectionHandler::sendData(int sock_fd, ft::bytes_vec const &data)
 {
 	std::size_t				total_sent = 0;
 	ssize_t					bytes_sent;
@@ -122,11 +120,15 @@ bool	ConnectionHandler::sendData(int sock_fd, ft::bytes_vec const &data)
 			}
 			else
 			{
-				//todo error
-				return (false);
+				throw(ConnectionHandlerException("ConnectionHandlerException at 123."));
 			}
 		}
 		total_sent += bytes_sent;
 	}
-	return (true);
+}
+
+ConnectionHandler::ConnectionHandlerException::ConnectionHandlerException(std::string const &msg)
+:std::runtime_error(msg)
+{
+	return ;
 }

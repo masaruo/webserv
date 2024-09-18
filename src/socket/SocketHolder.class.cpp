@@ -94,3 +94,9 @@ void	SocketHolder::deleteMarkedSocket(void)
 			it++;
 	}
 }
+
+SocketHolder::SocketHolderException::SocketHolderException(std::string const &msg)
+:std::runtime_error(msg)
+{
+	return ;
+}

@@ -1,12 +1,9 @@
 #pragma once
 #include "unique_ptr.hpp"
 #include <string>
+#include <stdexcept>
 
 class ARequest;
-// class GetRequest;
-// class Post;
-// class Delete;
-// class HttpLine;
 
 class RequestFactory
 {
@@ -17,4 +14,9 @@ private:
 	~RequestFactory();
 public:
 	static	ARequest	*createRequest(int fd);
+	// class RequestFactoryException : public std::runtime_error
+	// {
+	// public:
+	// 	RequestFactoryException(std::string const &msg);
+	// };
 };

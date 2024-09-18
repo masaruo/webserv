@@ -37,3 +37,10 @@ void	ASocket::markSocketDelete(void)
 {
 	type_ = to_delete;
 }
+
+//exception
+ASocket::SocketException::SocketException(std::string const &msg)
+:std::runtime_error(msg)
+{
+	return ;
+}

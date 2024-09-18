@@ -12,12 +12,12 @@
 
 #pragma once
 #include <vector>
+#include <stdexcept>
+#include <string>
 #include "SocketHolder.class.hpp"
 
 class SocketHolder;
-/*
- @brief wait for connecting sockets. 
-*/
+
 class Epoller
 {
 public:
@@ -43,4 +43,9 @@ public:
 	void	epollAdd(ASocket *socket);
 	void	epollClose(ASocket *socket);
 	void	epollLoop(void);
+	class EpollerException : public std::runtime_error
+	{
+	public:
+		EpollerException(std::string const &msg);
+	};
 };

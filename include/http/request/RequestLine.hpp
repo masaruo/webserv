@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <sstream>
+#include <stdexcept>
 
 class RequestLine
 {
@@ -20,5 +20,9 @@ public:
 	std::string	getMethod(void) const;
 	std::string	getUri(void) const;
 	std::string	getVersion(void) const;
-	//todo exceptions
+	class RequestLineException : public std::runtime_error
+	{
+	public:
+		RequestLineException(std::string const &msg);
+	};
 };

@@ -14,6 +14,7 @@ private:
 	~RequestFactory();
 public:
 	static	ARequest	*createRequest(int fd);
+	static	ARequest	*createRequest(ARequest *request);
 	// class RequestFactoryException : public std::runtime_error
 	// {
 	// public:

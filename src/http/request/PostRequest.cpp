@@ -4,8 +4,7 @@
 #include <fstream>
 
 PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
-:ARequest(line, header)
-,body_(body)
+:ARequest(line, header, body)
 {
 	return ;
 }
@@ -17,7 +16,6 @@ PostRequest::~PostRequest()
 
 PostRequest::PostRequest(PostRequest const &rhs)
 :ARequest(rhs)
-,body_(rhs.body_)
 {
 	return ;
 }
@@ -27,13 +25,12 @@ PostRequest &PostRequest::operator=(PostRequest const &rhs)
 	if (this != &rhs)
 	{
 		ARequest::operator=(rhs);
-		body_ = rhs.body_;
 	}
 	return (*this); 
 }
 
 AResponse	*PostRequest::createResponse(void) const
 {
-	// createTempFile();
-	return (new CgiResponse(getLine().getUri(), getHeader(), body_));
+	ft::unique_ptr<ARequest>tmp(new PostRequest(*this));
+	return (new CgiResponse(tmp));
 }

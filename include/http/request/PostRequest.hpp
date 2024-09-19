@@ -8,11 +8,9 @@ class AResponse;
 class PostRequest : public ARequest
 {
 private:
-	HttpBody	body_;
-	// void	createTempFile(void) const;
 	PostRequest();//=delete
 public:
-	PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
+	explicit PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
 	PostRequest(PostRequest const &rhs);
 	PostRequest &operator=(PostRequest const &rhs);
 	~PostRequest();

@@ -2,8 +2,14 @@
 #include "FileHandler.hpp"
 #include "define.hpp"
 
-GetResponse::GetResponse(std::string const &uri, HttpHeader const &req_header)
-:AResponse(uri, req_header)
+// GetResponse::GetResponse(std::string const &uri, HttpHeader const &req_header)
+// :AResponse(uri, req_header)
+// {
+// 	return ;
+// }
+
+GetResponse::GetResponse(ft::unique_ptr<ARequest>request)
+:AResponse(request)
 {
 	return ;
 }

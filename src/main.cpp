@@ -7,13 +7,19 @@
 
 int main(void)
 {
-  Epoller poller(1, 1000);
+	Epoller poller(1, 1000);
 
-  poller.epollAdd(new ListenSocket(7777));
-  poller.epollAdd(new ListenSocket(8888));
+	try
+	{
+		poller.epollAdd(new ListenSocket(7777));
+		poller.epollAdd(new ListenSocket(8888));
+		poller.epollAdd(new ListenSocket(6666));
 
-  poller.epollLoop();
-
-
-  return (0);
+		poller.epollLoop();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	return (0);
 }

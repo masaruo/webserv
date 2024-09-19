@@ -101,7 +101,7 @@ void	Epoller::epollLoop(void)
 				ASocket *new_socket = new ClientSocket(socket->getFd());
 				epollAdd(new_socket);
 			}
-			else if (ev & EPOLLIN)
+			else if (ev & (EPOLLIN | EPOLLOUT))
 			{
 				ClientSocket *client;
 				client = dynamic_cast<ClientSocket*>(socket);
@@ -112,13 +112,15 @@ void	Epoller::epollLoop(void)
 				client->recv_handler();
 				epollClose(socket);
 			}
-			else
-			{
-				throw (EpollerException("epoll with unknown error at 118."));
-			}
-			if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
+			else if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
 			{
 				epollClose(socket);
+				throw (EpollerException("epoll with HUP or ERR error at 118."));
+			}
+			else
+			{
+				epollClose(socket);
+				throw (EpollerException("epoll with unknown error at 123."));
 			}
 			it++;
 		}

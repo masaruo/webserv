@@ -53,7 +53,7 @@ RequestLine &RequestLine::operator=(RequestLine const &rhs)
 
 void	RequestLine::setMethod(std::string const &inMethod)
 {
-	if (inMethod != "GET" || inMethod != "POST" || inMethod != "DELETE" || inMethod != "PUT")
+	if (inMethod != "GET" && inMethod != "POST" && inMethod != "DELETE" && inMethod != "PUT")
 		throw (RequestLineException("Failed to parse method in requestline at 57."));
 	method_ = inMethod;
 }
@@ -66,7 +66,7 @@ void	RequestLine::setUri(std::string const &inUri)
 
 void	RequestLine::setVersion(std::string const &inVer)
 {
-	if (inVer != "Http/1.1")
+	if (inVer != "HTTP/1.1")
 		throw(RequestLineException("Failed to parse version in requestline at 70."));
 	version_ = inVer;
 }

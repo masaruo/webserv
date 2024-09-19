@@ -52,5 +52,6 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 
 GetResponse	*GetRequest::createResponse(void) const
 {
-	return (new GetResponse(getLine().getUri(), getHeader()));
+	ft::unique_ptr<ARequest>tmp(new GetRequest(*this));
+	return (new GetResponse(tmp));
 }

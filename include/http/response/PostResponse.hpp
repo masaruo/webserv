@@ -6,7 +6,8 @@ class PostResponse : public AResponse
 private:
 	PostResponse();//=delete
 public:
-	PostResponse(std::string const &target, HttpHeader const &req_header);
+	PostResponse(ft::unique_ptr<ARequest>request);
+	// PostResponse(std::string const &target, HttpHeader const &req_header);
 	~PostResponse();
 	PostResponse(PostResponse const &rhs);
 	PostResponse &operator=(PostResponse const &rhs);

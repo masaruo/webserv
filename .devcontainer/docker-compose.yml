@@ -6,6 +6,8 @@ services:
       dockerfile: .devcontainer/Dockerfile
     ports:
       - "8888:8888"
+      - "7777:7777"
+      - "6666:6666"
     volumes:
       - type: bind
         source: "../"

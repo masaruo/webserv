@@ -2,8 +2,8 @@
 #include "string.hpp"
 #include "cstring"
 
-Env::Env(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body)
-:env_(createEnv(uri, req_header, req_body))
+Env::Env(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
+:env_(createEnv(line, header, body))
 {
 	return ;
 }
@@ -28,7 +28,7 @@ Env	&Env::operator=(Env const &rhs)
 	return (*this);
 }
 
-ft::str_map	Env::createEnv(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body)
+ft::str_map	Env::createEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
 {
 	ft::str_map	env;
 
@@ -39,9 +39,9 @@ ft::str_map	Env::createEnv(std::string const &uri, HttpHeader const &req_header,
 	env["SERVER_PROTOCOL"] = "testProtocol/x.x";
 	env["SERVER_PORT"] = "7777";
 	// env["REQUEST_METHOD"] = req_header.getHeader("METHOD");//*
-	env["REQUEST_METHOD"] = "POST";
-	env["PATH_INFO"] = uri;
-	env["PATH_TRANSLATED"] = uri;//?
+	env["REQUEST_METHOD"] = line.getMethod();
+	env["PATH_INFO"] = line.getUri();
+	env["PATH_TRANSLATED"] = "???";//?
 	env["SCRIPT_NAME"] = "echo.cgi";
 	env["QUERY_STRING"] = "???";//todo get from httpheader
 	env["REMOTE_HOST"] = "REMOTE_ADDR";
@@ -49,9 +49,9 @@ ft::str_map	Env::createEnv(std::string const &uri, HttpHeader const &req_header,
 	env["AUTH_TYPE"] = "TEST";//?
 	env["REMOTE_USER"] = "Is it necessary?";//?
 	env["REMOTE_IDENT"] = "Is it necessary?";//?
-	env["CONTENT_TYPE"] = req_header.getHeader("Content-Type");
-	env["CONTENT_LENGTH"] = req_header.getHeader("Content-Length");
-	env["XBODY"] = req_body.str();
+	env["CONTENT_TYPE"] = header.getHeader("Content-Type");
+	env["CONTENT_LENGTH"] = header.getHeader("Content-Length");
+	// env["XBODY"] = req_body.str();
 	return (env);
 }
 

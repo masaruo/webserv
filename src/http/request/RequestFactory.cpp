@@ -43,6 +43,34 @@ ARequest	*RequestFactory::createRequest(int fd)
 	}
 }
 
+ARequest	*RequestFactory::createRequest(ARequest *request)
+{
+	std::string const	method = request->getLine().getMethod();
+	RequestLine const	line = request->getLine();
+	HttpHeader const	header = request->getHeader();
+	HttpBody const		body = request->getBody();
+	if (method == "GET")
+	{
+		return (new GetRequest(line, header));
+	}
+	else if (method == "POST")
+	{
+		return (new PostRequest(line, header, body));
+	}
+	else if (method == "DELETE")
+	{
+		return (new DeleteRequest(line, header, body));
+	}
+	else if (method == "PUT")
+	{
+		return (new PutRequest(line, header, body));
+	}
+	else
+	{
+		return (NULL);
+	}
+}
+
 // RequestFactory::RequestFactoryException::RequestFactoryException(std::string const &msg)
 // :std::runtime_error(msg)
 // {

@@ -5,10 +5,10 @@
 class PutResponse : public AResponse
 {
 private:
-	HttpBody	request_body_;
 	PutResponse();//=delete
 public:
-	PutResponse(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body);
+	PutResponse(ft::unique_ptr<ARequest>request);
+	// PutResponse(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body);
 	~PutResponse();
 	PutResponse(PutResponse const &rhs);
 	PutResponse &operator=(PutResponse const &rhs);

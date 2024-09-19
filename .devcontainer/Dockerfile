@@ -45,6 +45,7 @@ RUN apt-get update && apt-get upgrade -y && \
     tree \
     lsof \
     vim \
+    valgrind \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

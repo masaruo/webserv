@@ -3,8 +3,7 @@
 #include <fstream>
 
 PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
-:ARequest(line, header)
-,body_(body)
+:ARequest(line, header, body)
 {
 	return ;
 }
@@ -15,8 +14,7 @@ PutRequest::~PutRequest()
 }
 
 PutRequest::PutRequest(PutRequest const &rhs)
-:ARequest(rhs.getLine(), rhs.getHeader())
-,body_(rhs.body_)
+:ARequest(rhs.getLine(), rhs.getHeader(), rhs.getBody())
 {
 	return ;
 }
@@ -26,7 +24,6 @@ PutRequest &PutRequest::operator=(PutRequest const &rhs)
 	if (this != &rhs)
 	{
 		ARequest::operator=(rhs);
-		body_ = rhs.body_;
 	}
 	return (*this);
 }
@@ -34,7 +31,9 @@ PutRequest &PutRequest::operator=(PutRequest const &rhs)
 AResponse	*PutRequest::createResponse(void) const
 {
 	saveBody();
-	return (new PutResponse(getLine().getUri(), getHeader(), body_));
+	ft::unique_ptr<ARequest>tmp(new PutRequest(*this));
+	// return (new PutResponse(getLine().getUri(), getHeader(), body_));
+	return (new PutResponse(tmp));
 }
 
 void	PutRequest::saveBody(void) const
@@ -48,11 +47,8 @@ void	PutRequest::saveBody(void) const
 		//todo error
 		return ;
 	}
-	std::string const	&dataStr = body_.str();
-	Binary				binary(dataStr);
-	std::streamsize		size = binary.data().size();
 
-	ofs.write(binary.toStr().c_str(), size);
+	ofs.write(getBody().str().c_str(), getBody().getSize());
 	if (!ofs)
 	{
 		//todo error

@@ -6,7 +6,8 @@ class GetResponse : public AResponse
 private:
 	GetResponse();//=delete
 public:
-	explicit GetResponse(std::string const &uri, HttpHeader const &req_header);
+	// explicit GetResponse(std::string const &uri, HttpHeader const &req_header);
+	explicit GetResponse(ft::unique_ptr<ARequest>request);
 	~GetResponse();
 	GetResponse(GetResponse const &rhs);
 	GetResponse &operator=(GetResponse const &rhs);

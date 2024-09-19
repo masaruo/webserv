@@ -7,7 +7,7 @@
 class HttpBody
 {
 private:
-	Binary		body_;
+	Binary		data_;
 	std::size_t	size_;
 	Binary	parseBody(std::istringstream &iss);
 	Binary	parseBody(std::string const &str);

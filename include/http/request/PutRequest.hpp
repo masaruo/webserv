@@ -7,7 +7,6 @@ class AResponse;
 class PutRequest : public ARequest
 {
 private:
-	HttpBody	body_;
 	void	saveBody(void) const;
 	PutRequest();//=delete
 public:

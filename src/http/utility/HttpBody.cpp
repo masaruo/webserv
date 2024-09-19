@@ -14,28 +14,28 @@ Binary	HttpBody::parseBody(std::string const &str)
 }
 
 HttpBody::HttpBody()
-:body_()
+:data_()
 ,size_(0)
 {
 	return ;
 }
 
 HttpBody::HttpBody(std::istringstream &iss)
-:body_(parseBody(iss))
-,size_(body_.data().size())
+:data_(parseBody(iss))
+,size_(data_.data().size())
 {
 	return ;
 }
 
 HttpBody::HttpBody(std::string const &str)
-:body_(parseBody(str))
+:data_(parseBody(str))
 ,size_(str.size())
 {
 	return ;
 }
 
 HttpBody::HttpBody(Binary const &binary)
-:body_(binary)
+:data_(binary)
 ,size_(binary.data().size())
 {
 	return ;
@@ -47,7 +47,7 @@ HttpBody::~HttpBody()
 }
 
 HttpBody::HttpBody(HttpBody const &rhs)
-:body_(rhs.body_)
+:data_(rhs.data_)
 ,size_(rhs.size_)
 {
 	return ;
@@ -57,7 +57,7 @@ HttpBody &HttpBody::operator=(HttpBody const &rhs)
 {
 	if (this != &rhs)
 	{
-		body_ = rhs.body_;
+		data_ = rhs.data_;
 		size_ = rhs.size_;
 	}
 	return (*this);
@@ -65,7 +65,7 @@ HttpBody &HttpBody::operator=(HttpBody const &rhs)
 
 std::string	HttpBody::str(void) const
 {
-	return (body_.toStr());
+	return (data_.toStr());
 }
 
 std::size_t	HttpBody::getSize(void) const

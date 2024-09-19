@@ -1,9 +1,15 @@
 #include "PutResponse.hpp"
 #include "FileHandler.hpp"
 
-PutResponse::PutResponse(std::string const &uri, HttpHeader const &header, HttpBody const &body)
-:AResponse(uri, header)
-,request_body_(body)
+// PutResponse::PutResponse(std::string const &uri, HttpHeader const &header, HttpBody const &body)
+// :AResponse(uri, header)
+// ,request_body_(body)
+// {
+// 	return ;
+// }
+
+PutResponse::PutResponse(ft::unique_ptr<ARequest>request)
+:AResponse(request)
 {
 	return ;
 }
@@ -14,8 +20,7 @@ PutResponse::~PutResponse()
 }
 
 PutResponse::PutResponse(PutResponse const &rhs)
-:AResponse(rhs.getUri(), rhs.getHeader())
-,request_body_(rhs.request_body_)
+:AResponse(rhs)
 {
 	return ;
 }
@@ -25,7 +30,6 @@ PutResponse &PutResponse::operator=(PutResponse const &rhs)
 	if (this != &rhs)
 	{
 		AResponse::operator=(rhs);
-		request_body_ = rhs.request_body_;
 	}
 	return (*this);
 }

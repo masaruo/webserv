@@ -55,8 +55,8 @@ void	ClientSocket::setSockaddr(void)
 #include <iostream>
 void	ClientSocket::recv_handler(void)
 {
-	ft::unique_ptr<ARequest>req_tmp(RequestFactory::createRequest(fd_));
-	request_ = req_tmp;
+	ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(fd_));
+	// request_ = req_tmp;
 	ft::unique_ptr<AResponse>res(request_->createResponse());
 	res->generateResponse();
 	ConnectionHandler::sendData(fd_, res->getResponse());

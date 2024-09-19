@@ -1,8 +1,14 @@
 #include "PostResponse.hpp"
 #include "FileHandler.hpp"
 
-PostResponse::PostResponse(std::string const &target, HttpHeader const &req_header)
-:AResponse(target, req_header)
+// PostResponse::PostResponse(std::string const &target, HttpHeader const &req_header)
+// :AResponse(target, req_header)
+// {
+// 	return ;
+// }
+
+PostResponse::PostResponse(ft::unique_ptr<ARequest>request)
+:AResponse(request)
 {
 	return ;
 }

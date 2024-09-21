@@ -15,8 +15,8 @@ private:
 	HttpBody	body_;
 	ARequest();//=delete:
 public:
-	ARequest(RequestLine const &line, HttpHeader const &header);
-	ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
+	explicit ARequest(RequestLine const &line, HttpHeader const &header);
+	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
 	virtual ~ARequest();
 	ARequest(ARequest const &rhs);
 	ARequest &operator=(ARequest const &rhs);

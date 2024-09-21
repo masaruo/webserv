@@ -28,7 +28,7 @@ private:
 	ClientSocket(ClientSocket const &rhs);
 	ClientSocket &operator=(ClientSocket const &rhs);
 public:
-	ClientSocket(int listen_fd);
+	explicit ClientSocket(int listen_fd);
 	~ClientSocket();
 	void setSockaddr(void);//? need?
 	void	recv_handler(void);

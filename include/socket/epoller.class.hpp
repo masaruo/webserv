@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <string>
 #include "SocketHolder.class.hpp"
+#include "ConfigFactory.hpp"
 
 class SocketHolder;
 
@@ -27,18 +28,20 @@ public:
 	typedef ev_vec::difference_type			difference_type;
 	typedef ev_vec::size_type				size_type;
 private:
-	int const			epfd_;
-	SocketHolder		SocketHolder_;
-	ev_vec				res_evlist_;
-	int					timeout_;
+	int const				epfd_;
+	SocketHolder			SocketHolder_;//!what is this?
+	ev_vec					res_evlist_;//!what is this?
+	int						timeout_;
+	config::ConfigFactory	configs_;
+
 	int					epollWait(void);
 
 //hidden
-	Epoller();
-	Epoller(Epoller const &rhs);
-	Epoller &operator=(Epoller const &rhs);
+	Epoller();//=delete
+	Epoller(Epoller const &rhs);//=delete
+	Epoller &operator=(Epoller const &rhs);//=delete
 public:
-	Epoller(int size = 1, int timeout = -1);
+	explicit Epoller(int size = 1, int timeout = -1, std::string const &config_path = "/webserv/config/config.md");//!change path to config
 	~Epoller();
 	void	epollAdd(ASocket *socket);
 	void	epollClose(ASocket *socket);

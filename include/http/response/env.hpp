@@ -17,5 +17,5 @@ public:
 	~Env();
 	Env(Env const &rhs);
 	Env &operator=(Env const &rhs);
-	char		**to_cenv(void) const;
+	char	**to_cenv(void) const;
 };

@@ -13,7 +13,7 @@ private:
 	int			code_;
 	std::string	message_;
 	// Binary		binary_;
-	StatusCode(int code, std::string msg);
+	explicit StatusCode(int code, std::string msg);
 	//setter
 	void	setCode(int inCode);
 	void	setMessage(std::string const &inMsg);

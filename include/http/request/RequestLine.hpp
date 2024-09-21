@@ -13,7 +13,7 @@ private:
 	void	setVersion(std::string const &inVer);
 	RequestLine();//=delete
 public:
-	RequestLine(std::istringstream &iss);
+	explicit RequestLine(std::istringstream &iss);
 	~RequestLine();
 	RequestLine(RequestLine const &rhs);
 	RequestLine &operator=(RequestLine const &rhs);

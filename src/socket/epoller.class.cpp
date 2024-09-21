@@ -19,9 +19,10 @@
 #include <unistd.h>
 // #include <iostream>
 
-Epoller::Epoller(int size, int timeout)
+Epoller::Epoller(int size, int timeout, std::string const &config_path)
 :epfd_(epoll_create(size))
 ,timeout_(timeout)
+,configs_(config_path)
 {
 	if (epfd_ == ft::err)
 	{

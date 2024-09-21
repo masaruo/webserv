@@ -7,7 +7,7 @@ class PutResponse : public AResponse
 private:
 	PutResponse();//=delete
 public:
-	PutResponse(ft::unique_ptr<ARequest>request);
+	explicit PutResponse(ft::unique_ptr<ARequest>request);
 	// PutResponse(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body);
 	~PutResponse();
 	PutResponse(PutResponse const &rhs);

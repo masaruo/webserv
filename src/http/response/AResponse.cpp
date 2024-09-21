@@ -7,16 +7,6 @@ AResponse::AResponse(ft::unique_ptr<ARequest> request)
 
 }
 
-// AResponse::AResponse(std::string const &uri, HttpHeader const &req_header)
-// :uri_(uri)
-// ,request_header_(req_header)
-// ,code_()
-// ,response_header_()
-// ,body_()
-// {
-// 	return ;
-// }
-
 AResponse::~AResponse()
 {
 	return ;
@@ -106,7 +96,8 @@ Binary::vec_bytes	AResponse::getResponse(void) const
 	res += ft::string::CR + ft::string::LF;
 
 	HttpBody	body = getBody();
-	res += body.str();
+	if (body.getSize() != 0)
+		res += body.str();
 	return (res.to_binary());
 }
 

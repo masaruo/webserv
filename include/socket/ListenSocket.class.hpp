@@ -22,7 +22,7 @@ private:
 	ListenSocket(ListenSocket const &rhs);
 	ListenSocket &operator=(ListenSocket const &rhs);
 public:
-	ListenSocket(int in_port);
+	explicit ListenSocket(int in_port);
 	~ListenSocket();
 	void	setSockaddr(void);
 };

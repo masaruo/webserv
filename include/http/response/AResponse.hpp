@@ -12,8 +12,6 @@ class AResponse
 {
 private:
 	ft::unique_ptr<ARequest>	request_;
-	// std::string	uri_;//todo delete
-	// HttpHeader	request_header_;//todo delete
 	StatusCode	code_;
 	HttpHeader	header_;
 	HttpBody	body_;
@@ -27,8 +25,7 @@ protected:
 	std::string	getUri(void) const;
 
 public:
-	// AResponse(std::string const &uri, HttpHeader const &req_header);//todo delete
-	AResponse(ft::unique_ptr<ARequest>request);
+	explicit AResponse(ft::unique_ptr<ARequest>request);
 	virtual ~AResponse();
 	AResponse(AResponse const &rhs);
 	AResponse &operator=(AResponse const &rhs);

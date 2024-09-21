@@ -17,7 +17,6 @@ private:
 	CgiResponse();// = delete
 public:
 	explicit CgiResponse(ft::unique_ptr<ARequest>request);
-	// explicit CgiResponse(std::string const &uri, HttpHeader const &req_header, HttpBody const &req_body);
 	~CgiResponse();
 	CgiResponse(CgiResponse const &rhs);
 	CgiResponse &operator=(CgiResponse const &rhs);

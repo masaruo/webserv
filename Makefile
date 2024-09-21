@@ -15,6 +15,7 @@ CXX			:=	c++
 CXXFLAGS	:=	-Wall -Wextra -Werror -Wconversion -std=c++98 -MMD -MP
 LDFLAGS		:=	
 INC			:=	-I./include \
+				-I./include/config \
 				-I./include/http/utility \
 				-I./include/http/request \
 				-I./include/http/response \

@@ -9,7 +9,7 @@ private:
 	ft::str_map	parseQuery(std::string const &uri);
 	GetRequest();//=delete
 public:
-	GetRequest(RequestLine const &line, HttpHeader const &header);
+	explicit GetRequest(RequestLine const &line, HttpHeader const &header);
 	~GetRequest();
 	GetRequest(GetRequest const &rhs);
 	GetRequest &operator=(GetRequest const &rhs);

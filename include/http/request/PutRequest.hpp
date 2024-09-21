@@ -10,8 +10,8 @@ private:
 	void	saveBody(void) const;
 	PutRequest();//=delete
 public:
-	PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
-	PutRequest(PutRequest const &rhs);
+	explicit PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
+	explicit PutRequest(PutRequest const &rhs);
 	PutRequest &operator=(PutRequest const &rhs);
 	~PutRequest();
 	AResponse	*createResponse(void) const;

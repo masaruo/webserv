@@ -10,7 +10,7 @@ private:
 	void	saveBody(void) const;
 	PutRequest();//=delete
 public:
-	explicit PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
+	explicit PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);
 	explicit PutRequest(PutRequest const &rhs);
 	PutRequest &operator=(PutRequest const &rhs);
 	~PutRequest();

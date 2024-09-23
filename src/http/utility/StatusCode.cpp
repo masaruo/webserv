@@ -1,12 +1,13 @@
 #include "StatusCode.hpp"
 #include "define.hpp"
+#include "string.hpp"
 
 //todo FULL LIST to be added
 // List of StatusCode
-StatusCode const StatusCode::OK(200, "OK\r\n");
-StatusCode const StatusCode::OK_NOCONTENT(204, "No Content\r\n");
-StatusCode const StatusCode::NOT_FOUND(404, "Not Found\r\n");
-StatusCode const StatusCode::INTERNAL_SERVER_ERROR(500, "Internal Server Error\r\n");
+StatusCode const StatusCode::OK(200, "OK");
+StatusCode const StatusCode::OK_NOCONTENT(204, "No Content");
+StatusCode const StatusCode::NOT_FOUND(404, "Not Found");
+StatusCode const StatusCode::INTERNAL_SERVER_ERROR(500, "Internal Server Error");
 
 StatusCode::StatusCode()
 :code_(0)
@@ -17,7 +18,7 @@ StatusCode::StatusCode()
 
 StatusCode::StatusCode(int code, std::string msg)
 :code_(code)
-,message_(msg)
+,message_(msg + ft::string::CR + ft::string::LF)
 {
 	return ;
 }

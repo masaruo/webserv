@@ -2,8 +2,8 @@
 #include "PutResponse.hpp"
 #include <fstream>
 
-PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
-:ARequest(line, header, body)
+PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
+:ARequest(line, header, body, config)
 {
 	return ;
 }
@@ -14,7 +14,7 @@ PutRequest::~PutRequest()
 }
 
 PutRequest::PutRequest(PutRequest const &rhs)
-:ARequest(rhs.getLine(), rhs.getHeader(), rhs.getBody())
+:ARequest(rhs)
 {
 	return ;
 }
@@ -32,11 +32,10 @@ AResponse	*PutRequest::createResponse(void) const
 {
 	saveBody();
 	ft::unique_ptr<ARequest>tmp(new PutRequest(*this));
-	// return (new PutResponse(getLine().getUri(), getHeader(), body_));
 	return (new PutResponse(tmp));
 }
 
-void	PutRequest::saveBody(void) const
+void	PutRequest::saveBody(void) const//!put to respons?
 {
 	std::string	savePath = "/webserv/save/";
 	std::string	name = getHeader().getHeader("X-File-Name");

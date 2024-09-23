@@ -63,8 +63,10 @@ void	HttpHeader::setHeader(std::string const &key, std::string const &value)
 
 std::string	HttpHeader::getHeader(std::string const &key) const
 {
-	return (headers_.at(key).front());
-	//todo error - out_of_range will be thrown
+	if (hasHeader(key))
+		return (headers_.at(key).front());
+	else
+		return ("");
 }
 
 bool	HttpHeader::hasHeader(std::string const &key) const

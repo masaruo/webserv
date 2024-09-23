@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <Binary.hpp>
+#include <stdexcept>
 
 class StatusCode
 {
@@ -12,13 +12,11 @@ public:
 private:
 	int			code_;
 	std::string	message_;
-	// Binary		binary_;
 	explicit StatusCode(int code, std::string msg);
-	//setter
 	void	setCode(int inCode);
 	void	setMessage(std::string const &inMsg);
-public:
 	explicit StatusCode();
+public:
 	~StatusCode();
 	StatusCode(StatusCode const &rhs);
 	StatusCode &operator=(StatusCode const &rhs);
@@ -26,4 +24,11 @@ public:
 	//getter
 	int			getCode(void) const;
 	std::string	getMessage(void) const;
+
+	//error
+	class HttpError : public std::runtime_error
+	{
+	public:
+		HttpError(std::string const &msg);
+	};
 };

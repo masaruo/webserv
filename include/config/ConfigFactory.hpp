@@ -15,6 +15,7 @@ public:
 	~ConfigFactory();
 	Config	getDefaultConfig(void) const;
 	Config	getConfig(std::string const &server_name) const;
+	std::vector<std::size_t> getAcceptedPorts(void) const;//! at init to set up listen ports
 
 	class ConfigFactoryException : public std::runtime_error
 	{

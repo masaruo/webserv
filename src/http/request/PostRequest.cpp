@@ -3,8 +3,8 @@
 #include "CgiResponse.hpp"
 #include <fstream>
 
-PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
-:ARequest(line, header, body)
+PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
+:ARequest(line, header, body, config)
 {
 	return ;
 }

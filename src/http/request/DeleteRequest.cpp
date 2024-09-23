@@ -1,8 +1,8 @@
 #include "DeleteRequest.hpp"
 #include "CgiResponse.hpp"
 
-DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
-:ARequest(line, header, body)
+DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
+:ARequest(line, header, body, config)
 {
 	return ;
 }

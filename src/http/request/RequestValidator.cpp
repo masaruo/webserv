@@ -7,7 +7,7 @@ static void	assertRequestLine(RequestLine const &line, HttpHeader const &header,
 {
 	std::string const	method = line.getMethod();
 
-	if ()
+	// if (!config.isAllowedMethod(method))
 
 	std::string const	uri = line.getUri();
 	std::string const	version = line.getVersion();

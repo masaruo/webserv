@@ -13,7 +13,7 @@ AResponse::~AResponse()
 }
 
 AResponse::AResponse(AResponse const &rhs)
-:code_(rhs.code_)
+:status_(rhs.status_)
 ,header_(rhs.header_)
 ,body_(rhs.body_)
 {
@@ -25,16 +25,16 @@ AResponse &AResponse::operator=(AResponse const &rhs)
 	if (this != &rhs)
 	{
 		request_.reset(RequestFactory::createRequest(rhs.request_.get()));
-		code_ = rhs.code_;
+		status_ = rhs.status_;
 		header_ = rhs.header_;
 		body_ = rhs.body_;
 	}
 	return (*this);
 }
 
-void	AResponse::setCode(StatusCode const &code)
+void	AResponse::setStatus(HttpStatus const &status)
 {
-	code_ = code;
+	status_ = status;
 }
 
 void	AResponse::setHeader(HttpHeader const &header)
@@ -67,9 +67,9 @@ std::string	AResponse::getUri(void) const
 	return (request_->getLine().getUri());
 }
 
-StatusCode	AResponse::getCode(void) const
+HttpStatus	AResponse::getStatus(void) const
 {
-	return (code_);
+	return (status_);
 }
 
 HttpHeader	AResponse::getHeader(void) const
@@ -85,10 +85,13 @@ HttpBody	AResponse::getBody(void) const
 Binary::vec_bytes	AResponse::getResponse(void) const
 {
 	ft::string	res;
-	StatusCode	status_code = getCode();
+	HttpStatus	status_code = getStatus();
 	std::string	code_num = ft::to_string<int>(status_code.getCode());
-	std::string	code_str = status_code.getMessage();
-	res += "HTTP/1.1 " + code_num + " " + code_str;
+	// std::string	code_str = status_code.getMessage();
+	// res += "HTTP/1.1 " + code_num + " " + code_str;
+
+	std::string statusStr = status_code.str();
+	res += statusStr;
 
 	HttpHeader header = getHeader();
 	res += header.str();
@@ -99,10 +102,4 @@ Binary::vec_bytes	AResponse::getResponse(void) const
 	if (body.getSize() != 0)
 		res += body.str();
 	return (res.to_binary());
-}
-
-AResponse::ResponseException::ResponseException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
 }

@@ -23,8 +23,8 @@ ft::str_map	GetRequest::parseQuery(std::string const &uri)
 	return (query);
 }
 
-GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header)
-:ARequest(line, header)
+GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
+:ARequest(line, header, config)
 ,query_(parseQuery(line.getUri()))
 {
 	return ;

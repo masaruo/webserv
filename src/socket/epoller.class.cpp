@@ -22,7 +22,7 @@
 Epoller::Epoller(int size, int timeout, std::string const &config_path)
 :epfd_(epoll_create(size))
 ,timeout_(timeout)
-,configs_(config_path)
+,config_factory_(config_path)
 {
 	if (epfd_ == ft::err)
 	{
@@ -110,7 +110,7 @@ void	Epoller::epollLoop(void)
 				{
 					throw (EpollerException("epoll to get client socket failed at 111."));
 				}
-				client->recv_handler();
+				client->recv_handler(config_factory_);
 				epollClose(socket);
 			}
 			else if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))

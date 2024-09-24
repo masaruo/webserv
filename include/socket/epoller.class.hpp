@@ -32,7 +32,7 @@ private:
 	SocketHolder			SocketHolder_;//!what is this?
 	ev_vec					res_evlist_;//!what is this?
 	int						timeout_;
-	config::ConfigFactory	configs_;
+	config::ConfigFactory	config_factory_;
 
 	int					epollWait(void);
 

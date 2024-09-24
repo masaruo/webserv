@@ -13,14 +13,14 @@ RequestLine::RequestLine(std::istringstream &iss)
 	}
 	if (line.empty())
 	{
-		RequestLineException("Failed to parse request line at 16");
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 	}
 	ft::string	to_split(line);
 	to_split.trim(ft::string::CRLF);
 	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WHITESPACE);
 	if (split_by_sp.size() != 3)
 	{
-		RequestLineException("Failed to parse request line at 23");
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 	}
 	setMethod(split_by_sp.at(0));
 	setUri(split_by_sp.at(1));
@@ -54,7 +54,7 @@ RequestLine &RequestLine::operator=(RequestLine const &rhs)
 void	RequestLine::setMethod(std::string const &inMethod)
 {
 	if (inMethod != "GET" && inMethod != "POST" && inMethod != "DELETE" && inMethod != "PUT")
-		throw (RequestLineException("Failed to parse method in requestline at 57."));
+		throw (HttpStatus::HttpStatusException(HttpCode::METHOD_NOT_ALLOWED));
 	method_ = inMethod;
 }
 
@@ -67,7 +67,7 @@ void	RequestLine::setUri(std::string const &inUri)
 void	RequestLine::setVersion(std::string const &inVer)
 {
 	if (inVer != "HTTP/1.1")
-		throw(RequestLineException("Failed to parse version in requestline at 70."));
+		throw (HttpStatus::HttpStatusException(HttpCode::HTTP_VERSION_NOT_SUPPORTED));
 	version_ = inVer;
 }
 
@@ -84,10 +84,4 @@ std::string	RequestLine::getUri(void) const
 std::string RequestLine::getVersion(void) const
 {
 	return (version_);
-}
-
-RequestLine::RequestLineException::RequestLineException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
 }

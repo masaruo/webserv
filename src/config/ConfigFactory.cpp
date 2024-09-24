@@ -2,8 +2,15 @@
 
 config::ConfigFactory::ConfigFactory(std::string const &config_path)
 {
-	Config	mockdefault("default");
-	Config	mockexample("example");
+	//todo codes
+	return ;
+}
+
+config::ConfigFactory::ConfigFactory(int flag)//todo delete mock only
+{
+	(void) flag;
+	Config	mockdefault(1);
+	Config	mockexample(2);
 	configs_.push_back(mockdefault);
 	configs_.push_back(mockexample);
 	return ;

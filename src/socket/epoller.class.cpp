@@ -31,6 +31,18 @@ Epoller::Epoller(int size, int timeout, std::string const &config_path)
 	return ;
 }
 
+Epoller::Epoller(int size, int timeout, int flag)
+:epfd_(epoll_create(size))
+,timeout_(timeout)
+,config_factory_(flag)
+{
+	if (epfd_ == ft::err)
+	{
+		throw(EpollerException("epoll class initialization failed at 28."));
+	}
+	return ;
+}
+
 Epoller::~Epoller()
 {
 	if (epfd_ != ft::err)

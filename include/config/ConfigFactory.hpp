@@ -10,6 +10,7 @@ private:
 	ConfigFactory();//=delete
 public:
 	ConfigFactory(std::string const &config_path);//todo = default path
+	ConfigFactory(int flag);//todo delete: mock purpose only
 	ConfigFactory(ConfigFactory const &rhs);
 	ConfigFactory &operator=(ConfigFactory const &rhs);
 	~ConfigFactory();

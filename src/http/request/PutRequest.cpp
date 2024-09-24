@@ -38,7 +38,7 @@ AResponse	*PutRequest::createResponse(void) const
 void	PutRequest::saveBody(void) const//!put to respons?
 {
 	std::string	savePath = "/webserv/save/";
-	std::string	name = getHeader().getHeader("X-File-Name");
+	std::string	name = getHeader().getValue("X-File-Name");
 	std::string	fullPath = savePath + name;
 	std::ofstream	ofs(fullPath.c_str() , std::ios_base::trunc | std::ios_base::binary);
 	if (!ofs)

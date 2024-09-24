@@ -1,9 +1,9 @@
 #include "Config.hpp"
 #include "HttpStatus.hpp"
 
-config::Config::Config(std::string const &block)//!this is MOCK!
+config::Config::Config(int flag)//!this is MOCK!
 {
-	if (block == "default")
+	if (flag == 1)
 	{
 		server_name_ = "_";
 		port_ = 8888;

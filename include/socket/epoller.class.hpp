@@ -42,6 +42,7 @@ private:
 	Epoller &operator=(Epoller const &rhs);//=delete
 public:
 	explicit Epoller(int size = 1, int timeout = -1, std::string const &config_path = "/webserv/config/config.md");//!change path to config
+	explicit Epoller(int size = 1, int timeout = -1, int flag = 1);//!change path to config
 	~Epoller();
 	void	epollAdd(ASocket *socket);
 	void	epollClose(ASocket *socket);

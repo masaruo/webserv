@@ -7,7 +7,7 @@
 
 int main(void)
 {
-	Epoller					poller(1, 1000);
+	Epoller					poller(1, 1000, 1);//last arg is flag for mock;
 
 	try
 	{

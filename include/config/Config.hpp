@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 #include <stdexcept>
+#include "HttpCode.hpp"
 
 namespace config
 {
@@ -12,21 +13,23 @@ class Config
 public:
 	struct location_s
 	{
+		std::string				index_;
 		std::set<std::string>	allowed_methods_;
 		bool					is_autoindex_;
 		bool					is_cgi_;
 		std::string				cgi_root_;
-		std::string				upload_path_;
+		std::string				cgi_upload_path_;
 	};
 private:
-	std::string							server_name_;
-	std::size_t							port_;
-	std::string							root_;
-	std::string							index_;
-	std::size_t							max_body_size_;
-	std::map<std::size_t, std::string>	error_pages_;
-	std::map<std::string, location_s>	locations_;
+	std::string								server_name_;
+	std::size_t								port_;
+	std::string								root_;
+	std::size_t								max_body_size_;
+	std::map<HttpCode::code_e, std::string>	error_pages_;
+	std::size_t								keep_alive_timeout_;
+	std::map<std::string, location_s>		locations_;
 	Config();//=delete
+	location_s	getLocation(std::string const &path) const;
 public:
 	// consturctor and destructor
 	Config(std::string const &block);//todo = add default path
@@ -36,28 +39,18 @@ public:
 
 	// getter for attributes (ex location)
 	std::string	getServerName(void) const;
-	// std::size_t	getPort(void) const;
-	// std::string	getRoot(void) const;
-	// std::string	getIndex(void) const;
-	// std::size_t	getMaxBodySize(void) const;
-	// std::string	getErrorPage(std::size_t error_number) const;
+	std::size_t	getPort(void) const;
+	std::string	getRoot(void) const;
+	std::size_t	getMaxBodySize(void) const;
+	std::string	getErrorPage(HttpCode::code_e error_code) const;
+	std::size_t	getKeepAliveTimeout(void) const;
 
 	// getter for location directives
-	// bool		isAllowedMethod(std::string const &method) const;
-	// bool		isAutoIndex(std::string const &path) const;
-	// std::string	getTargetDir(std::string const &path) const;
-	// bool		isCgi(std::string const &path) const;
-	// std::string	getCgiRoot(std::string const &path) const;
-	// std::string	getCgiUploadPath(std::string const &path) const;
-
-	class ConfigException : public std::runtime_error
-	{
-	public:
-		ConfigException(std::string const &msg)
-		:std::runtime_error(msg)
-		{
-			return ;
-		}
-	};
+	std::string	getIndex(std::string const &path) const;
+	bool		isAllowedMethod(std::string const &path, std::string const &method) const;
+	bool		isAutoIndex(std::string const &path) const;
+	bool		isCgi(std::string const &path) const;
+	std::string	getCgiRoot(std::string const &path) const;
+	std::string	getCgiUploadPath(std::string const &path) const;
 };
 }

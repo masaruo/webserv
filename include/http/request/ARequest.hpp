@@ -4,6 +4,7 @@
 #include "HttpBody.hpp"
 #include "RequestFactory.hpp"
 #include "Config.hpp"
+#include "HttpStatus.hpp"
 #include <stdexcept>
 
 class AResponse;
@@ -27,10 +28,4 @@ public:
 	HttpBody			getBody(void) const;
 	config::Config		getConfig(void) const;
 	virtual	AResponse	*createResponse(void) const = 0;
-	//ERROR CLASS
-	class RequestException : public std::runtime_error
-	{
-	public:
-		RequestException(std::string const &msg);
-	};
 };

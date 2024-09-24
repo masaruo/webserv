@@ -64,10 +64,3 @@ config::Config	ARequest::getConfig(void) const
 {
 	return (config_);
 }
-
-//Error
-ARequest::RequestException::RequestException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
-}

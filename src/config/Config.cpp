@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include "HttpStatus.hpp"
 
 config::Config::Config(std::string const &block)//!this is MOCK!
 {
@@ -7,7 +8,6 @@ config::Config::Config(std::string const &block)//!this is MOCK!
 		server_name_ = "_";
 		port_ = 8888;
 		root_ = "/webserv/www/html";
-		index_ = "index.html";
 		max_body_size_ = 10000000;
 		error_pages_.insert(std::make_pair(404, "/404.html"));
 		error_pages_.insert(std::make_pair(500, "/50x.html"));
@@ -17,13 +17,14 @@ config::Config::Config(std::string const &block)//!this is MOCK!
 
 //location /
 		location_s tmp;
+		tmp.index_ = "index.html";
 		tmp.allowed_methods_.insert("GET");
 		tmp.allowed_methods_.insert("POST");
 		tmp.allowed_methods_.insert("DELETE");
 		tmp.is_autoindex_ = true;
 		tmp.is_cgi_ = false;
 		tmp.cgi_root_ = "";
-		tmp.upload_path_ = "";
+		tmp.cgi_upload_path_ = "";
 		locations_.insert(std::make_pair("/", tmp));
 
 //location uploads
@@ -31,7 +32,7 @@ config::Config::Config(std::string const &block)//!this is MOCK!
 		tmp.is_autoindex_ = false;
 		tmp.is_cgi_ = false;
 		tmp.cgi_root_ = "";
-		tmp.upload_path_ = "/webserv/www/save";
+		tmp.cgi_upload_path_ = "/webserv/www/save";
 		locations_.insert(std::make_pair("/uploads", tmp));
 
 //location cgi
@@ -39,7 +40,7 @@ config::Config::Config(std::string const &block)//!this is MOCK!
 		tmp.is_autoindex_ = false;
 		tmp.is_cgi_ = true;
 		tmp.cgi_root_ = "/webserv/cgi-bin";
-		tmp.upload_path_ = "";
+		tmp.cgi_upload_path_ = "";
 		locations_.insert(std::make_pair(".py", tmp));
 	}
 	else
@@ -47,7 +48,6 @@ config::Config::Config(std::string const &block)//!this is MOCK!
 		server_name_ = "example.com";
 		port_ = 7777;
 		root_ = "/webserv/www/example";
-		index_ = "index.html";
 		max_body_size_ = 5000000;
 		error_pages_.insert(std::make_pair(404, "/404.html"));
 		error_pages_.insert(std::make_pair(500, "/50x.html"));
@@ -57,11 +57,12 @@ config::Config::Config(std::string const &block)//!this is MOCK!
 
 //location /
 		location_s tmp;
+		tmp.index_ = "index.html";
 		tmp.allowed_methods_.insert("GET");
 		tmp.is_autoindex_ = true;
 		tmp.is_cgi_ = false;
 		tmp.cgi_root_ = "";
-		tmp.upload_path_ = "";
+		tmp.cgi_upload_path_ = "";
 		locations_.insert(std::make_pair("/", tmp));
 	}
 }
@@ -75,7 +76,6 @@ config::Config::Config(Config const &rhs)
 :server_name_(rhs.server_name_)
 ,port_(rhs.port_)
 ,root_(rhs.root_)
-,index_(rhs.index_)
 ,max_body_size_(rhs.max_body_size_)
 ,error_pages_(rhs.error_pages_)
 ,locations_(rhs.locations_)
@@ -90,7 +90,6 @@ config::Config &config::Config::operator=(Config const &rhs)
 		server_name_ = rhs.server_name_;
 		port_ = rhs.port_;
 		root_ = rhs.root_;
-		index_ = rhs.index_;
 		max_body_size_ = rhs.max_body_size_;
 		error_pages_ = rhs.error_pages_;
 		locations_ = rhs.locations_;
@@ -102,4 +101,72 @@ config::Config &config::Config::operator=(Config const &rhs)
 std::string	config::Config::getServerName(void) const
 {
 	return (server_name_);
+}
+
+std::size_t	config::Config::getPort(void) const
+{
+	return (port_);
+}
+
+std::string	config::Config::getRoot(void) const
+{
+	return (root_);
+}
+
+std::size_t	config::Config::getMaxBodySize(void) const
+{
+	return (max_body_size_);
+}
+
+std::string	config::Config::getErrorPage(HttpCode::code_e error_code) const
+{
+	std::string const	error_path = error_pages_.at(error_code);
+	return (error_path);
+}
+
+std::size_t	config::Config::getKeepAliveTimeout(void) const
+{
+	return (keep_alive_timeout_);
+}
+
+config::Config::location_s	config::Config::getLocation(std::string const &path) const
+{
+	if (locations_.find(path) == locations_.end())
+		throw (HttpStatus::HttpStatusException(HttpCode::NOT_FOUND));
+	location_s loc = locations_.at(path);
+	return (loc);
+}
+
+std::string	config::Config::getIndex(std::string const &path) const
+{
+	return (getLocation(path).index_);
+}
+
+bool	config::Config::isAllowedMethod(std::string const &path, std::string const &method) const
+{
+	location_s	loc = getLocation(path);
+	if (loc.allowed_methods_.find(method) == loc.allowed_methods_.end())
+		return (false);
+	else
+		return (true);
+}
+
+bool	config::Config::isAutoIndex(std::string const &path) const
+{
+	return (getLocation(path).is_autoindex_);
+}
+
+bool	config::Config::isCgi(std::string const &path) const
+{
+	return (getLocation(path).is_cgi_);
+}
+
+std::string	config::Config::getCgiRoot(std::string const &path) const
+{
+	return (getLocation(path).cgi_root_);
+}
+
+std::string	config::Config::getCgiRoot(std::string const &path) const
+{
+	return (getLocation(path).cgi_upload_path_);
 }

@@ -1,6 +1,7 @@
 #include "HttpHeader.hpp"
 #include <utility>
 #include "string.hpp"
+#include "HttpStatus.hpp"
 
 HttpHeader::HttpHeader()
 :headers_()
@@ -48,10 +49,13 @@ void	HttpHeader::setHeader(std::string const &line)
 		return ;
 	ft::string	to_mod(line);
 	ft::string::string_vector	split_by_dcolon = to_mod.split(":");
+	if (split_by_dcolon.size() != 2)
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 	std::string	key = split_by_dcolon.at(0);
 	split_by_dcolon.at(1).trim(ft::string::SP + ft::string::CR);
 	std::string value = split_by_dcolon.at(1);
-	//todo verification
+	if (key.empty() || value.empty())
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 	setHeader(key, value);
 	
 }
@@ -61,7 +65,7 @@ void	HttpHeader::setHeader(std::string const &key, std::string const &value)
 	headers_[key].push_back(value);
 }
 
-std::string	HttpHeader::getHeader(std::string const &key) const
+std::string	HttpHeader::getValue(std::string const &key) const
 {
 	if (hasHeader(key))
 		return (headers_.at(key).front());
@@ -104,10 +108,4 @@ ft::string 	HttpHeader::str(void) const
 		iter++;
 	}
 	return (ans);
-}
-
-HttpHeader::HttpHeaderException::HttpHeaderException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
 }

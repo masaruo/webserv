@@ -24,13 +24,8 @@ public:
 	HttpHeader(HttpHeader const &rhs);
 	HttpHeader &operator=(HttpHeader const &rhs);
 	void		setHeader(std::string const &key, std::string const &value);
-	std::string	getHeader(std::string const &key) const;
+	std::string	getValue(std::string const &key) const;
 	map_vec_t	data(void) const;
 	bool		hasHeader(std::string const &key) const;
 	ft::string	str(void) const;
-	class HttpHeaderException : public std::runtime_error
-	{
-	public:
-		HttpHeaderException(std::string const &rhs);
-	};
 };

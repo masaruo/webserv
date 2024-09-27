@@ -75,7 +75,7 @@ void	HttpUri::parseAuthority(void)
 	if (portStart == std::string::npos)
 	{
 		host_ = authority_;
-		port_ = 0;
+		port_ = 80;
 	}
 	else
 	{
@@ -83,14 +83,14 @@ void	HttpUri::parseAuthority(void)
 		std::string	hostStr = authority_.substr(portStart + 1);
 		try
 		{
-			host_ = ft::stonum<std::size_t>(hostStr);
+			port_ = ft::stonum<std::size_t>(hostStr);
 		}
 		catch(std::invalid_argument const &e)
 		{
 			throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 		}
 	}
-	if (host_.empty())
+	if (host_.empty() || port_ == 0)
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 }
 
@@ -165,6 +165,11 @@ void	HttpUri::constructWithHostheader(std::string const &host)
 		parseOrigin(host);
 	else
 		parseAbsolute(host);
+
+// to lower host data
+	ft::string	ft_host(host_);
+	ft_host.to_lower();
+	host_ = ft_host;
 }
 
 std::string	HttpUri::getAuthority(void) const

@@ -17,8 +17,8 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	std::istringstream	requestStream(raw_request);
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
-	requestLine.getUri().constructWithHostheader(header.getValue("Host"));
-	config::Config	config = config_factory.getConfig(header.getValue("Host"));
+	requestLine.getUri().constructWithHostheader(header.getFirstValue("Host"));
+	config::Config	config = config_factory.getConfig(header.getFirstValue("Host"));
 
 	std::string	method = requestLine.getMethod();
 	if (method == "GET")
@@ -27,7 +27,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	}
 	else if (method == "POST" || method == "DELETE" || method == "PUT")
 	{
-		std::size_t len = ft::stonum<std::size_t>(header.getValue("Content-Length"));
+		std::size_t len = ft::stonum<std::size_t>(header.getFirstValue("Content-Length"));
 		std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
 		bodyStr += ConnectionHandler::recvData(fd, 6000, len);
 		std::istringstream	bodyStream(bodyStr);

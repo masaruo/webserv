@@ -25,7 +25,7 @@ static void	assertRequestHeader(HttpHeader const &header, RequestLine const &lin
 			throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 		try
 		{
-			ft::stonum<std::size_t>(header.getValue("Content-Length"));
+			ft::stonum<std::size_t>(header.getFirstValue("Content-Length"));
 		}
 		catch(std::invalid_argument const &e)
 		{

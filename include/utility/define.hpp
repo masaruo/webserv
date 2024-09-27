@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <stdint.h> // uint8_t
+#include <stdexcept>
 
 namespace ft
 {
@@ -47,7 +48,7 @@ namespace ft
 		ss >> num;
 		if (ss.fail() || !ss.eof())
 		{
-			//todo error?
+			throw (std::invalid_argument("Conversion error in stonum (define.hpp at line 51)."));
 		}
 		return (num);
 	}
@@ -59,7 +60,7 @@ namespace ft
 		numStr << num;
 		if (numStr.failbit)
 		{
-			//todo error?
+			throw (std::invalid_argument("Conversion error in to_string (define.hpp at line 63)."));
 		}
 		return (numStr.str());
 	}

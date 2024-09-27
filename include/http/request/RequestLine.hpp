@@ -2,15 +2,17 @@
 #include <string>
 #include <stdexcept>
 #include "HttpStatus.hpp"
+#include "HttpUri.hpp"
 
 class RequestLine
 {
 private:
+	std::size_t const	URI_MAX_LEN = 1024;//? from config?
 	std::string	method_;
-	std::string	uri_;
+	HttpUri		uri_;
+	// std::string	uri_;
 	std::string	version_;
 	void	setMethod(std::string const &inMethod);
-	void	setUri(std::string const &inUri);
 	void	setVersion(std::string const &inVer);
 	RequestLine();//=delete
 public:
@@ -18,7 +20,9 @@ public:
 	~RequestLine();
 	RequestLine(RequestLine const &rhs);
 	RequestLine &operator=(RequestLine const &rhs);
+	void		setUri(std::string const &inUri);
+	void		constructUri(std::string const &host_value);
 	std::string	getMethod(void) const;
-	std::string	getUri(void) const;
+	HttpUri		getUri(void) const;
 	std::string	getVersion(void) const;
 };

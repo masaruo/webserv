@@ -58,8 +58,8 @@ void	HttpHeader::setHeader(std::string const &line)
 	}
 	key = line.substr(0, loc);
 	value = line.substr(loc + 1);
-	key.trim(ft::string::WHITESPACE + ft::string::CR);
-	value.trim(ft::string::WHITESPACE + ft::string::CR);
+	key.trim(ft::string::WS + ft::string::CR);
+	value.trim(ft::string::WS + ft::string::CR);
 	if (key.empty() || value.empty())
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 	setHeader(key, value);

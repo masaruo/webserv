@@ -17,6 +17,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	std::istringstream	requestStream(raw_request);
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
+	requestLine.getUri().constructWithHostheader(header.getValue("Host"));
 	config::Config	config = config_factory.getConfig(header.getValue("Host"));
 
 	std::string	method = requestLine.getMethod();

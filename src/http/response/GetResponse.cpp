@@ -32,8 +32,9 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 void	GetResponse::generateResponse(void)
 {
 	// std::string	path = getUri();
-	MockPath	mock;
-	std::string	path = mock.getPath(getUri());
+	// MockPath	mock;
+	// std::string	path = mock.getPath(getUri());
+	std::string	path = getUri();
 	HttpBody body(FileReader::readTextFile(path));
 	//todo try catch : error handling
 

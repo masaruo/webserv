@@ -64,7 +64,7 @@ HttpBody	AResponse::getRequestBody(void) const
 
 std::string	AResponse::getUri(void) const
 {
-	return (request_->getLine().getUri());
+	return (request_->getLine().getUri().getPath());
 }
 
 HttpStatus	AResponse::getStatus(void) const
@@ -90,7 +90,7 @@ Binary::vec_bytes	AResponse::getResponse(void) const
 	// std::string	code_str = status_code.getMessage();
 	// res += "HTTP/1.1 " + code_num + " " + code_str;
 
-	std::string statusStr = status_code.str();
+	std::string statusStr = status_code.to_stdstring();
 	res += statusStr;
 
 	HttpHeader header = getHeader();

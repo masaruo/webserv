@@ -3,7 +3,7 @@
 #include "define.hpp"
 
 GetResponse::GetResponse(ft::unique_ptr<ARequest>request)
-:AResponse(request)
+:Response(request)
 {
 	return ;
 }
@@ -14,7 +14,7 @@ GetResponse::~GetResponse()
 }
 
 GetResponse::GetResponse(GetResponse const &rhs)
-:AResponse(rhs)
+:Response(rhs)
 {
 	return ;
 }
@@ -23,7 +23,7 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 {
 	if (this != &rhs)
 	{
-		AResponse::operator=(rhs);
+		Response::operator=(rhs);
 	}
 	return (*this);
 }
@@ -31,10 +31,7 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 #include "mockpath.hpp"//todo delete
 void	GetResponse::generateResponse(void)
 {
-	// std::string	path = getUri();
-	// MockPath	mock;
-	// std::string	path = mock.getPath(getUri());
-	std::string	path = getUri();
+	std::string	path = getResource().getNormalizedPath();
 	HttpBody body(FileReader::readTextFile(path));
 	//todo try catch : error handling
 

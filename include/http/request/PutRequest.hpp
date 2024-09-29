@@ -2,7 +2,7 @@
 #include "ARequest.hpp"
 #include "HttpBody.hpp"
 
-class AResponse;
+class Response;
 
 class PutRequest : public ARequest
 {
@@ -14,5 +14,5 @@ public:
 	explicit PutRequest(PutRequest const &rhs);
 	PutRequest &operator=(PutRequest const &rhs);
 	~PutRequest();
-	AResponse	*createResponse(void) const;
+	Response	*createResponse(void) const;
 };

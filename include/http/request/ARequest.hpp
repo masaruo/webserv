@@ -5,9 +5,8 @@
 #include "RequestFactory.hpp"
 #include "Config.hpp"
 #include "HttpStatus.hpp"
-#include <stdexcept>
 
-class AResponse;
+class Response;
 
 class ARequest
 {
@@ -27,5 +26,5 @@ public:
 	HttpHeader 			getHeader(void) const;
 	HttpBody			getBody(void) const;
 	config::Config		getConfig(void) const;
-	virtual	AResponse	*createResponse(void) const = 0;
+	virtual	Response	*createResponse(void) const = 0;
 };

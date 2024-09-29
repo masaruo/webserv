@@ -18,9 +18,9 @@ public:
 	typedef map_vec_t::difference_type							difference_type;
 private:
 	map_vec_t						headers_;
-	static std::set<std::string>	noDupHeaderSet;
+	static std::set<std::string>	noDupHeaderSet_;
 	void							setHeader(std::string const &line);
-	void							initNoDupHeader(void);
+	void							setupHeaderWithNoDuplication(void);
 	void	assertDupHeaderName(std::string const &name) const;
 	void	assertSemanticValue(void) const;
 public:
@@ -33,6 +33,7 @@ public:
 	std::string	getFirstValue(std::string const &key) const;
 	std::string	getLastValue(std::string const &key) const;
 	ft::str_vec	getValues(std::string const &key) const;
+	std::size_t	getContentLen(void) const;
 	map_vec_t	data(void) const;
 	bool		hasHeader(std::string const &key) const;
 	std::string	str(void) const;

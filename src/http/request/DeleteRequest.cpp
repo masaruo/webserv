@@ -27,7 +27,7 @@ DeleteRequest &DeleteRequest::operator=(DeleteRequest const &rhs)
 	return (*this);
 }
 
-AResponse	*DeleteRequest::createResponse(void) const
+Response	*DeleteRequest::createResponse(void) const
 {
 	ft::unique_ptr<ARequest>tmp(new DeleteRequest(*this));
 	return (new CgiResponse(tmp));

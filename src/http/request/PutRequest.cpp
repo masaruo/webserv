@@ -28,7 +28,7 @@ PutRequest &PutRequest::operator=(PutRequest const &rhs)
 	return (*this);
 }
 
-AResponse	*PutRequest::createResponse(void) const
+Response	*PutRequest::createResponse(void) const
 {
 	saveBody();
 	ft::unique_ptr<ARequest>tmp(new PutRequest(*this));
@@ -47,7 +47,7 @@ void	PutRequest::saveBody(void) const//!put to respons?
 		return ;
 	}
 
-	ofs.write(getBody().str().c_str(), getBody().getSize());
+	ofs.write(getBody().data().c_str(), getBody().getSize());
 	if (!ofs)
 	{
 		//todo error

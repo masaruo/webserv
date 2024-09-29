@@ -9,7 +9,7 @@
 // }
 
 PutResponse::PutResponse(ft::unique_ptr<ARequest>request)
-:AResponse(request)
+:Response(request)
 {
 	return ;
 }
@@ -20,7 +20,7 @@ PutResponse::~PutResponse()
 }
 
 PutResponse::PutResponse(PutResponse const &rhs)
-:AResponse(rhs)
+:Response(rhs)
 {
 	return ;
 }
@@ -29,7 +29,7 @@ PutResponse &PutResponse::operator=(PutResponse const &rhs)
 {
 	if (this != &rhs)
 	{
-		AResponse::operator=(rhs);
+		Response::operator=(rhs);
 	}
 	return (*this);
 }

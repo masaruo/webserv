@@ -5,7 +5,8 @@
 
 std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 {
-	std::string	buffer(buffer_size, '\0');
+	std::string	buffer;
+	buffer.resize(buffer_size);
 	std::string	received_data;
 	ssize_t		bytes_received;
 
@@ -33,6 +34,7 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 			received_data.append(buffer, 0, bytes_received);
 			if(received_data.find("\r\n\r\n") != std::string::npos)
 			{
+				
 				break ;
 			}
 		}

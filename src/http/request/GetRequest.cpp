@@ -1,5 +1,5 @@
 #include "GetRequest.hpp"
-#include "GetResponse.hpp"
+// #include "GetResponse.hpp"
 #include "string.hpp"
 
 GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
@@ -28,8 +28,8 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 	return (*this);
 }
 
-GetResponse	*GetRequest::createResponse(void) const
-{
-	ft::unique_ptr<ARequest>tmp(new GetRequest(*this));
-	return (new GetResponse(tmp));
-}
+// GetResponse	*GetRequest::createResponse(void) const
+// {
+// 	ft::unique_ptr<ARequest>tmp(new GetRequest(*this));
+// 	return (new GetResponse(tmp));
+// }

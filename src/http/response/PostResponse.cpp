@@ -8,7 +8,7 @@
 // }
 
 PostResponse::PostResponse(ft::unique_ptr<ARequest>request)
-:AResponse(request)
+:Response(request)
 {
 	return ;
 }
@@ -19,7 +19,7 @@ PostResponse::~PostResponse()
 }
 
 PostResponse::PostResponse(PostResponse const &rhs)
-:AResponse(rhs)
+:Response(rhs)
 {
 	return ;
 }
@@ -28,7 +28,7 @@ PostResponse &PostResponse::operator=(PostResponse const &rhs)
 {
 	if (this != &rhs)
 	{
-		AResponse::operator=(rhs);
+		Response::operator=(rhs);
 	}
 	return (*this);
 }

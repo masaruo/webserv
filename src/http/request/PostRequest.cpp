@@ -29,7 +29,7 @@ PostRequest &PostRequest::operator=(PostRequest const &rhs)
 	return (*this); 
 }
 
-AResponse	*PostRequest::createResponse(void) const
+Response	*PostRequest::createResponse(void) const
 {
 	ft::unique_ptr<ARequest>tmp(new PostRequest(*this));
 	return (new CgiResponse(tmp));

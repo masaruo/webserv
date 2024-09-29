@@ -5,19 +5,24 @@
 #include "HttpStatus.hpp"
 #include <sstream>
 
+std::set<std::string>	HttpHeader::noDupHeaderSet_;
+
 void	HttpHeader::assertSemanticValue(void) const
 {
 	bool	is_invalid = false;
 
 	if (!hasHeader("host"))
 		is_invalid = true;
-	try
+	if (hasHeader("content-length"))
 	{
-		ft::stonum<std::size_t>(getFirstValue("content-length"));
-	}
-	catch(const std::invalid_argument& e)
-	{
-		is_invalid = true;
+		try
+		{
+			ft::stonum<std::size_t>(getFirstValue("content-length"));
+		}
+		catch(const std::invalid_argument& e)
+		{
+			is_invalid = true;
+		}
 	}
 	if (is_invalid)
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
@@ -26,23 +31,24 @@ void	HttpHeader::assertSemanticValue(void) const
 	//transfer-encoding
 }
 
-void	HttpHeader::initNoDupHeader(void)
+void	HttpHeader::setupHeaderWithNoDuplication(void)
 {
-	noDupHeaderSet.insert("host");
-	noDupHeaderSet.insert("content-type");
-	noDupHeaderSet.insert("content-length");
-	noDupHeaderSet.insert("content-encoding");
-	noDupHeaderSet.insert("transfer-encoding");
-	noDupHeaderSet.insert("if-modified-since");
-	noDupHeaderSet.insert("if-unmodified-since");
-	noDupHeaderSet.insert("if-none-match");
-	noDupHeaderSet.insert("if-match");
+	noDupHeaderSet_.insert("host");
+	noDupHeaderSet_.insert("content-type");
+	noDupHeaderSet_.insert("content-length");
+	noDupHeaderSet_.insert("content-encoding");
+	noDupHeaderSet_.insert("transfer-encoding");
+	noDupHeaderSet_.insert("if-modified-since");
+	noDupHeaderSet_.insert("if-unmodified-since");
+	noDupHeaderSet_.insert("if-none-match");
+	noDupHeaderSet_.insert("if-match");
 }
 
 HttpHeader::HttpHeader()
 :headers_()
 {
-	initNoDupHeader();
+	if (!noDupHeaderSet_.empty())
+		setupHeaderWithNoDuplication();
 	return ;
 }
 
@@ -114,6 +120,8 @@ HttpHeader::HttpHeader(std::istringstream &iss)
 	while (true)
 	{
 		std::getline(iss, line);
+		if (line == ft::string::CR)//!ヘッダーの最後（CRLFCRLF）だが、LFはGETLINEで削除される＝single CR
+			break ;
 		assetHeaderLine(line);
 		ft::string ftline = line;
 		ftline.trim(ft::string::CR);
@@ -168,8 +176,8 @@ bool	HttpHeader::hasHeader(std::string const &key) const
 void	HttpHeader::assertDupHeaderName(std::string const &name) const
 {
 	std::set<std::string>::const_iterator foundPos;
-	std::set<std::string>::const_iterator end = noDupHeaderSet.end();
-	foundPos = noDupHeaderSet.find(name);
+	std::set<std::string>::const_iterator end = noDupHeaderSet_.end();
+	foundPos = noDupHeaderSet_.find(name);
 	if (foundPos != end)
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 }
@@ -207,6 +215,19 @@ std::string	HttpHeader::getLastValue(std::string const &key) const
 ft::str_vec	HttpHeader::getValues(std::string const &key) const
 {
 	return (headers_.at(key));
+}
+
+std::size_t	HttpHeader::getContentLen(void) const
+{
+	try
+	{
+		std::size_t	res = ft::stonum<std::size_t>(getFirstValue("content-length"));
+		return (res);
+	}
+	catch(const std::invalid_argument& e)
+	{
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));	
+	}
 }
 
 HttpHeader::map_vec_t	HttpHeader::data(void) const

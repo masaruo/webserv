@@ -28,7 +28,6 @@ private:
 	std::map<HttpCode::code_e, std::string>	error_pages_;
 	std::size_t								keep_alive_timeout_;
 	std::map<std::string, location_s>		locations_;
-	location_s	getLocation(std::string const &path) const;
 	Config();//=delete
 public:
 	// consturctor and destructor
@@ -45,6 +44,7 @@ public:
 	std::size_t	getMaxBodySize(void) const;
 	std::string	getErrorPage(HttpCode::code_e error_code) const;
 	std::size_t	getKeepAliveTimeout(void) const;
+	location_s	getLocation(std::string const &path) const;
 
 	// getter for location directives
 	std::string	getIndex(std::string const &path) const;

@@ -1,42 +1,37 @@
 #include "HttpBody.hpp"
 
-Binary	HttpBody::parseBody(std::istringstream &iss)
+std::string	HttpBody::assertBodyLen(std::string const &body)
 {
-	std::string		str(iss.str().substr(iss.tellg()));
-	Binary	bin(str);
-	return (bin);
-}
+	bool	is_valid = true;
 
-Binary	HttpBody::parseBody(std::string const &str)
-{
-	Binary	bin(str);
-	return (bin);
+	if (body.size() > HttpBody::MAX_BODY_SIZE)
+		is_valid = false;
+	if (body.size() != header_.getContentLen())
+		is_valid = false;
+	if (!is_valid)
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+	else
+		return (body);
+
 }
 
 HttpBody::HttpBody()
 :data_()
-,size_(0)
+,header_()
 {
 	return ;
 }
 
-HttpBody::HttpBody(std::istringstream &iss)
-:data_(parseBody(iss))
-,size_(data_.data().size())
+HttpBody::HttpBody(std::istringstream &iss, HttpHeader const &header)
+:data_(assertBodyLen(iss.str()))
+,header_(header)
 {
 	return ;
 }
 
 HttpBody::HttpBody(std::string const &str)
-:data_(parseBody(str))
-,size_(str.size())
-{
-	return ;
-}
-
-HttpBody::HttpBody(Binary const &binary)
-:data_(binary)
-,size_(binary.data().size())
+:data_(str)
+,header_()//!~?
 {
 	return ;
 }
@@ -48,7 +43,7 @@ HttpBody::~HttpBody()
 
 HttpBody::HttpBody(HttpBody const &rhs)
 :data_(rhs.data_)
-,size_(rhs.size_)
+,header_(rhs.header_)
 {
 	return ;
 }
@@ -58,23 +53,17 @@ HttpBody &HttpBody::operator=(HttpBody const &rhs)
 	if (this != &rhs)
 	{
 		data_ = rhs.data_;
-		size_ = rhs.size_;
+		header_ = rhs.header_;
 	}
 	return (*this);
 }
 
-std::string	HttpBody::str(void) const
+std::string	HttpBody::data(void) const
 {
-	return (data_.toStr());
+	return (data_);
 }
 
 std::size_t	HttpBody::getSize(void) const
 {
-	return (size_);
-}
-
-HttpBody::HttpBodyException::HttpBodyException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
+	return (data_.size());
 }

@@ -6,18 +6,23 @@ class HttpUri
 {
 private:
 	static std::size_t const	URI_MAX_LEN = 1024;
+	static std::size_t const	PERCENT_DECORD_SIZE = 3;
 	std::string	raw_;
 	std::string	authority_;
 	std::string	host_;
 	std::size_t	port_;
 	std::string	path_;
+	std::string	ext_;
 	ft::str_map	query_;
 	bool		hasQuery_;
-	void	parseUri(std::string const &authorityStart, std::string const &host);
-	void	parseAbsolute(std::string const &host);
-	void	parseOrigin(std::string const &host);
-	void	parseAuthority(void);
-	void	parseQuery(std::string const &query);
+	void		parseUri(std::string const &authorityStart, std::string const &host);
+	void		parseAbsolute(std::string const &host);
+	void		parseOrigin(std::string const &host);
+	void		parseAuthority(void);
+	void		parsePort(void);
+	void		parseExt(void);
+	void		parseQuery(std::string const &query);
+	std::string	percentDecoder(std::string const &str);
 public:
 	HttpUri();
 	~HttpUri();

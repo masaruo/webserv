@@ -14,16 +14,15 @@ private:
 	bool						is_directory_;
 	ResourceManager();//=delete
 	void	normalizeResourcePath(void);
-	void	assertResourcePath(void) const;
+	// void	assertResourcePath(void) const;
 	void	handleDots(void);
+	void	initializeResource(void);
+	void	checkResourceType(void);
 public:
 	ResourceManager(HttpUri const &uri, config::Config const &config);
 	~ResourceManager();
 	ResourceManager(ResourceManager const &rhs);
 	ResourceManager &operator=(ResourceManager const &rhs);
-
-	void	initializeResource(void);
-	void	checkResourceType(void);
 
 	std::string	getNormalizedPath(void) const;
 	bool		isDirectory(void) const;

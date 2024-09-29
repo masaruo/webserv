@@ -16,8 +16,7 @@
 #include "unistd.h"
 #include "ConnectionHandler.hpp"
 #include "RequestFactory.hpp"
-#include "AResponse.hpp"
-#include "GetResponse.hpp"
+#include "Response.hpp"
 
 ClientSocket::ClientSocket(int listen_fd)
 :ASocket(ASocket::accepted)
@@ -55,10 +54,30 @@ void	ClientSocket::setSockaddr(void)
 #include <iostream>
 void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
 {
-	ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(fd_, config_factory));
-	ft::unique_ptr<AResponse>res(request_->createResponse());
-	res->generateResponse();
-	ConnectionHandler::sendData(fd_, res->getResponse());
+	try
+	{
+		ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(fd_, config_factory));
+		Response res = request_->generateResponse();
+		ConnectionHandler::sendData(fd_, res.to_string());
+	}
+	catch(HttpStatus::HttpStatusException const &e)
+	{
+		std::cerr << e.what() << std::endl;//todo
+		// ConnectionHandler::sendData(fd_, );
+	}
+	catch(HttpStatus::HttpStatusExceptionWithResponse const &e)
+	{
+		std::cerr << e.what() << std::endl;//todo
+		// ConnectionHandler::sendData(fd_, );
+	}
+	catch(HttpStatus::HttpException const &e)
+	{
+		std::cerr << e.what() << std::endl;//todo
+	}
+	catch(std::runtime_error const &e)
+	{
+		std::cerr << e.what() << std::endl;//todo
+	}	
 	set_time();
 }
 

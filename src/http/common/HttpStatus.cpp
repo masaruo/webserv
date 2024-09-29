@@ -44,7 +44,7 @@ HttpCode::code_e	HttpStatus::getCode(void) const
 	return (code_);
 }
 
-std::string	HttpStatus::to_stdstring(void) const
+std::string	HttpStatus::to_string(void) const
 {
 	std::string const	msg = HttpCode::str(code_);
 	std::string const	res("HTTP/1.1 " + msg);
@@ -52,24 +52,24 @@ std::string	HttpStatus::to_stdstring(void) const
 }
 
 //! EXCEPTIONS
-HttpStatus::HttpStatusException::HttpStatusException(HttpCode::code_e error_code)
+HttpStatus::HttpException::HttpException(HttpCode::code_e error_code)
 :std::runtime_error(HttpCode::str(error_code))
 ,error_code_(error_code)
 {
 	return ;
 }
 
-HttpCode::code_e	HttpStatus::HttpStatusException::getErrorCode(void) const
+HttpCode::code_e	HttpStatus::HttpException::getErrorCode(void) const
 {
 	return (error_code_);
 }
 
-char const	*HttpStatus::HttpStatusException::what() const throw()
+char const	*HttpStatus::HttpException::what() const throw()
 {
 	return (to_string().c_str());
 }
 
-std::string	HttpStatus::HttpStatusException::to_string(void) const
+std::string	HttpStatus::HttpException::to_string(void) const
 {
 	std::string const	runtime_msg = std::runtime_error::what();
 
@@ -78,4 +78,16 @@ std::string	HttpStatus::HttpStatusException::to_string(void) const
 	oss << " ";
 	oss << runtime_msg;
 	return (oss.str());
+}
+
+HttpStatus::HttpStatusException::HttpStatusException(HttpCode::code_e error_code)
+:HttpException(error_code)
+{
+	return ;
+}
+
+HttpStatus::HttpStatusExceptionWithResponse::HttpStatusExceptionWithResponse(HttpCode::code_e error_code)
+:HttpException(error_code)
+{
+	return ;
 }

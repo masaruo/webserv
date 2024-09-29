@@ -1,6 +1,4 @@
 #include "ARequest.hpp"
-#include "define.hpp"
-// #include "GetResponse.hpp"
 
 class GetRequest : public ARequest
 {
@@ -10,6 +8,6 @@ public:
 	explicit GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	~GetRequest();
 	GetRequest(GetRequest const &rhs);
-	GetRequest &operator=(GetRequest const &rhs);
-	// GetResponse	*createResponse(void) const;
+	GetRequest	&operator=(GetRequest const &rhs);
+	Response	generateResponse(void) const;
 };

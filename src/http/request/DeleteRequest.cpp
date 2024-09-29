@@ -1,5 +1,5 @@
 #include "DeleteRequest.hpp"
-#include "CgiResponse.hpp"
+#include "Response.hpp"
 
 DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
@@ -27,8 +27,9 @@ DeleteRequest &DeleteRequest::operator=(DeleteRequest const &rhs)
 	return (*this);
 }
 
-Response	*DeleteRequest::createResponse(void) const
+Response	DeleteRequest::generateResponse(void) const
 {
-	ft::unique_ptr<ARequest>tmp(new DeleteRequest(*this));
-	return (new CgiResponse(tmp));
+	ResourceManager const	resource(getLine().getUri(), getConfig());
+	std::string const	normalized_path = resource.getNormalizedPath();
+
 }

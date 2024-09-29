@@ -1,7 +1,5 @@
 #pragma once
 #include "ARequest.hpp"
-#include "HttpBody.hpp"
-// #include "AHttpBody.hpp"
 
 class Response;
 
@@ -14,5 +12,5 @@ public:
 	PostRequest(PostRequest const &rhs);
 	PostRequest &operator=(PostRequest const &rhs);
 	~PostRequest();
-	Response	*createResponse(void) const;
+	Response	createResponse(void) const;
 };

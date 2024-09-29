@@ -28,7 +28,6 @@ GetResponse &GetResponse::operator=(GetResponse const &rhs)
 	return (*this);
 }
 
-#include "mockpath.hpp"//todo delete
 void	GetResponse::generateResponse(void)
 {
 	std::string	path = getResource().getNormalizedPath();

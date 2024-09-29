@@ -76,30 +76,14 @@ HttpBody	Response::getBody(void) const
 	return (body_);
 }
 
-std::string	Response::generateResponse(void) const
+std::string	Response::to_string(void) const
 {
 	std::ostringstream	oss;
 
-	oss << status_.to_stdstring();
-	oss << header_.to_stdstring();
+	oss << status_.to_string();
+	oss << header_.to_string();
 	oss << ft::string::CR +ft::string::LF;
 	if (has_body_)
-		oss << body_.to_stdstring();
-	// ft::string	res;
-	// HttpStatus	status_code = getStatus();
-	// std::string	code_num = ft::to_string<int>(status_code.getCode());
-
-	// std::string statusStr = status_code.to_stdstring();
-	// res += statusStr;
-
-	// HttpHeader header = getHeader();
-	// res += header.str();
-
-	// res += ft::string::CR + ft::string::LF;
-
-	// HttpBody	body = getBody();
-	// if (body.getSize() != 0)
-	// 	res += body.data();
-	// return (res.str());
-
+		oss << body_.to_string();
+	return (oss.str());
 }

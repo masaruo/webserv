@@ -18,7 +18,7 @@ public:
 		bool					is_autoindex_;
 		bool					is_cgi_;
 		std::string				cgi_root_;
-		std::string				cgi_upload_path_;
+		std::string				cgi_upload_path_;//todo change name to upload_store_;
 	};
 private:
 	std::string								server_name_;

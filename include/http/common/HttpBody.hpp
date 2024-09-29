@@ -19,6 +19,7 @@ public:
 	~HttpBody();
 	HttpBody(HttpBody const &rhs);
 	HttpBody &operator=(HttpBody const &rhs);
-	std::string	data(void) const;
+	std::string	to_string(void) const;
 	std::size_t	getSize(void) const;
+	std::string	getSizeStr(void) const;
 };

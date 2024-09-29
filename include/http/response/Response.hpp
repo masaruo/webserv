@@ -11,8 +11,6 @@
 class Response
 {
 private:
-	// ft::unique_ptr<ARequest>	request_;
-	// ResourceManager				resource_;
 	HttpStatus					status_;
 	HttpHeader					header_;
 	HttpBody					body_;
@@ -20,11 +18,9 @@ private:
 
 	Response();//=delete
 
-protected:
 	void		setStatus(HttpStatus const &code);
 	void		setHeader(HttpHeader const &inHeader);
 	void		setBody(HttpBody const &body);
-	std::string	getUri(void) const;
 
 public:
 	explicit Response(HttpStatus const &status, HttpHeader const &header);
@@ -36,5 +32,5 @@ public:
 	HttpStatus		getStatus(void) const;//todo move to private
 	HttpHeader		getHeader(void) const;//todo move to private
 	HttpBody		getBody(void) const;//todo move to private
-	std::string		generateResponse(void) const;
+	std::string		to_string(void) const;
 };

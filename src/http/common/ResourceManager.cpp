@@ -15,6 +15,7 @@ ResourceManager::ResourceManager(HttpUri const &uri, config::Config const &confi
 ,normalized_path_()
 ,is_directory_(false)
 {
+	initializeResource();
 	return ;
 }
 
@@ -61,6 +62,7 @@ void	ResourceManager::initializeResource(void)
 	}
 	raw_path_ = config_.getRoot() + path;
 	checkResourceType();
+	normalizeResourcePath();
 }
 
 void	ResourceManager::checkResourceType(void)

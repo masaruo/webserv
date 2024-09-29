@@ -11,5 +11,6 @@ public:
 	DeleteRequest(DeleteRequest const &rhs);
 	DeleteRequest &operator=(DeleteRequest const &rsh);
 	~DeleteRequest();
-	Response	*createResponse(void) const;
+
+	Response	generateResponse(void) const;
 };

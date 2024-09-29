@@ -1,5 +1,6 @@
 #include "PutRequest.hpp"
-#include "PutResponse.hpp"
+#include "Response.hpp"
+#include "ResourceManager.hpp"
 #include <fstream>
 
 PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
@@ -28,28 +29,34 @@ PutRequest &PutRequest::operator=(PutRequest const &rhs)
 	return (*this);
 }
 
-Response	*PutRequest::createResponse(void) const
+Response	PutRequest::createResponse(void) const
 {
-	saveBody();
-	ft::unique_ptr<ARequest>tmp(new PutRequest(*this));
-	return (new PutResponse(tmp));
+	ResourceManager const	resource(getLine().getUri(), getConfig());
+	std::string const	normalized_path = resource.getNormalizedPath();
+	upload(normalized_path);
+
+	HttpHeader	header;
+	header.setHeader("content-length", "0");
+
+	HttpStatus	status(HttpCode::OK);
+
+	Response	response(status, header);
+	return (response);
 }
 
-void	PutRequest::saveBody(void) const//!put to respons?
+void	PutRequest::upload(std::string const &path) const
 {
-	std::string	savePath = "/webserv/save/";
-	std::string	name = getHeader().getFirstValue("X-File-Name");
-	std::string	fullPath = savePath + name;
-	std::ofstream	ofs(fullPath.c_str() , std::ios_base::trunc | std::ios_base::binary);
-	if (!ofs)
-	{
-		//todo error
-		return ;
-	}
+	std::string const	upload_path = getConfig().getCgiUploadPath(path);
+	std::string const	fullpath = getConfig().getRoot() + upload_path;
 
-	ofs.write(getBody().data().c_str(), getBody().getSize());
+	std::ofstream	ofs(fullpath.c_str() , std::ios_base::trunc | std::ios_base::binary);
 	if (!ofs)
 	{
-		//todo error
+		throw (HttpStatus::HttpStatusException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
+	ofs.write(getBody().to_string().c_str(), getBody().getSize());
+	if (!ofs)
+	{
+		throw (HttpStatus::HttpStatusException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 }

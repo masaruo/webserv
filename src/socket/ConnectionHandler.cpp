@@ -106,28 +106,28 @@ void	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 	}
 }
 
-void	ConnectionHandler::sendData(int sock_fd, ft::bytes_vec const &data)
-{
-	std::size_t				total_sent = 0;
-	ssize_t					bytes_sent;
+// void	ConnectionHandler::sendData(int sock_fd, ft::bytes_vec const &data)
+// {
+// 	std::size_t				total_sent = 0;
+// 	ssize_t					bytes_sent;
 
-	while (total_sent < data.size())
-	{
-		bytes_sent = send(sock_fd, data.data() + total_sent, data.size() - total_sent, 0);
-		if (bytes_sent == ft::err)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-			{
-				continue ;
-			}
-			else
-			{
-				throw(ConnectionHandlerException("ConnectionHandlerException at 123."));
-			}
-		}
-		total_sent += bytes_sent;
-	}
-}
+// 	while (total_sent < data.size())
+// 	{
+// 		bytes_sent = send(sock_fd, data.data() + total_sent, data.size() - total_sent, 0);
+// 		if (bytes_sent == ft::err)
+// 		{
+// 			if (errno == EAGAIN || errno == EWOULDBLOCK)
+// 			{
+// 				continue ;
+// 			}
+// 			else
+// 			{
+// 				throw(ConnectionHandlerException("ConnectionHandlerException at 123."));
+// 			}
+// 		}
+// 		total_sent += bytes_sent;
+// 	}
+// }
 
 ConnectionHandler::ConnectionHandlerException::ConnectionHandlerException(std::string const &msg)
 :std::runtime_error(msg)

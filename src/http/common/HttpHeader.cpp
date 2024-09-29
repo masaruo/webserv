@@ -235,7 +235,7 @@ HttpHeader::map_vec_t	HttpHeader::data(void) const
 	return (headers_);
 }
 
-std::string 	HttpHeader::str(void) const
+std::string 	HttpHeader::to_string(void) const
 {
 	const_iterator		iter = headers_.begin();
 	const_iterator		end = headers_.end();

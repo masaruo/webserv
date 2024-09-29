@@ -58,7 +58,7 @@ HttpBody &HttpBody::operator=(HttpBody const &rhs)
 	return (*this);
 }
 
-std::string	HttpBody::data(void) const
+std::string	HttpBody::to_string(void) const
 {
 	return (data_);
 }
@@ -66,4 +66,13 @@ std::string	HttpBody::data(void) const
 std::size_t	HttpBody::getSize(void) const
 {
 	return (data_.size());
+}
+
+std::string	HttpBody::getSizeStr(void) const
+{
+	std::size_t const	size = getSize();
+	std::string sizeStr;
+
+	sizeStr = ft::to_string<std::size_t>(size);
+	return (sizeStr);
 }

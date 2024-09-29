@@ -36,5 +36,5 @@ public:
 	std::size_t	getContentLen(void) const;
 	map_vec_t	data(void) const;
 	bool		hasHeader(std::string const &key) const;
-	std::string	str(void) const;
+	std::string	to_string(void) const;
 };

@@ -1,6 +1,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <map>
+#include "../../include/http/common/HttpCode.hpp"
 // #include <../../include/config/Location.hpp>
 
 /*
@@ -27,9 +29,13 @@ bool issemicolon(int c)
 
 class Config {
 public:    
-    std::string server_name;
-    size_t      port;
-    std::string root;
+	std::string								server_name_;
+	std::size_t								port_;
+	std::string								root_;
+	std::size_t								max_body_size_;
+	std::map<HttpCode::code_e, std::string>	error_pages_;
+	std::size_t								keep_alive_timeout_;
+	// std::map<std::string, location_s>		locations_;
 };
 
 class Parser {
@@ -42,6 +48,7 @@ private:
     bool is_server_name(Config& config);
     bool is_port(Config& config);
     bool is_root(Config& config);
+    bool is_max_body_size(Config& config);
     bool start_with(const std::string& str);
 public:    
     // Parser(const std::string& file_name);
@@ -86,6 +93,7 @@ bool Parser::is_server(Config& config) {
         is_port(config);
         is_server_name(config);
         is_root(config);
+        is_max_body_size(config);
     }
     if (consume_token() != "}")
         return false;
@@ -97,7 +105,7 @@ bool Parser::is_server_name(Config& config) {
         return false;
     consume_token();
     std::string server_name = consume_token();
-    config.server_name = server_name;
+    config.server_name_ = server_name;
     if (consume_token() != ";")
         return false;
     return true;
@@ -109,7 +117,7 @@ bool Parser::is_port(Config& config) {
     consume_token();
     std::stringstream port;
     port << consume_token();
-    port >> config.port;
+    port >> config.port_;
     if (consume_token() != ";")
         return false;
     return true;
@@ -119,7 +127,19 @@ bool Parser::is_root(Config& config) {
     if (get_token() != "root")
         return false;
     consume_token();
-    config.root = consume_token();
+    config.root_ = consume_token();
+    if (consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool Parser::is_max_body_size(Config& config) {
+    if (get_token() != "max_body_size")
+        return false;
+    consume_token();
+    std::stringstream max_body_size;
+    max_body_size << consume_token();
+    max_body_size >> config.max_body_size_;
     if (consume_token() != ";")
         return false;
     return true;
@@ -164,16 +184,17 @@ std::string Parser::consume_token()
 
 int main()
 {
-    std::string str = "server {\n\tlisten 8080;\n\tserver_name localhost;\n\troot ./docs/;\n\t}\n";
+    std::string str = "server {\n\tlisten 8080;\n\tserver_name localhost;\n\troot ./docs/;\n\tmax_body_size 10000;\n\t}\n";
     // std::string str = "server { }";
     std::cout << str << std::endl;
     // std::cout << std::boolalpha << is_config(str) << std::endl;
 
     Parser parser(str);
     Config config = parser.parse();
-    std::cout << "port: " << config.port << std::endl;
-    std::cout << "server_name: " << config.server_name << std::endl;
-    std::cout << "root: " << config.root << std::endl;
+    std::cout << "port: " << config.port_ << std::endl;
+    std::cout << "server_name: " << config.server_name_ << std::endl;
+    std::cout << "root: " << config.root_ << std::endl;
+    std::cout << "max_body_size: " << config.max_body_size_ << std::endl;
     // std::cout << parser.get_token() << std::endl;
     // std::cout << parser.get_token() << std::endl;
     // std::cout << parser.get_token() << std::endl;

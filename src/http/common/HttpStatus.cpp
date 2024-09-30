@@ -43,6 +43,13 @@ HttpCode::code_e	HttpStatus::getCode(void) const
 	return (code_);
 }
 
+std::string	HttpStatus::str(void) const
+{
+	std::string const	msg = HttpCode::str(code_);
+	std::string const	res("HTTP/1.1 " + msg);
+	return (res);
+}
+
 //! EXCEPTIONS
 HttpStatus::HttpStatusException::HttpStatusException(HttpCode::code_e error_code)
 :std::runtime_error(HttpCode::str(error_code))

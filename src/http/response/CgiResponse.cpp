@@ -186,8 +186,8 @@ void	CgiResponse::exec_parent(int pipefd[2], pid_t child_pid)
 void	CgiResponse::generateResponse(void)
 {
 	execute();
-	StatusCode status(StatusCode::OK);
-	setCode(status);
+
+	setStatus(HttpCode::OK);
 	HttpHeader	header;
 	header.setHeader("Content-Type", " text/html\r\n");
 	std::string size_str = ft::to_string<std::size_t>(getBody().getSize());

@@ -40,8 +40,7 @@ void	PutResponse::generateResponse(void)
 	HttpBody body(FileReader::readTextFile(path));
 	//todo try catch : error handling
 
-	StatusCode	status(StatusCode::OK);
-	setCode(status);
+	setStatus(HttpCode::OK);
 
 	HttpHeader	header;
 	header.setHeader("Content-Type", " text/html\r\n");

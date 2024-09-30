@@ -49,8 +49,8 @@ ft::str_map	Env::createEnv(RequestLine const &line, HttpHeader const &header, Ht
 	env["AUTH_TYPE"] = "TEST";//?
 	env["REMOTE_USER"] = "Is it necessary?";//?
 	env["REMOTE_IDENT"] = "Is it necessary?";//?
-	env["CONTENT_TYPE"] = header.getHeader("Content-Type");
-	env["CONTENT_LENGTH"] = header.getHeader("Content-Length");
+	env["CONTENT_TYPE"] = header.getValue("Content-Type");
+	env["CONTENT_LENGTH"] = header.getValue("Content-Length");
 	// env["XBODY"] = req_body.str();
 	return (env);
 }

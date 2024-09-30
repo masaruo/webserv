@@ -14,6 +14,7 @@ public:
 	HttpStatus &operator=(HttpStatus const &rhs);
 	void				setCode(HttpCode::code_e code);
 	HttpCode::code_e	getCode(void) const;
+	std::string			str(void) const;
 
 	class HttpStatusException : public std::runtime_error
 	{

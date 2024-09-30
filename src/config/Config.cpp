@@ -1,19 +1,19 @@
 #include "Config.hpp"
 #include "HttpStatus.hpp"
 
-config::Config::Config(std::string const &block)//!this is MOCK!
+config::Config::Config(int flag)//!this is MOCK!
 {
-	if (block == "default")
+	if (flag == 1)
 	{
 		server_name_ = "_";
 		port_ = 8888;
 		root_ = "/webserv/www/html";
 		max_body_size_ = 10000000;
-		error_pages_.insert(std::make_pair(404, "/404.html"));
-		error_pages_.insert(std::make_pair(500, "/50x.html"));
-		error_pages_.insert(std::make_pair(502, "/50x.html"));
-		error_pages_.insert(std::make_pair(503, "/50x.html"));
-		error_pages_.insert(std::make_pair(504, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
+		error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
 
 //location /
 		location_s tmp;
@@ -49,11 +49,11 @@ config::Config::Config(std::string const &block)//!this is MOCK!
 		port_ = 7777;
 		root_ = "/webserv/www/example";
 		max_body_size_ = 5000000;
-		error_pages_.insert(std::make_pair(404, "/404.html"));
-		error_pages_.insert(std::make_pair(500, "/50x.html"));
-		error_pages_.insert(std::make_pair(502, "/50x.html"));
-		error_pages_.insert(std::make_pair(503, "/50x.html"));
-		error_pages_.insert(std::make_pair(504, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
+		error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
+		error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
 
 //location /
 		location_s tmp;
@@ -166,7 +166,7 @@ std::string	config::Config::getCgiRoot(std::string const &path) const
 	return (getLocation(path).cgi_root_);
 }
 
-std::string	config::Config::getCgiRoot(std::string const &path) const
+std::string	config::Config::getCgiUploadPath(std::string const &path) const
 {
 	return (getLocation(path).cgi_upload_path_);
 }

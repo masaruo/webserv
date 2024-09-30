@@ -1,5 +1,6 @@
 #include "HttpHeader.hpp"
 #include <utility>
+#include <algorithm>
 #include "string.hpp"
 #include "HttpStatus.hpp"
 
@@ -46,18 +47,22 @@ HttpHeader &HttpHeader::operator=(HttpHeader const &rhs)
 void	HttpHeader::setHeader(std::string const &line)
 {
 	if (line == ft::string::CR)
-		return ;
-	ft::string	to_mod(line);
-	ft::string::string_vector	split_by_dcolon = to_mod.split(":");
-	if (split_by_dcolon.size() != 2)
+	{
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-	std::string	key = split_by_dcolon.at(0);
-	split_by_dcolon.at(1).trim(ft::string::SP + ft::string::CR);
-	std::string value = split_by_dcolon.at(1);
+	}
+	ft::string	key, value;
+	std::string::size_type loc = line.find(':');
+	if (loc == std::string::npos)
+	{
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+	}
+	key = line.substr(0, loc);
+	value = line.substr(loc + 1);
+	key.trim(ft::string::WHITESPACE + ft::string::CR);
+	value.trim(ft::string::WHITESPACE + ft::string::CR);
 	if (key.empty() || value.empty())
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 	setHeader(key, value);
-	
 }
 
 void	HttpHeader::setHeader(std::string const &key, std::string const &value)

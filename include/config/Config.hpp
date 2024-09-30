@@ -28,10 +28,11 @@ private:
 	std::map<HttpCode::code_e, std::string>	error_pages_;
 	std::size_t								keep_alive_timeout_;
 	std::map<std::string, location_s>		locations_;
-	Config();//=delete
 	location_s	getLocation(std::string const &path) const;
+	Config();//=delete
 public:
 	// consturctor and destructor
+	Config(int flag);//todo delete mock only = mogawa to delete
 	Config(std::string const &block);//todo = add default path
 	Config(Config const &rhs);
 	Config &operator=(Config const &rhs);

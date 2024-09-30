@@ -65,4 +65,12 @@ namespace ft
 		return (numStr.str());
 	}
 
+	template <typename CONTAINER>
+	bool	is_empty(CONTAINER const &c)
+	{
+		if (c.empty())
+			return (true);
+		else
+			return (false);
+	}
 }

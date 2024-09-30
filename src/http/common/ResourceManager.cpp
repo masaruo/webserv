@@ -62,7 +62,7 @@ void	ResourceManager::initializeResource(void)
 	}
 	raw_path_ = config_.getRoot() + path;
 	checkResourceType();
-	// normalizeResourcePath();
+	// normalizeResourcePath();re
 }
 
 void	ResourceManager::checkResourceType(void)
@@ -103,56 +103,3 @@ std::string	ResourceManager::getIndexFile(void) const
 {
 	return (config_.getIndex(uri_.getPath()));
 }
-
-// void	ResourceManager::handleDots(void)
-// {
-// 	ft::string									ftpath(raw_path_);
-// 	ft::string::string_vector					splitBySlash = ftpath.split("/");
-// 	ft::string::string_vector					normalized;
-// 	ft::string::string_vector_iterator			str = splitBySlash.begin();
-// 	ft::string::string_vector_const_iterator	end = splitBySlash.end();
-
-// 	while (str != end)
-// 	{
-// 		if (*str == "." && str->size() == 1)//dotだけなら、消す
-// 		{
-// 			str++;
-// 			continue ;
-// 		}
-// 		else if (*str == "..")
-// 		{
-// 			if (!normalized.empty())
-// 				normalized.pop_back();
-// 			else
-// 				throw (HttpStatus::HttpStatusException(HttpCode::FORBIDDEN));
-// 		}
-// 		else
-// 		{
-// 			normalized.push_back(*str);
-// 		}
-// 		str++;
-// 	}
-// 	std::stringstream							ss;
-// 	ft::string::string_vector::const_iterator	iter = normalized.begin();
-// 	ft::string::string_vector::const_iterator	end_normalized = normalized.end();
-// 	ft::string::string_vector::const_iterator	last = normalized.end();
-// 	std::advance(last, -1);
-// 	while (iter != end_normalized)
-// 	{
-// 		ss << str->str();
-// 		if (str != last || ftpath.end_with('/'))
-// 			ss << "/";
-// 		iter++;
-// 	}
-// 	normalized_path_ = ss.str();
-// }
-
-// void	ResourceManager::normalizeResourcePath(void)
-// {
-// 	std::string::iterator	begin = raw_path_.begin();
-// 	std::string::iterator	end = raw_path_.end();
-
-// 	std::replace(begin, end, '\\', '/');// windows \ to normalized to linux /
-
-// 	handleDots();
-// }

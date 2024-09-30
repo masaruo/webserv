@@ -1,37 +1,44 @@
 #include "UriNormalizer.hpp"
 #include "string.hpp"
 #include "HttpStatus.hpp"
+#include "define.hpp"
 #include <algorithm>
 #include <sstream>
 
-static std::string	handleDots(std::string const &raw);
-static std::string	decodePercent(std::string const &raw);
 static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim);
 static char			decodeHex(std::string const &str);
-
-std::string	UriNormalizer::normalizeFullUri(std::string const &raw)
+std::string	UriNormalizer::uniformSlashAndHandleDots(std::string const &raw)
 {
+	if (ft::is_empty<std::string>(raw))
+		return ("");
+
 	std::string	uri(raw);
 
 	std::replace(uri.begin(), uri.end(), '\\', '/');
 	
-	std::string	DotsHandled = handleDots(uri);
+	std::string	DotsHandled = decodeDots(uri);
 	return (DotsHandled);
 }
 
-std::string	UriNormalizer::normalizeComponent(std::string const &raw)
+std::string	UriNormalizer::decodePercentAndHandleDots(std::string const &raw)
 {
+	if (ft::is_empty(raw))
+		return ("");
+
 	ft::string	ftraw(raw);
 	std::string	decoded, dotsHandled;
 
 	decoded = decodePercent(ftraw);
-	dotsHandled = handleDots(decoded);
+	dotsHandled = decodeDots(decoded);
 
 	return (dotsHandled);
 }
 
-static std::string	handleDots(std::string const &raw)
+std::string	UriNormalizer::decodeDots(std::string const &raw)
 {
+	if (ft::is_empty(raw))
+		return ("");
+
 	ft::string									ftraw(raw);
 	ft::string::string_vector					split_by_slash = ftraw.split("/");
 	ft::string::string_vector_iterator			str = split_by_slash.begin();
@@ -74,8 +81,11 @@ static char	decodeHex(std::string const &str)
 	return (static_cast<char>(value));
 }
 
-static std::string	decodePercent(ft::string const &raw)
+std::string	UriNormalizer::decodePercent(std::string const &raw)
 {
+	if (ft::is_empty(raw))
+		return ("");
+
 	ft::string::const_iterator	iter = raw.begin();
 	ft::string::const_iterator	begin = raw.begin();
 	ft::string::const_iterator	end = raw.end();
@@ -90,7 +100,7 @@ static std::string	decodePercent(ft::string const &raw)
 			{
 				throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 			}
-			percentStr = raw.str().substr(std::distance(begin, iter), UriNormalizer::PERCENT_ENCODE_LEN);
+			percentStr = raw.substr(std::distance(begin, iter), UriNormalizer::PERCENT_ENCODE_LEN);
 			decorded.push_back(decodeHex(percentStr));
 			std::advance(iter, UriNormalizer::PERCENT_ENCODE_LEN);
 		}
@@ -105,7 +115,7 @@ static std::string	decodePercent(ft::string const &raw)
 
 static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim)
 {
-	if (string_vec.empty())
+	if (ft::is_empty<ft::string::string_vector>(string_vec) || ft::is_empty(raw))
 		return ("");
 
 	ft::string::string_vector_const_iterator	iter = string_vec.begin();

@@ -13,9 +13,6 @@ private:
 	std::string					normalized_path_;
 	bool						is_directory_;
 	ResourceManager();//=delete
-	// void	normalizeResourcePath(void);
-	// void	assertResourcePath(void) const;
-	// void	handleDots(void);
 	void	initializeResource(void);
 	void	checkResourceType(void);
 public:

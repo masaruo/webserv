@@ -6,7 +6,7 @@ class HttpUri
 {
 private:
 	static std::size_t const	URI_MAX_LEN = 1024;
-	std::string	raw_;
+	std::string	initial_uri_;
 	std::string	authority_;
 	std::string	host_;
 	std::size_t	port_;
@@ -15,21 +15,22 @@ private:
 	std::string	path_info_;
 	ft::str_map	query_;
 	bool		hasQuery_;
-	void		parseUri(std::string const &authorityStart, std::string const &host);
-	void		parseAbsolute(std::string const &host);
+	void		parseUri(std::string const &authorityStart);
+	void		parseAbsolute(void);
 	void		parseOrigin(std::string const &host);
 	void		parseAuthority(void);
 	void		parsePort(void);
 	void		parseExtAndPathInfo(void);
-	void		parseQuery(std::string const &query);
-	std::string	percentDecoder(std::string const &str);
+	void		parseQueryWithDecodePercent(std::string const &query);
+	void		formatEachComponentsExQuery(void);
+	void		assertFinalData(void) const;
 public:
 	HttpUri();
 	~HttpUri();
 	HttpUri(HttpUri const &rhs);
 	HttpUri &operator=(HttpUri const &rhs);
 	void		init(std::string const &raw);
-	void		constructWithHostheader(std::string const &host);
+	void		updateWithHostHeader(std::string const &host);
 	std::string	getAuthority(void) const;
 	std::string	getHost(void) const;
 	std::size_t	getPort(void) const;

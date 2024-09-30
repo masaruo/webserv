@@ -1,10 +1,11 @@
 #include "HttpUri.hpp"
 #include "HttpStatus.hpp"
 #include "string.hpp"
+#include "UriNormalizer.hpp"
 #include <sstream>
 
 HttpUri::HttpUri()
-:raw_()
+:initial_uri_()
 ,authority_()
 ,host_()
 ,port_(0)
@@ -23,7 +24,7 @@ HttpUri::~HttpUri()
 }
 
 HttpUri::HttpUri(HttpUri const &rhs)
-:raw_(rhs.raw_)
+:initial_uri_(rhs.initial_uri_)
 ,authority_(rhs.authority_)
 ,host_(rhs.host_)
 ,port_(rhs.port_)
@@ -40,7 +41,7 @@ HttpUri &HttpUri::operator=(HttpUri const &rhs)
 {
 	if (this != &rhs)
 	{
-		raw_ = rhs.raw_;
+		initial_uri_ = rhs.initial_uri_;
 		authority_ = rhs.authority_;
 		host_ = rhs.host_;
 		port_ = rhs.port_;
@@ -59,10 +60,10 @@ void	HttpUri::init(std::string const &raw)
 		throw (HttpStatus::HttpStatusException(HttpCode::URI_TOO_LONG));
 	else if (raw.empty())
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-	raw_ = raw;
+	initial_uri_ = UriNormalizer::uniformSlashAndHandleDots(raw);
 }
 
-void	HttpUri::parseQuery(std::string const &query)
+void	HttpUri::parseQueryWithDecodePercent(std::string const &query)
 {
 	ft::string					ft_query(query);
 	ft::string::string_vector	split_by_and = ft_query.split("&");
@@ -76,8 +77,12 @@ void	HttpUri::parseQuery(std::string const &query)
 		ft::string::string_vector	split_by_equal = iter->split("=");
 		if (split_by_equal.empty() || split_by_equal.size() != 2)
 			throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-		std::string	key(percentDecoder(split_by_equal.at(0)));
-		std::string	value(percentDecoder(split_by_equal.at(1)));
+		std::string	key(UriNormalizer::decodePercent(split_by_equal.at(0)));
+		std::string	value(UriNormalizer::decodePercent(split_by_equal.at(1)));
+		ft::string ftkey(key);
+		ft::string ftvalue(value);
+		if (!ftkey.has_only(ft::string::VCHAR) || !ftvalue.has_only(ft::string::VCHAR))
+			throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 		query_[key] = value;
 		iter++;
 	}
@@ -108,27 +113,30 @@ void	HttpUri::parsePort(void)
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 }
 
-//todo in the middle of refactor
 void	HttpUri::parseExtAndPathInfo(void)
 {
-	std::string::size_type	lastDotPos = authority_.find_last_of('.');
-	std::string::size_type	extEnd = authority_.find_first_of("/", lastDotPos + 1);
+	std::string				dotDecodedStr = UriNormalizer::decodeDots(authority_);
+	std::string::size_type	lastDotPos = dotDecodedStr.find_last_of('.');
+	std::string::size_type	extEnd = dotDecodedStr.find_first_of("/", lastDotPos + 1);
 	std::string				ext, pathInfo;
 
 	if (lastDotPos == std::string::npos)
 	{
-		
-	}
-	if (extEnd == std::string::npos)
-	{
-		ext = authority_.substr(lastDotPos + 1);
+		ext = "";
 		pathInfo = "";
 	}
-	
-	ans = authority_.substr(lastDotPos + 1);
-	if (ans.empty())
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-	ext_ = percentDecoder(ans);
+	else if (extEnd == std::string::npos)
+	{
+		ext = dotDecodedStr.substr(lastDotPos + 1);
+		pathInfo = "";
+	}
+	else
+	{
+		ext = dotDecodedStr.substr(lastDotPos + 1, extEnd);
+		pathInfo = dotDecodedStr.substr(extEnd + 1);
+	}
+	ext_ = ext;
+	path_info_ = pathInfo;
 }
 
 void	HttpUri::parseAuthority(void)
@@ -137,26 +145,13 @@ void	HttpUri::parseAuthority(void)
 	parseExtAndPathInfo();
 }
 
-void	HttpUri::parseAbsolute(std::string const &host)//? check host
-{
-	std::string	scheme(raw_, 0, 4);
-	ft::string	ft_scheme(scheme);
-	ft_scheme.to_lower();
-	if (ft_scheme.str() != "http")
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-	
-	std::string::size_type	authorityStart = raw_.find("://") + 3;
-	std::string	raw_after_scheme = raw_.substr(authorityStart);
-	parseUri(raw_after_scheme, host);
-}
-
-void	HttpUri::parseUri(std::string const &authorityStart, std::string const &host)//? check host
+void	HttpUri::parseUri(std::string const &authorityStart)//? check host
 {
 	std::string::size_type	authorityEnd = authorityStart.find_first_of("/?");
 
 	if (authorityEnd == std::string::npos)
 	{
-		authority_ = raw_;
+		authority_ = initial_uri_;
 		path_ = "/";
 		hasQuery_ = false;
 	}
@@ -167,7 +162,7 @@ void	HttpUri::parseUri(std::string const &authorityStart, std::string const &hos
 		{
 			path_ = "/";
 			std::string queryString = authorityStart.substr(authorityEnd + 1);
-			parseQuery(queryString);
+			parseQueryWithDecodePercent(queryString);
 			hasQuery_ = true;
 		}
 		else
@@ -175,14 +170,14 @@ void	HttpUri::parseUri(std::string const &authorityStart, std::string const &hos
 			std::string::size_type	queryStart = authorityStart.find('?', authorityEnd);
 			if (queryStart == std::string::npos)
 			{
-				path_ = percentDecoder(authorityStart.substr(authorityEnd));
+				path_ = authorityStart.substr(authorityEnd);
 				hasQuery_ = false;
 			}
 			else
 			{
-				path_ = percentDecoder(authorityStart.substr(0, queryStart));
+				path_ = authorityStart.substr(0, queryStart);
 				std::string queryString = authorityStart.substr(queryStart + 1);
-				parseQuery(queryString);
+				parseQueryWithDecodePercent(queryString);
 				hasQuery_ = true;
 			}
 		}
@@ -192,27 +187,74 @@ void	HttpUri::parseUri(std::string const &authorityStart, std::string const &hos
 	parseAuthority();
 }
 
-void	HttpUri::parseOrigin(std::string const &host)
+void	HttpUri::parseAbsolute(void)
 {
-	if (host.empty())
+	std::string	scheme(initial_uri_, 0, 4);
+	ft::string	ft_scheme(scheme);
+	ft_scheme.to_lower();
+	if (ft_scheme.str() != "http")
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-	std::string	concatinated = host + raw_;
-	parseUri(concatinated, host);
+	
+	std::string::size_type	authorityStart = initial_uri_.find("://") + 3;
+	std::string	raw_after_scheme = initial_uri_.substr(authorityStart);
+	parseUri(raw_after_scheme);
 }
 
-void	HttpUri::constructWithHostheader(std::string const &host)
+void	HttpUri::parseOrigin(std::string const &hostHeader)
 {
-	if (raw_.empty())
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-	if (raw_.at(0) == '/')
-		parseOrigin(host);
-	else
-		parseAbsolute(host);
+	std::string	concatinated = hostHeader + initial_uri_;
+	parseUri(concatinated);
+}
 
-// to lower host data
-	ft::string	ft_host(host_);
-	ft_host.to_lower();
-	host_ = ft_host;
+void	HttpUri::updateWithHostHeader(std::string const &hostHeader)
+{
+	if (initial_uri_.empty() || hostHeader.empty())
+		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+	if (initial_uri_.at(0) == '/')
+		parseOrigin(hostHeader);
+	else
+		parseAbsolute();
+	formatEachComponentsExQuery();
+	assertFinalData();
+}
+
+void	HttpUri::formatEachComponentsExQuery(void)
+{
+	// to lower
+	ft::string	fthost(host_);
+	fthost.to_lower();
+	host_ = fthost.str();
+
+	// % decode
+	authority_ = UriNormalizer::decodePercent(authority_);
+	host_ = UriNormalizer::decodePercent(host_);
+	path_ = UriNormalizer::decodePercent(host_);
+	ext_ = UriNormalizer::decodePercent(ext_);
+	path_info_ = UriNormalizer::decodePercent(path_info_);
+
+	// expand dots
+	path_ = UriNormalizer::decodeDots(path_);
+	path_info_ = UriNormalizer::decodeDots(path_info_);
+}
+
+void	HttpUri::assertFinalData(void) const
+{
+	bool	is_valid = true;
+
+	ft::string	str;
+	str = host_;
+	if (!str.has_only(ft::string::HOST))
+		is_valid = false;
+	if (port_ < 1 || 65535 < port_)
+		is_valid = false;
+	str = path_;
+	if (!str.has_only(ft::string::PCHAR))
+		is_valid = false;
+	if (ext_ != "py" || ext_ != "cgi")
+		is_valid = false;
+	str = path_info_;
+	if (!str.has_only(ft::string::VCHAR))
+		is_valid = false;
 }
 
 std::string	HttpUri::getAuthority(void) const
@@ -265,63 +307,18 @@ std::string	HttpUri::getQueryString(void) const
 {
 	ft::str_map_const_iter	iter = query_.begin();
 	ft::str_map_const_iter	end = query_.end();
-	ft::str_map_const_iter	last = query_.end();
-	std::advance(last, -1);
 	std::ostringstream	oss;
 
 	while (iter != end)
 	{
 		oss << iter->first << "=" << iter->second;
-		if (iter != last)
+		ft::str_map_const_iter	next = iter;
+		std::advance(next, 1);
+		if (next != end)
+		{
 			oss << "&";
+		}
 		iter++;
 	}
 	return(oss.str());
 }
-
-// static void	assertHex(std::string const &hex)
-// {
-// 	ft::string	fthex(hex);
-
-// 	if (!fthex.has_only(ft::string::PCHAR))
-// 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-// }
-
-// static std::string	decordHex(std::string const &hex)
-// {
-// 	ft::string	first(hex.substr(1, 1));
-// 	ft::string	second(hex.substr(2));
-// 	std::string	decorded;
-
-// 	if (!first.has_only(ft::string::HEXDIG) || !second.has_only(ft::string::HEXDIG))
-// 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-// 	decorded = "\\x"+ first.str() + second.str();
-// 	assertHex(decorded);
-// 	return (decorded);
-// }
-
-// std::string	HttpUri::percentDecoder(std::string const &str)
-// {
-// 	std::string::const_iterator	iter = str.begin();
-// 	std::string::const_iterator	begin = str.begin();
-// 	std::string::const_iterator	end = str.end();
-// 	std::string					decordedStr;
-
-// 	while (iter != end)
-// 	{
-// 		if (*iter == '%')
-// 		{
-// 			if (std::distance(iter, end) < PERCENT_DECORD_SIZE)//%を含めて３桁が文字列の最後までなければ
-// 				throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-// 			std::string	cordedStr = str.substr(std::distance(begin, iter), PERCENT_DECORD_SIZE);
-// 			decordedStr += decordHex(cordedStr);
-// 			std::advance(iter, PERCENT_DECORD_SIZE);
-// 		}
-// 		else
-// 		{
-// 			decordedStr.push_back(*iter);
-// 			iter++;
-// 		}
-// 	}
-// 	return (decordedStr);
-// }

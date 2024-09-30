@@ -50,6 +50,8 @@ std::string const	ft::string::URI_UNRESERVED = ft::string::ALNUM + "-._~";
 std::string const	ft::string::QUERY = ft::string::URI_UNRESERVED + "/?:@!$'()*+,;=";
 std::string const	ft::string::PCHAR = ft::string::URI_UNRESERVED + ":@&=+$,";
 std::string const	ft::string::SCHEME = ft::string::ALNUM + "+-,";
+std::string const	ft::string::SUBDELIMS = "!$&'()*+,;=";
+std::string const	ft::string::HOST = ft::string::URI_UNRESERVED + ft::string::SUBDELIMS;
 //constructor / destructor
 ft::string::string()
 :base_()

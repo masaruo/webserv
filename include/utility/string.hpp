@@ -49,6 +49,8 @@ public:
 	static std::string const	QUERY;
 	static std::string const	PCHAR;
 	static std::string const	SCHEME;
+	static std::string const	SUBDELIMS;
+	static std::string const	HOST;
 
 	typedef std::string::iterator 				iterator;
 	typedef std::string::const_iterator			const_iterator;

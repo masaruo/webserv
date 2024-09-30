@@ -4,7 +4,15 @@
 #include <sstream>
 
 HttpUri::HttpUri()
-:raw_(), authority_(),host_(), port_(0), path_(), ext_(), query_(),  hasQuery_(false)
+:raw_()
+,authority_()
+,host_()
+,port_(0)
+,path_()
+,ext_()
+,path_info_()
+,query_()
+,hasQuery_(false)
 {
 	return ;
 }
@@ -21,6 +29,7 @@ HttpUri::HttpUri(HttpUri const &rhs)
 ,port_(rhs.port_)
 ,path_(rhs.path_)
 ,ext_(rhs.ext_)
+,path_info_(rhs.path_info_)
 ,query_(rhs.query_)
 ,hasQuery_(rhs.hasQuery_)
 {
@@ -37,6 +46,7 @@ HttpUri &HttpUri::operator=(HttpUri const &rhs)
 		port_ = rhs.port_;
 		path_ = rhs.path_;
 		ext_ = rhs.ext_;
+		path_info_ = rhs.path_info_;
 		query_ = rhs.query_;
 		hasQuery_ = rhs.hasQuery_;
 	}
@@ -98,10 +108,23 @@ void	HttpUri::parsePort(void)
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
 }
 
-void	HttpUri::parseExt(void)
+//todo in the middle of refactor
+void	HttpUri::parseExtAndPathInfo(void)
 {
 	std::string::size_type	lastDotPos = authority_.find_last_of('.');
-	std::string 			ans;
+	std::string::size_type	extEnd = authority_.find_first_of("/", lastDotPos + 1);
+	std::string				ext, pathInfo;
+
+	if (lastDotPos == std::string::npos)
+	{
+		
+	}
+	if (extEnd == std::string::npos)
+	{
+		ext = authority_.substr(lastDotPos + 1);
+		pathInfo = "";
+	}
+	
 	ans = authority_.substr(lastDotPos + 1);
 	if (ans.empty())
 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
@@ -111,7 +134,7 @@ void	HttpUri::parseExt(void)
 void	HttpUri::parseAuthority(void)
 {
 	parsePort();
-	parseExt();
+	parseExtAndPathInfo();
 }
 
 void	HttpUri::parseAbsolute(std::string const &host)//? check host
@@ -207,9 +230,24 @@ std::size_t	HttpUri::getPort(void) const
 	return (port_);
 }
 
+std::string	HttpUri::getPortStr(void) const
+{
+	return (ft::to_string<std::size_t>(port_));
+}
+
 std::string	HttpUri::getPath(void) const
 {
 	return (path_);
+}
+
+std::string	HttpUri::getExt(void) const
+{
+	return (ext_);
+}
+
+std::string	HttpUri::getPathInfo(void) const
+{
+	return (path_info_);
 }
 
 ft::str_map	HttpUri::getQuery(void) const
@@ -241,49 +279,49 @@ std::string	HttpUri::getQueryString(void) const
 	return(oss.str());
 }
 
-static void	assertHex(std::string const &hex)
-{
-	ft::string	fthex(hex);
+// static void	assertHex(std::string const &hex)
+// {
+// 	ft::string	fthex(hex);
 
-	if (!fthex.has_only(ft::string::PCHAR))
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-}
+// 	if (!fthex.has_only(ft::string::PCHAR))
+// 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+// }
 
-static std::string	decordHex(std::string const &hex)
-{
-	ft::string	first(hex.substr(1, 1));
-	ft::string	second(hex.substr(2));
-	std::string	decorded;
+// static std::string	decordHex(std::string const &hex)
+// {
+// 	ft::string	first(hex.substr(1, 1));
+// 	ft::string	second(hex.substr(2));
+// 	std::string	decorded;
 
-	if (!first.has_only(ft::string::HEXDIG) || !second.has_only(ft::string::HEXDIG))
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-	decorded = "\\x"+ first.str() + second.str();
-	assertHex(decorded);
-	return (decorded);
-}
+// 	if (!first.has_only(ft::string::HEXDIG) || !second.has_only(ft::string::HEXDIG))
+// 		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+// 	decorded = "\\x"+ first.str() + second.str();
+// 	assertHex(decorded);
+// 	return (decorded);
+// }
 
-std::string	HttpUri::percentDecoder(std::string const &str)
-{
-	std::string::const_iterator	iter = str.begin();
-	std::string::const_iterator	begin = str.begin();
-	std::string::const_iterator	end = str.end();
-	std::string					decordedStr;
+// std::string	HttpUri::percentDecoder(std::string const &str)
+// {
+// 	std::string::const_iterator	iter = str.begin();
+// 	std::string::const_iterator	begin = str.begin();
+// 	std::string::const_iterator	end = str.end();
+// 	std::string					decordedStr;
 
-	while (iter != end)
-	{
-		if (*iter == '%')
-		{
-			if (std::distance(iter, end) < PERCENT_DECORD_SIZE)//%を含めて３桁が文字列の最後までなければ
-				throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
-			std::string	cordedStr = str.substr(std::distance(begin, iter), PERCENT_DECORD_SIZE);
-			decordedStr += decordHex(cordedStr);
-			std::advance(iter, PERCENT_DECORD_SIZE);
-		}
-		else
-		{
-			decordedStr.push_back(*iter);
-			iter++;
-		}
-	}
-	return (decordedStr);
-}
+// 	while (iter != end)
+// 	{
+// 		if (*iter == '%')
+// 		{
+// 			if (std::distance(iter, end) < PERCENT_DECORD_SIZE)//%を含めて３桁が文字列の最後までなければ
+// 				throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+// 			std::string	cordedStr = str.substr(std::distance(begin, iter), PERCENT_DECORD_SIZE);
+// 			decordedStr += decordHex(cordedStr);
+// 			std::advance(iter, PERCENT_DECORD_SIZE);
+// 		}
+// 		else
+// 		{
+// 			decordedStr.push_back(*iter);
+// 			iter++;
+// 		}
+// 	}
+// 	return (decordedStr);
+// }

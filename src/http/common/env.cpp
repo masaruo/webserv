@@ -1,4 +1,4 @@
-#include "env.hpp"
+#include "Env.hpp"
 #include "string.hpp"
 #include "cstring"
 
@@ -34,6 +34,13 @@ ft::str_map	Env::createEnv(RequestLine const &line, HttpHeader const &header, Ht
 	HttpUri	const	uri = line.getUri();
 
 	env = to_cppenv();
+	env["auth_type"] = "";
+	env["content_length"] = body.getSizeStr();
+	env["content_type"] = header.getFirstValue("Content-Type");
+	env["gateway_interface"] = "CGI/1.1";
+	env["path_info"] = 
+
+
 	env["SERVER_SOFTWARE"] = "test/x.x";
 	env["SERVER_NAME"] = uri.getHost();
 	env["GATEWAY_INTERFACE"] = "testCGI/x.x";

@@ -1,5 +1,5 @@
 #include "Config.hpp"
-#include "HttpStatus.hpp"
+#include "HttpException.hpp"
 
 config::Config::Config(int flag)//!this is MOCK!
 {
@@ -120,6 +120,12 @@ std::size_t	config::Config::getMaxBodySize(void) const
 
 std::string	config::Config::getErrorPage(HttpCode::code_e error_code) const
 {
+	std::map<HttpCode::code_e, std::string>::size_type	findCount;
+	findCount = error_pages_.count(error_code);
+
+	if (findCount == 0)
+		return ("");
+
 	std::string const	error_path = error_pages_.at(error_code);
 	return (error_path);
 }
@@ -131,9 +137,11 @@ std::size_t	config::Config::getKeepAliveTimeout(void) const
 
 config::Config::location_s	config::Config::getLocation(std::string const &path) const
 {
+	location_s	loc;
 	if (locations_.find(path) == locations_.end())
-		throw (HttpStatus::HttpStatusException(HttpCode::NOT_FOUND));
-	location_s loc = locations_.at(path);
+		loc = locations_.at("/");
+	else
+		loc = locations_.at(path);
 	return (loc);
 }
 

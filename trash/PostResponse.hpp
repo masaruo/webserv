@@ -1,7 +1,7 @@
 #pragma once
 #include "AResponse.hpp"
 
-class PostResponse : public AResponse
+class PostResponse : public Response
 {
 private:
 	PostResponse();//=delete

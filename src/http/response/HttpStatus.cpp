@@ -1,4 +1,6 @@
 #include "HttpStatus.hpp"
+#include <sstream>
+#include "Response.hpp"
 
 HttpStatus::HttpStatus()
 :code_(HttpCode::UNINITIALIZED)
@@ -43,29 +45,9 @@ HttpCode::code_e	HttpStatus::getCode(void) const
 	return (code_);
 }
 
-std::string	HttpStatus::str(void) const
+std::string	HttpStatus::to_string(void) const
 {
 	std::string const	msg = HttpCode::str(code_);
 	std::string const	res("HTTP/1.1 " + msg);
 	return (res);
-}
-
-//! EXCEPTIONS
-HttpStatus::HttpStatusException::HttpStatusException(HttpCode::code_e error_code)
-:std::runtime_error(HttpCode::str(error_code))
-,error_code_(error_code)
-{
-	return ;
-}
-
-HttpCode::code_e	HttpStatus::HttpStatusException::getErrorCode(void) const
-{
-	return (error_code_);
-}
-
-char const	*HttpStatus::HttpStatusException::what() const throw()
-{
-	std::string const	runtime_msg = std::runtime_error::what();
-	std::string const	res("HTTP/1.1 " + runtime_msg); 
-	return (res.c_str());
 }

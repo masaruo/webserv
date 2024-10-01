@@ -17,6 +17,8 @@ LDFLAGS		:=
 INC			:=	-I./include \
 				-I./include/config \
 				-I./include/http/common \
+				-I./include/http/exception \
+				-I./include/http/http_code \
 				-I./include/http/request \
 				-I./include/http/response \
 				-I./include/socket \

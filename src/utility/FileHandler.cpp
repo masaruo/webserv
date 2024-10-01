@@ -21,15 +21,17 @@ std::string FileReader::readTextFile(std::string const &path)
 	return (buf);
 }
 
-ft::bytes_vec	FileReader::readFdFile(int fd)
+std::string	FileReader::readFdFile(int fd)
 {
 	const std::size_t BUFFSIZE = 4096;
-	ft::bytes_vec	buf(BUFFSIZE);//todo buffer size
-	ft::bytes_vec	result;
+		// ft::bytes_vec	buf(BUFFSIZE);//todo buffer size
+		// ft::bytes_vec	result;
+	std::string buf(BUFFSIZE, '\0');
+	std::string	result;
 
 	while (true)
 	{
-		ssize_t	bytesRead = read(fd, buf.data(), buf.size());
+		ssize_t	bytesRead = read(fd, (void*)buf.data(), buf.size());
 		if (bytesRead == ft::err)
 		{
 			//todo err

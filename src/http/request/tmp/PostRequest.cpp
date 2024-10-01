@@ -1,7 +1,5 @@
 #include "PostRequest.hpp"
-// #include "PostResponse.hpp"
-#include "CgiResponse.hpp"
-#include <fstream>
+#include "Response.hpp"
 
 PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
@@ -29,8 +27,7 @@ PostRequest &PostRequest::operator=(PostRequest const &rhs)
 	return (*this); 
 }
 
-AResponse	*PostRequest::createResponse(void) const
+Response	PostRequest::createResponse(void) const
 {
-	ft::unique_ptr<ARequest>tmp(new PostRequest(*this));
-	return (new CgiResponse(tmp));
+	
 }

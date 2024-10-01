@@ -1,4 +1,4 @@
-#include "env.hpp"
+#include "Env.hpp"
 #include "string.hpp"
 #include "cstring"
 
@@ -31,27 +31,33 @@ Env	&Env::operator=(Env const &rhs)
 ft::str_map	Env::createEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
 {
 	ft::str_map	env;
+	HttpUri	const	uri = line.getUri();
 
 	env = to_cppenv();
+	env["auth_type"] = "";
+	env["content_length"] = body.getSizeStr();
+	env["content_type"] = header.getFirstValue("Content-Type");
+	env["gateway_interface"] = "CGI/1.1";
+	env["path_info"] = 
+
+
 	env["SERVER_SOFTWARE"] = "test/x.x";
-	env["SERVER_NAME"] = "webserv";
+	env["SERVER_NAME"] = uri.getHost();
 	env["GATEWAY_INTERFACE"] = "testCGI/x.x";
 	env["SERVER_PROTOCOL"] = "testProtocol/x.x";
-	env["SERVER_PORT"] = "7777";
-	// env["REQUEST_METHOD"] = req_header.getHeader("METHOD");//*
+	env["SERVER_PORT"] = uri.getPort();
 	env["REQUEST_METHOD"] = line.getMethod();
-	env["PATH_INFO"] = line.getUri();
+	env["PATH_INFO"] = line.getUri().getPath();
 	env["PATH_TRANSLATED"] = "???";//?
-	env["SCRIPT_NAME"] = "echo.cgi";
-	env["QUERY_STRING"] = "???";//todo get from httpheader
+	env["SCRIPT_NAME"] = "echo.cgi";//!
+	env["QUERY_STRING"] = uri.getQueryString();
 	env["REMOTE_HOST"] = "REMOTE_ADDR";
 	env["REMOTE_ADDR"] = "???.???.???.???";//?
 	env["AUTH_TYPE"] = "TEST";//?
 	env["REMOTE_USER"] = "Is it necessary?";//?
 	env["REMOTE_IDENT"] = "Is it necessary?";//?
-	env["CONTENT_TYPE"] = header.getValue("Content-Type");
-	env["CONTENT_LENGTH"] = header.getValue("Content-Length");
-	// env["XBODY"] = req_body.str();
+	env["CONTENT_TYPE"] = header.getFirstValue("Content-Type");
+	env["CONTENT_LENGTH"] = header.getFirstValue("Content-Length");
 	return (env);
 }
 

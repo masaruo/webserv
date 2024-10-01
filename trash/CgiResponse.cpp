@@ -10,7 +10,7 @@ int const	CgiResponse::WRITE_FD = 1;
 int const	CgiResponse::CHILD_PID = 0;
 
 CgiResponse::CgiResponse(ft::unique_ptr<ARequest>request)
-:AResponse(request)
+:Response(request)
 ,env_(getRequestLine(), getRequestHeader(), getRequestBody())
 {
 	return ;
@@ -22,7 +22,7 @@ CgiResponse::~CgiResponse()
 }
 
 CgiResponse::CgiResponse(CgiResponse const &rhs)//todo
-:AResponse(rhs)
+:Response(rhs)
 ,env_(rhs.env_)
 {
 	return ;
@@ -32,7 +32,7 @@ CgiResponse &CgiResponse::operator=(CgiResponse const &rhs)
 {
 	if (this != &rhs)
 	{
-		AResponse::operator=(rhs);
+		Response::operator=(rhs);
 		env_ = rhs.env_;
 	}
 	return (*this);
@@ -137,12 +137,11 @@ void	CgiResponse::exec_child(int pipefd[2]) const
 void	CgiResponse::exec_parent(int pipefd[2], pid_t child_pid)
 {
 	ssize_t		total_written = 0;
-	// std::size_t	remaining = getBody().getSize();
 	std::size_t	remaining = getRequestBody().getSize();
+
 	while (remaining > 0)
 	{
-		// ssize_t	bytesWritten = write(pipefd[WRITE_FD], data + total_written, remaining);
-		ssize_t	bytesWritten = write(pipefd[WRITE_FD], getRequestBody().str().c_str() + total_written, remaining);
+		ssize_t	bytesWritten = write(pipefd[WRITE_FD], getRequestBody().data().c_str() + total_written, remaining);
 		if (bytesWritten == ft::err)
 		{
 			if (errno == EINTR)
@@ -167,9 +166,8 @@ void	CgiResponse::exec_parent(int pipefd[2], pid_t child_pid)
 		{
 			//todo error
 		}
-		ft::bytes_vec	result = FileReader::readFdFile(pipefd[READ_FD]);
-		Binary	bin(result);
-		HttpBody body(bin);
+		std::string	result = FileReader::readFdFile(pipefd[READ_FD]);
+		HttpBody body(result);
 		setBody(body);
 	}
 	else if (WIFSIGNALED(status))

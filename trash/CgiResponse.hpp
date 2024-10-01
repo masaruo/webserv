@@ -4,7 +4,7 @@
 #include "env.hpp"
 
 //todo environ
-class CgiResponse : public AResponse
+class CgiResponse : public Response
 {
 private:
 	Env				env_;

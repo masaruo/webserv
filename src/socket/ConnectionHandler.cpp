@@ -2,10 +2,12 @@
 #include <sys/socket.h>
 #include <cerrno>
 #include "define.hpp"
+#include "HttpException.hpp"
 
 std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 {
-	std::string	buffer(buffer_size, '\0');
+	std::string	buffer;
+	buffer.resize(buffer_size);
 	std::string	received_data;
 	ssize_t		bytes_received;
 
@@ -21,7 +23,7 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 			}
 			else
 			{
-				throw (ConnectionHandlerException("ConnectionHandlerException at 24"));
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		else if (bytes_received == ft::eof)
@@ -33,6 +35,7 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 			received_data.append(buffer, 0, bytes_received);
 			if(received_data.find("\r\n\r\n") != std::string::npos)
 			{
+				
 				break ;
 			}
 		}
@@ -58,7 +61,7 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size, ss
 			}
 			else
 			{
-				throw (ConnectionHandlerException("ConnectionHandlerException at 61."));
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		else if (bytes_received == ft::eof)
@@ -97,38 +100,9 @@ void	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 			}
 			else
 			{
-				throw(ConnectionHandlerException("ConnectionHandlerException at 100."));
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		total_sent += bytes_sent;
 	}
-}
-
-void	ConnectionHandler::sendData(int sock_fd, ft::bytes_vec const &data)
-{
-	std::size_t				total_sent = 0;
-	ssize_t					bytes_sent;
-
-	while (total_sent < data.size())
-	{
-		bytes_sent = send(sock_fd, data.data() + total_sent, data.size() - total_sent, 0);
-		if (bytes_sent == ft::err)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-			{
-				continue ;
-			}
-			else
-			{
-				throw(ConnectionHandlerException("ConnectionHandlerException at 123."));
-			}
-		}
-		total_sent += bytes_sent;
-	}
-}
-
-ConnectionHandler::ConnectionHandlerException::ConnectionHandlerException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
 }

@@ -2,7 +2,7 @@
 #include "AResponse.hpp"
 #include "HttpBody.hpp"
 
-class PutResponse : public AResponse
+class PutResponse : public Response
 {
 private:
 	PutResponse();//=delete

@@ -15,10 +15,5 @@ private:
 	~RequestFactory();
 public:
 	static	ARequest	*createRequest(int fd, config::ConfigFactory const &config_factory);
-	static	ARequest	*createRequest(ARequest *request);
-	// class RequestFactoryException : public std::runtime_error
-	// {
-	// public:
-	// 	RequestFactoryException(std::string const &msg);
-	// };
+	// static	ARequest	*createRequest(ARequest *request);
 };

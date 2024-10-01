@@ -1,4 +1,4 @@
-#include "Binary.hpp"
+#include "XXXBinary.hpp"
 
 Binary::vec_bytes	Binary::fromStr(std::string const &str) const
 {

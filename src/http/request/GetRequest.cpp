@@ -1,5 +1,4 @@
 #include "GetRequest.hpp"
-#include "ResourceManager.hpp"
 #include "Response.hpp"
 #include "FileHandler.hpp"
 
@@ -31,8 +30,7 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 
 Response	GetRequest::generateResponse(void) const
 {
-	ResourceManager const	resource(getLine().getUri(), getConfig());
-	std::string	path = resource.getNormalizedPath();
+	std::string	path = getAbsolutePath();
 
 	HttpBody	body(FileReader::readTextFile(path));
 

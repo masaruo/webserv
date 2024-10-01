@@ -1,12 +1,9 @@
 #pragma once
-#include <string>
 #include "define.hpp"
 #include "HttpHeader.hpp"
 #include "HttpBody.hpp"
 #include "HttpStatus.hpp"
-#include "unique_ptr.hpp"
-#include "ARequest.hpp"
-#include "ResourceManager.hpp"
+#include <string>
 
 class Response
 {

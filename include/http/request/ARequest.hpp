@@ -22,7 +22,6 @@ private:
 	ARequest();//=delete:
 	config::Config::location_s	setLocation(void);
 	std::string					setAbsolutePath(void);
-	bool						checkIsDirectory(void);
 	void						assertAllowedMethod(void) const;
 protected:
 	RequestLine 				getLine(void) const;
@@ -31,7 +30,6 @@ protected:
 	config::Config				getConfig(void) const;
 	config::Config::location_s	getLocation(void) const;
 	std::string					getAbsolutePath(void) const;
-	bool						isDirectory(void) const;
 public:
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);

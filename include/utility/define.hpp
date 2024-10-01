@@ -58,7 +58,7 @@ namespace ft
 	{
 		std::stringstream	numStr;
 		numStr << num;
-		if (numStr.failbit)
+		if (numStr.fail())
 		{
 			throw (std::invalid_argument("Conversion error in to_string (define.hpp at line 63)."));
 		}

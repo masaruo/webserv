@@ -7,6 +7,7 @@
 
 static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim);
 static char			decodeHex(std::string const &str);
+
 std::string	UriNormalizer::uniformSlashAndHandleDots(std::string const &raw)
 {
 	if (ft::is_empty<std::string>(raw))
@@ -115,13 +116,13 @@ std::string	UriNormalizer::decodePercent(std::string const &raw)
 
 static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim)
 {
-	if (ft::is_empty<ft::string::string_vector>(string_vec) || ft::is_empty(raw))
-		return ("");
-
 	ft::string::string_vector_const_iterator	iter = string_vec.begin();
 	ft::string::string_vector_const_iterator	end = string_vec.end();
 	std::stringstream	ss;
 	ft::string	ftraw(raw);
+
+	if (ftraw.start_with('/'))
+		ss << "/";
 
 	while (iter != end)
 	{

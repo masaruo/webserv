@@ -1,14 +1,14 @@
-#include <sstream>
 #include "RequestFactory.hpp"
+#include <sstream>
 #include "ARequest.hpp"
 #include "GetRequest.hpp"
-#include "PostRequest.hpp"
+// #include "PostRequest.hpp"
 #include "string.hpp"
 #include "RequestLine.hpp"
 #include "HttpHeader.hpp"
-#include "PutRequest.hpp"
+// #include "PutRequest.hpp"
 #include "define.hpp"
-#include "DeleteRequest.hpp"
+// #include "DeleteRequest.hpp"
 #include "ConnectionHandler.hpp"
 
 ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &config_factory)
@@ -17,7 +17,11 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	std::istringstream	requestStream(raw_request);
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
-	requestLine.getUri().constructWithHostheader(header.getFirstValue("host"));
+
+	std::string	host_value = header.getFirstValue("host");
+	HttpUri &uri = requestLine.getUriReference();
+	uri.updateWithHostHeader(host_value);
+
 	config::Config	config = config_factory.getConfig(header.getFirstValue("host"));
 
 	std::string	method = requestLine.getMethod();
@@ -32,11 +36,14 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 		std::istringstream	bodyStream(bodyStr);
 		HttpBody body(bodyStream, header);
 		if (method == "POST")
-			return (new PostRequest(requestLine, header, body, config));
+			;
+			// return (new PostRequest(requestLine, header, body, config));
 		else if (method == "DELETE")
-			return (new DeleteRequest(requestLine, header, body, config));
+			;
+			// return (new DeleteRequest(requestLine, header, body, config));
 		else
-			return (new PutRequest(requestLine, header, body, config));
+			;
+			// return (new PutRequest(requestLine, header, body, config));
 	}
 	else
 	{
@@ -44,32 +51,34 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	}
 }
 
-ARequest	*RequestFactory::createRequest(ARequest *request)
-{
-	std::string const	method = request->getLine().getMethod();
-	RequestLine const	line = request->getLine();
-	HttpHeader const	header = request->getHeader();
-	HttpBody const		body = request->getBody();
-	config::Config const config = request->getConfig();
+// // ARequest	*RequestFactory::createRequest(ARequest *request)
+// // {
+// 	// std::string const	method = request->getLine().getMethod();
+// 	// RequestLine const	line = request->getLine();
+// 	// HttpHeader const	header = request->getHeader();
+// 	// HttpBody const		body = request->getBody();
+// 	// config::Config const config = request->getConfig();
 
-	if (method == "GET")
-	{
-		return (new GetRequest(line, header, config));
-	}
-	else if (method == "POST")
-	{
-		return (new PostRequest(line, header, body, config));
-	}
-	else if (method == "DELETE")
-	{
-		return (new DeleteRequest(line, header, body, config));
-	}
-	else if (method == "PUT")
-	{
-		return (new PutRequest(line, header, body, config));
-	}
-	else
-	{
-		return (NULL);
-	}
-}
+// 	// if (method == "GET")
+// 	// {
+// 	// 	return (new GetRequest(line, header, config));
+// 	// }
+// 	// else if (method == "POST")
+// 	// {
+// 	// 	// return (new PostRequest(line, header, body, config));
+// 	// 	;
+// 	// }
+// 	// else if (method == "DELETE")
+// 	// {
+// 	// 	return (new DeleteRequest(line, header, body, config));
+// 	// }
+// 	// else if (method == "PUT")
+// 	// {
+// 	// 	// return (new PutRequest(line, header, body, config));
+// 	// 	;
+// 	// }
+// 	// else
+// 	// {
+// 	// 	return (NULL);
+// 	}
+// }

@@ -24,5 +24,6 @@ public:
 	void		constructUri(std::string const &host_value);
 	std::string	getMethod(void) const;
 	HttpUri		getUri(void) const;
+	HttpUri		&getUriReference(void);
 	std::string	getVersion(void) const;
 };

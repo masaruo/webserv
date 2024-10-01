@@ -228,7 +228,7 @@ void	HttpUri::formatEachComponentsExQuery(void)
 	// % decode
 	authority_ = UriNormalizer::decodePercent(authority_);
 	host_ = UriNormalizer::decodePercent(host_);
-	path_ = UriNormalizer::decodePercent(host_);
+	path_ = UriNormalizer::decodePercent(path_);
 	ext_ = UriNormalizer::decodePercent(ext_);
 	path_info_ = UriNormalizer::decodePercent(path_info_);
 

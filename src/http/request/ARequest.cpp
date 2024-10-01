@@ -1,6 +1,7 @@
 #include "ARequest.hpp"
 #include "string.hpp"
 #include <sys/stat.h>
+#include <sstream>
 
 ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
 :line_(line)
@@ -9,7 +10,6 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 ,config_(config)
 ,matched_location_(setLocation())
 ,absolute_path_(setAbsolutePath())
-,is_directory_(checkIsDirectory())
 {
 	assertAllowedMethod();
 	return ;
@@ -22,7 +22,6 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody c
 ,config_(config)
 ,matched_location_(setLocation())
 ,absolute_path_(setAbsolutePath())
-,is_directory_(checkIsDirectory())
 {
 	assertAllowedMethod();
 	return ;
@@ -35,7 +34,6 @@ ARequest::ARequest(ARequest const &rhs)
 ,config_(rhs.config_)
 ,matched_location_(rhs.matched_location_)
 ,absolute_path_(rhs.absolute_path_)
-,is_directory_(rhs.is_directory_)
 {
 	return ;
 }
@@ -55,7 +53,6 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 		config_ = rhs.config_;
 		matched_location_ = rhs.matched_location_;
 		absolute_path_ = rhs.absolute_path_;
-		is_directory_ = rhs.is_directory_;
 	}
 	return (*this);
 }
@@ -64,27 +61,39 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 config::Config::location_s	ARequest::setLocation(void)
 {
 	config::Config::location_s loc;
-	loc = config_.getLocation(header_.getFirstValue("host"));
+	loc = config_.getLocation(getLine().getUri().getPath());
 	//todo if host == empty? possible? or if loc is empty?
 	return (loc);
 }
 
-std::string	ARequest::setAbsolutePath(void)
-{
-	std::string	ans(config_.getRoot() + getLine().getUri().getPath());
-	return (ans);
-}
-
-bool	ARequest::checkIsDirectory(void)
+static bool	checkIsDirectory(std::string const &absolute_path)
 {
 	struct stat	filestat;
-	if (stat(absolute_path_.c_str(), &filestat) == ft::err)
+	if (stat(absolute_path.c_str(), &filestat) == ft::err)
 	{
 		throw (HttpStatus::HttpStatusExceptionWithResponse(HttpCode::NOT_FOUND));
 	}
 	bool	isDir;
 	isDir = S_ISDIR(filestat.st_mode);
 	return (isDir);
+}
+
+std::string	ARequest::setAbsolutePath(void)
+{
+	std::string	path = getLine().getUri().getPath();
+
+	// create path by concatinate root and path;
+	std::stringstream	ss;
+	ss << config_.getRoot();
+	if (path != "/")
+		ss << "/";
+	ss << path;
+	if (checkIsDirectory(ss.str()))
+	{
+		std::string	file = config_.getIndex(path);
+		ss << file;
+	}
+	return (ss.str());
 }
 
 void	ARequest::assertAllowedMethod(void) const
@@ -125,9 +134,4 @@ config::Config::location_s	ARequest::getLocation(void) const
 std::string	ARequest::getAbsolutePath(void) const
 {
 	return (absolute_path_);
-}
-
-bool	ARequest::isDirectory(void) const
-{
-	return (is_directory_);
 }

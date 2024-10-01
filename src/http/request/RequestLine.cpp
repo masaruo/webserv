@@ -85,6 +85,11 @@ HttpUri	RequestLine::getUri(void) const
 	return (uri_);
 }
 
+HttpUri	&RequestLine::getUriReference(void)
+{
+	return (uri_);
+}
+
 std::string RequestLine::getVersion(void) const
 {
 	return (version_);

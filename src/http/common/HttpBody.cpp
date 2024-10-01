@@ -9,7 +9,7 @@ std::string	HttpBody::assertBodyLen(std::string const &body)
 	if (body.size() != header_.getContentLen())
 		is_valid = false;
 	if (!is_valid)
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	else
 		return (body);
 

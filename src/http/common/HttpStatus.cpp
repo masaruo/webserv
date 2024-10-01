@@ -1,5 +1,6 @@
 #include "HttpStatus.hpp"
 #include <sstream>
+#include "Response.hpp"
 
 HttpStatus::HttpStatus()
 :code_(HttpCode::UNINITIALIZED)
@@ -51,7 +52,7 @@ std::string	HttpStatus::to_string(void) const
 	return (res);
 }
 
-//! EXCEPTIONS
+//! HttpException
 HttpStatus::HttpException::HttpException(HttpCode::code_e error_code)
 :std::runtime_error(HttpCode::str(error_code))
 ,error_code_(error_code)
@@ -59,14 +60,21 @@ HttpStatus::HttpException::HttpException(HttpCode::code_e error_code)
 	return ;
 }
 
+HttpStatus::HttpException::~HttpException() throw ()
+{
+	return ;
+}
+
+HttpStatus::HttpException::HttpException(HttpException const &rhs)
+:std::runtime_error(rhs)
+,error_code_(rhs.error_code_)
+{
+	return ;
+}
+
 HttpCode::code_e	HttpStatus::HttpException::getErrorCode(void) const
 {
 	return (error_code_);
-}
-
-char const	*HttpStatus::HttpException::what() const throw()
-{
-	return (to_string().c_str());
 }
 
 std::string	HttpStatus::HttpException::to_string(void) const
@@ -80,14 +88,54 @@ std::string	HttpStatus::HttpException::to_string(void) const
 	return (oss.str());
 }
 
-HttpStatus::HttpStatusException::HttpStatusException(HttpCode::code_e error_code)
+Response	HttpStatus::HttpException::generateResponse(void) const
+{
+	HttpHeader	header;
+	header.setHeader("content-type", "text/plain");
+	header.setHeader("content-length", "0");
+
+	HttpStatus	status(error_code_);
+
+	Response	response(status, header);
+
+	return (response);
+}
+
+//! HttpExceptionWithConfig
+HttpStatus::HttpExceptionWithConfig::HttpExceptionWithConfig(HttpCode::code_e error_code, config::Config const &config)
 :HttpException(error_code)
+,config_(config)
 {
 	return ;
 }
 
-HttpStatus::HttpStatusExceptionWithResponse::HttpStatusExceptionWithResponse(HttpCode::code_e error_code)
-:HttpException(error_code)
+HttpStatus::HttpExceptionWithConfig::~HttpExceptionWithConfig() throw ()
 {
 	return ;
+}
+
+HttpStatus::HttpExceptionWithConfig::HttpExceptionWithConfig(HttpExceptionWithConfig const &rhs)
+:HttpException(rhs)
+,config_(rhs.config_)
+{
+	return ;
+}
+
+static HttpBody	generateBody(std::string const &path)
+{
+	//todo 
+}
+
+static HttpHeader	generateHeader(std::size_t body_length)
+{
+	//todo
+}
+
+Response	HttpStatus::HttpExceptionWithConfig::generateResponse(void) const
+{
+	HttpCode::code_e	error_code = HttpException::getErrorCode();
+
+
+	//todo 401 error et al = create body
+	//todo create header according to error code
 }

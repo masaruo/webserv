@@ -132,7 +132,7 @@ std::size_t	config::Config::getKeepAliveTimeout(void) const
 config::Config::location_s	config::Config::getLocation(std::string const &path) const
 {
 	if (locations_.find(path) == locations_.end())
-		throw (HttpStatus::HttpStatusException(HttpCode::NOT_FOUND));
+		throw (HttpStatus::HttpException(HttpCode::NOT_FOUND));
 	location_s loc = locations_.at(path);
 	return (loc);
 }

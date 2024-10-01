@@ -1,6 +1,9 @@
 #pragma once
 #include "HttpCode.hpp"
+#include "Config.hpp"
 #include <stdexcept>
+
+class Response;
 
 class HttpStatus
 {
@@ -20,22 +23,28 @@ public:
 	{
 	private:
 		HttpCode::code_e	error_code_;
-	public:
-		HttpException(HttpCode::code_e error_code);
+		HttpException();//=delete
+		HttpException &operator=(HttpException const &rhs);//=delete
+	protected:
 		HttpCode::code_e	getErrorCode(void) const;
-		char const			*what() const throw();
-		std::string			to_string(void) const;
+		std::string	to_string(void) const;
+	public:
+		explicit HttpException(HttpCode::code_e error_code);
+		HttpException(HttpException const &rhs);
+		~HttpException() throw();
+		virtual Response	generateResponse(void) const;
 	};
 
-	class HttpStatusException : public HttpException
+	class HttpExceptionWithConfig : public HttpException
 	{
+	private:
+		config::Config	config_;
+		HttpExceptionWithConfig();//=delete
+		HttpExceptionWithConfig &operator=(HttpExceptionWithConfig const &rhs);//=delete
 	public:
-		HttpStatusException(HttpCode::code_e error_code);
-	};
-
-	class HttpStatusExceptionWithResponse : public HttpException
-	{
-	public:
-		HttpStatusExceptionWithResponse(HttpCode::code_e error_code);
+		explicit HttpExceptionWithConfig(HttpCode::code_e error_code, config::Config const &config);
+		~HttpExceptionWithConfig() throw ();
+		HttpExceptionWithConfig(HttpExceptionWithConfig const &rhs);
+		Response	generateResponse(void) const;
 	};
 };

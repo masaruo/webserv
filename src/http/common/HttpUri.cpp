@@ -57,9 +57,9 @@ HttpUri &HttpUri::operator=(HttpUri const &rhs)
 void	HttpUri::init(std::string const &raw)
 {
 	if (raw.size() > URI_MAX_LEN)
-		throw (HttpStatus::HttpStatusException(HttpCode::URI_TOO_LONG));
+		throw (HttpStatus::HttpException(HttpCode::URI_TOO_LONG));
 	else if (raw.empty())
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	initial_uri_ = UriNormalizer::uniformSlashAndHandleDots(raw);
 }
 
@@ -68,7 +68,7 @@ void	HttpUri::parseQueryWithDecodePercent(std::string const &query)
 	ft::string					ft_query(query);
 	ft::string::string_vector	split_by_and = ft_query.split("&");
 	if (split_by_and.empty())
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	ft::string::string_vector_const_iterator	iter = split_by_and.begin();
 	ft::string::string_vector_const_iterator	end = split_by_and.end();
 
@@ -76,13 +76,13 @@ void	HttpUri::parseQueryWithDecodePercent(std::string const &query)
 	{
 		ft::string::string_vector	split_by_equal = iter->split("=");
 		if (split_by_equal.empty() || split_by_equal.size() != 2)
-			throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+			throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 		std::string	key(UriNormalizer::decodePercent(split_by_equal.at(0)));
 		std::string	value(UriNormalizer::decodePercent(split_by_equal.at(1)));
 		ft::string ftkey(key);
 		ft::string ftvalue(value);
 		if (!ftkey.has_only(ft::string::VCHAR) || !ftvalue.has_only(ft::string::VCHAR))
-			throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+			throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 		query_[key] = value;
 		iter++;
 	}
@@ -106,11 +106,11 @@ void	HttpUri::parsePort(void)
 		}
 		catch(std::invalid_argument const &e)
 		{
-			throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+			throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 		}
 	}
 	if (host_.empty() || port_ == 0)
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 }
 
 void	HttpUri::parseExtAndPathInfo(void)
@@ -183,7 +183,7 @@ void	HttpUri::parseUri(std::string const &authorityStart)//? check host
 		}
 	}
 	if (authority_.empty() || path_.empty())
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	parseAuthority();
 }
 
@@ -193,7 +193,7 @@ void	HttpUri::parseAbsolute(void)
 	ft::string	ft_scheme(scheme);
 	ft_scheme.to_lower();
 	if (ft_scheme.str() != "http")
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	
 	std::string::size_type	authorityStart = initial_uri_.find("://") + 3;
 	std::string	raw_after_scheme = initial_uri_.substr(authorityStart);
@@ -209,7 +209,7 @@ void	HttpUri::parseOrigin(std::string const &hostHeader)
 void	HttpUri::updateWithHostHeader(std::string const &hostHeader)
 {
 	if (initial_uri_.empty() || hostHeader.empty())
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	if (initial_uri_.at(0) == '/')
 		parseOrigin(hostHeader);
 	else

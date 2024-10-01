@@ -59,16 +59,18 @@ void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
 		ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(fd_, config_factory));
 		Response res = request_->generateResponse();
 		ConnectionHandler::sendData(fd_, res.to_string());
+		std::cerr << "Good Request" << std::endl;//todo
 	}
-	catch(HttpStatus::HttpStatusException const &e)
+	catch(HttpStatus::HttpException const &e)
+	{
+		Response res = e.generateResponse();
+		ConnectionHandler::sendData(fd_, res.to_string());
+	}
+	catch(HttpStatus::HttpExceptionWithConfig const &e)
 	{
 		std::cerr << e.what() << std::endl;//todo
-		// ConnectionHandler::sendData(fd_, );
-	}
-	catch(HttpStatus::HttpStatusExceptionWithResponse const &e)
-	{
-		std::cerr << e.what() << std::endl;//todo
-		// ConnectionHandler::sendData(fd_, );
+		Response res = e.generateResponse();
+		ConnectionHandler::sendData(fd_, res.to_string());
 	}
 	catch(HttpStatus::HttpException const &e)
 	{

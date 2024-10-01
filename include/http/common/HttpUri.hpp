@@ -5,7 +5,7 @@
 class HttpUri
 {
 private:
-	static std::size_t const	URI_MAX_LEN = 1024;
+	static std::size_t const	URI_MAX_LEN = 8000;
 	std::string	initial_uri_;
 	std::string	authority_;
 	std::string	host_;

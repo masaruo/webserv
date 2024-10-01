@@ -19,12 +19,14 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	HttpHeader	header(requestStream);
 
 	std::string	host_value = header.getFirstValue("host");
+
+	config::Config	config = config_factory.getConfig(host_value);
+
 	HttpUri &uri = requestLine.getUriReference();
 	uri.updateWithHostHeader(host_value);
 
-	config::Config	config = config_factory.getConfig(header.getFirstValue("host"));
-
 	std::string	method = requestLine.getMethod();
+	//!ここからのエラーはconfig情報つき
 	if (method == "GET")
 	{
 		return (new GetRequest(requestLine, header, config));

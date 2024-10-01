@@ -26,7 +26,7 @@ RequestLine::RequestLine(std::istringstream &iss)
 	to_split.trim(ft::string::CR);
 	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WS);
 	if (split_by_sp.size() != 3 || split_by_sp.at(0).empty() || split_by_sp.at(1).empty() || split_by_sp.at(2).empty())
-		throw (HttpStatus::HttpStatusException(HttpCode::BAD_REQUEST));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	setMethod(split_by_sp.at(0));
 	setUri(split_by_sp.at(1));
 	setVersion(split_by_sp.at(2));
@@ -59,7 +59,7 @@ RequestLine &RequestLine::operator=(RequestLine const &rhs)
 void	RequestLine::setMethod(std::string const &inMethod)
 {
 	if (inMethod != "GET" && inMethod != "POST" && inMethod != "DELETE" && inMethod != "PUT")
-		throw (HttpStatus::HttpStatusException(HttpCode::METHOD_NOT_ALLOWED));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	method_ = inMethod;
 }
 
@@ -71,7 +71,7 @@ void	RequestLine::setUri(std::string const &inUri)
 void	RequestLine::setVersion(std::string const &inVer)
 {
 	if (inVer != "HTTP/1.1")
-		throw (HttpStatus::HttpStatusException(HttpCode::HTTP_VERSION_NOT_SUPPORTED));
+		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
 	version_ = inVer;
 }
 

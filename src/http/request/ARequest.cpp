@@ -66,12 +66,12 @@ config::Config::location_s	ARequest::setLocation(void)
 	return (loc);
 }
 
-static bool	checkIsDirectory(std::string const &absolute_path)
+static bool	checkIsDirectory(std::string const &absolute_path, config::Config const &config)
 {
 	struct stat	filestat;
 	if (stat(absolute_path.c_str(), &filestat) == ft::err)
 	{
-		throw (HttpStatus::HttpStatusExceptionWithResponse(HttpCode::NOT_FOUND));
+		throw (HttpStatus::HttpExceptionWithConfig(HttpCode::NOT_FOUND, config));
 	}
 	bool	isDir;
 	isDir = S_ISDIR(filestat.st_mode);
@@ -88,7 +88,7 @@ std::string	ARequest::setAbsolutePath(void)
 	if (path != "/")
 		ss << "/";
 	ss << path;
-	if (checkIsDirectory(ss.str()))
+	if (checkIsDirectory(ss.str(), getConfig()))
 	{
 		std::string	file = config_.getIndex(path);
 		ss << file;
@@ -101,7 +101,7 @@ void	ARequest::assertAllowedMethod(void) const
 	std::string const	method = line_.getMethod();
 	if (!config_.isAllowedMethod(line_.getUri().getPath(), method))
 	{
-		throw (HttpStatus::HttpStatusException(HttpCode::METHOD_NOT_ALLOWED));
+		throw (HttpStatus::HttpExceptionWithConfig(HttpCode::METHOD_NOT_ALLOWED, getConfig()));
 	}
 }
 

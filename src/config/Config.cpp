@@ -1,5 +1,5 @@
 #include "Config.hpp"
-#include "HttpStatus.hpp"
+#include "HttpException.hpp"
 
 config::Config::Config(int flag)//!this is MOCK!
 {
@@ -132,7 +132,7 @@ std::size_t	config::Config::getKeepAliveTimeout(void) const
 config::Config::location_s	config::Config::getLocation(std::string const &path) const
 {
 	if (locations_.find(path) == locations_.end())
-		throw (HttpStatus::HttpException(HttpCode::NOT_FOUND));
+		throw (HttpException(HttpCode::NOT_FOUND));
 	location_s loc = locations_.at(path);
 	return (loc);
 }

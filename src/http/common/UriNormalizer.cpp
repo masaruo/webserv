@@ -1,6 +1,6 @@
 #include "UriNormalizer.hpp"
 #include "string.hpp"
-#include "HttpStatus.hpp"
+#include "HttpException.hpp"
 #include "define.hpp"
 #include <algorithm>
 #include <sstream>
@@ -58,7 +58,7 @@ std::string	UriNormalizer::decodeDots(std::string const &raw)
 			if (!normalized.empty())
 				normalized.pop_back();
 			else
-				throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+				throw (HttpException(HttpCode::BAD_REQUEST));
 		}
 		else
 		{
@@ -77,7 +77,7 @@ static char	decodeHex(std::string const &str)
 	iss >> std::hex >> value;
 	if (iss.fail())
 	{
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 	}
 	return (static_cast<char>(value));
 }
@@ -99,7 +99,7 @@ std::string	UriNormalizer::decodePercent(std::string const &raw)
 		{
 			if (std::distance(iter, end) < UriNormalizer::PERCENT_ENCODE_LEN)//%後の文字列が２つないとき
 			{
-				throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+				throw (HttpException(HttpCode::BAD_REQUEST));
 			}
 			percentStr = raw.substr(std::distance(begin, iter), UriNormalizer::PERCENT_ENCODE_LEN);
 			decorded.push_back(decodeHex(percentStr));

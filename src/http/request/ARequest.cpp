@@ -1,5 +1,6 @@
 #include "ARequest.hpp"
 #include "string.hpp"
+#include "HttpExceptionWithConfig.hpp"
 #include <sys/stat.h>
 #include <sstream>
 
@@ -71,7 +72,7 @@ static bool	checkIsDirectory(std::string const &absolute_path, config::Config co
 	struct stat	filestat;
 	if (stat(absolute_path.c_str(), &filestat) == ft::err)
 	{
-		throw (HttpStatus::HttpExceptionWithConfig(HttpCode::NOT_FOUND, config));
+		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, config));
 	}
 	bool	isDir;
 	isDir = S_ISDIR(filestat.st_mode);
@@ -101,7 +102,7 @@ void	ARequest::assertAllowedMethod(void) const
 	std::string const	method = line_.getMethod();
 	if (!config_.isAllowedMethod(line_.getUri().getPath(), method))
 	{
-		throw (HttpStatus::HttpExceptionWithConfig(HttpCode::METHOD_NOT_ALLOWED, getConfig()));
+		throw (HttpExceptionWithConfig(HttpCode::METHOD_NOT_ALLOWED, getConfig()));
 	}
 }
 

@@ -13,10 +13,12 @@
 #include "ClientSocket.class.hpp"
 #include "define.hpp"
 #include "Fcntl.class.hpp"
-#include "unistd.h"
 #include "ConnectionHandler.hpp"
 #include "RequestFactory.hpp"
 #include "Response.hpp"
+#include "HttpException.hpp"
+#include "HttpExceptionWithConfig.hpp"
+#include <unistd.h>
 
 ClientSocket::ClientSocket(int listen_fd)
 :ASocket(ASocket::accepted)
@@ -61,18 +63,18 @@ void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
 		ConnectionHandler::sendData(fd_, res.to_string());
 		std::cerr << "Good Request" << std::endl;//todo
 	}
-	catch(HttpStatus::HttpException const &e)
+	catch(HttpException const &e)
 	{
 		Response res = e.generateResponse();
 		ConnectionHandler::sendData(fd_, res.to_string());
 	}
-	catch(HttpStatus::HttpExceptionWithConfig const &e)
+	catch(HttpExceptionWithConfig const &e)
 	{
 		std::cerr << e.what() << std::endl;//todo
 		Response res = e.generateResponse();
 		ConnectionHandler::sendData(fd_, res.to_string());
 	}
-	catch(HttpStatus::HttpException const &e)
+	catch(HttpException const &e)
 	{
 		std::cerr << e.what() << std::endl;//todo
 	}

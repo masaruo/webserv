@@ -1,6 +1,5 @@
 #pragma once
 #include "define.hpp"
-#include "HttpStatus.hpp"
 #include "HttpHeader.hpp"
 #include <string>
 

@@ -2,6 +2,7 @@
 #include <sys/socket.h>
 #include <cerrno>
 #include "define.hpp"
+#include "HttpException.hpp"
 
 std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 {
@@ -22,7 +23,7 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size)
 			}
 			else
 			{
-				throw (HttpStatus::HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		else if (bytes_received == ft::eof)
@@ -60,7 +61,7 @@ std::string	ConnectionHandler::recvData(int sock_fd, std::size_t buffer_size, ss
 			}
 			else
 			{
-				throw (HttpStatus::HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		else if (bytes_received == ft::eof)
@@ -99,7 +100,7 @@ void	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 			}
 			else
 			{
-				throw (HttpStatus::HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		total_sent += bytes_sent;

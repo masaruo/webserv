@@ -15,5 +15,5 @@ private:
 	~RequestFactory();
 public:
 	static	ARequest	*createRequest(int fd, config::ConfigFactory const &config_factory);
-	static	ARequest	*createRequest(ARequest *request);
+	// static	ARequest	*createRequest(ARequest *request);
 };

@@ -2,7 +2,7 @@
 #include <utility>
 #include <algorithm>
 #include "string.hpp"
-#include "HttpStatus.hpp"
+#include "HttpException.hpp"
 #include <sstream>
 
 std::set<std::string>	HttpHeader::noDupHeaderSet_;
@@ -25,7 +25,7 @@ void	HttpHeader::assertSemanticValue(void) const
 		}
 	}
 	if (is_invalid)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 	//todo 
 	//connection header
 	//transfer-encoding
@@ -69,7 +69,7 @@ static void	assetHeaderLine(std::string const &line)
 		is_invalid = true;
 
 	if (is_invalid)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
 static void	assertHeaderName(std::string const &name)
@@ -83,7 +83,7 @@ static void	assertHeaderName(std::string const &name)
 		is_invalid = true;
 	
 	if (is_invalid)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
 static void	assertHeaderValueLine(std::string const &line)
@@ -97,7 +97,7 @@ static void	assertHeaderValueLine(std::string const &line)
 		is_invalid = true;
 
 	if (is_invalid)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
 static void	assetHeaderValue(std::string const &a_value)
@@ -111,7 +111,7 @@ static void	assetHeaderValue(std::string const &a_value)
 		is_invalid = true;
 
 	if (is_invalid)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
 HttpHeader::HttpHeader(std::istringstream &iss)
@@ -179,7 +179,7 @@ void	HttpHeader::assertDupHeaderName(std::string const &name) const
 	std::set<std::string>::const_iterator end = noDupHeaderSet_.end();
 	foundPos = noDupHeaderSet_.find(name);
 	if (foundPos != end)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
 void	HttpHeader::setHeader(std::string const &name, std::string const &value)
@@ -191,7 +191,7 @@ void	HttpHeader::setHeader(std::string const &name, std::string const &value)
 	if (hasHeader(ftname.str()))
 		assertDupHeaderName(ftname.str());
 	if (headers_.size() > MAX_HEADERS)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 
 	headers_[ftname].push_back(ftvalue);
 }
@@ -226,7 +226,7 @@ std::size_t	HttpHeader::getContentLen(void) const
 	}
 	catch(const std::invalid_argument& e)
 	{
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));	
+		throw (HttpException(HttpCode::BAD_REQUEST));	
 	}
 }
 

@@ -3,7 +3,6 @@
 #include <sys/types.h>
 #include <string>
 #include "define.hpp"
-#include "HttpStatus.hpp"
 
 class ConnectionHandler
 {

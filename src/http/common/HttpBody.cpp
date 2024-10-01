@@ -1,4 +1,5 @@
 #include "HttpBody.hpp"
+#include "HttpException.hpp"
 
 std::string	HttpBody::assertBodyLen(std::string const &body)
 {
@@ -9,7 +10,7 @@ std::string	HttpBody::assertBodyLen(std::string const &body)
 	if (body.size() != header_.getContentLen())
 		is_valid = false;
 	if (!is_valid)
-		throw (HttpStatus::HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 	else
 		return (body);
 

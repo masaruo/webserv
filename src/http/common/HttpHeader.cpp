@@ -252,8 +252,8 @@ std::string 	HttpHeader::to_string(void) const
 			oss << *it;
 			it++;
 		}
+		oss << ft::string::CR << ft::string::LF;
 		iter++;
 	}
-	oss << ft::string::CR << ft::string::LF;
 	return (oss.str());
 }

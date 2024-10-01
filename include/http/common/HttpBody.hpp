@@ -9,8 +9,7 @@ public:
 	static std::size_t const	MAX_BODY_SIZE = 6000000;
 private:
 	std::string	data_;
-	HttpHeader	header_;
-	std::string	assertBodyLen(std::string const &body);
+	std::string	checkBodyLen(std::string const &body);
 public:
 	HttpBody();
 	HttpBody(std::istringstream &iss, HttpHeader const &header);

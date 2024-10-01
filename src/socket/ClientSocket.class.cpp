@@ -63,12 +63,12 @@ void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
 		ConnectionHandler::sendData(fd_, res.to_string());
 		std::cerr << "Good Request" << std::endl;//todo
 	}
-	catch(HttpException const &e)
+	catch(HttpExceptionWithConfig const &e)
 	{
 		Response res = e.generateResponse();
 		ConnectionHandler::sendData(fd_, res.to_string());
 	}
-	catch(HttpExceptionWithConfig const &e)
+	catch(HttpException const &e)
 	{
 		std::cerr << e.what() << std::endl;//todo
 		Response res = e.generateResponse();

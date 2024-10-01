@@ -1,13 +1,11 @@
 #include "HttpBody.hpp"
 #include "HttpException.hpp"
 
-std::string	HttpBody::assertBodyLen(std::string const &body)
+std::string	HttpBody::checkBodyLen(std::string const &body)
 {
 	bool	is_valid = true;
 
 	if (body.size() > HttpBody::MAX_BODY_SIZE)
-		is_valid = false;
-	if (body.size() != header_.getContentLen())
 		is_valid = false;
 	if (!is_valid)
 		throw (HttpException(HttpCode::BAD_REQUEST));
@@ -18,21 +16,18 @@ std::string	HttpBody::assertBodyLen(std::string const &body)
 
 HttpBody::HttpBody()
 :data_()
-,header_()
 {
 	return ;
 }
 
 HttpBody::HttpBody(std::istringstream &iss, HttpHeader const &header)
-:data_(assertBodyLen(iss.str()))
-,header_(header)
+:data_(checkBodyLen(iss.str()))
 {
 	return ;
 }
 
 HttpBody::HttpBody(std::string const &str)
-:data_(str)
-,header_()//!~?
+:data_(checkBodyLen(str))
 {
 	return ;
 }
@@ -44,7 +39,6 @@ HttpBody::~HttpBody()
 
 HttpBody::HttpBody(HttpBody const &rhs)
 :data_(rhs.data_)
-,header_(rhs.header_)
 {
 	return ;
 }
@@ -54,7 +48,6 @@ HttpBody &HttpBody::operator=(HttpBody const &rhs)
 	if (this != &rhs)
 	{
 		data_ = rhs.data_;
-		header_ = rhs.header_;
 	}
 	return (*this);
 }

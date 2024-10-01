@@ -39,7 +39,8 @@ static void	assertRequestHeader(HttpHeader const &header, RequestLine const &lin
 
 static void	assertRequestBody(HttpBody const &body, RequestLine const &line, HttpHeader const &header, config::Config const &config)
 {
-
+	if (body.getSize() != header.getContentLen())
+	//todo throw
 }
 
 void	RequestValidator::assertRequest(ARequest const &request)

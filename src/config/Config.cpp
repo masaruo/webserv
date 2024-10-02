@@ -30,6 +30,7 @@ config::Config::Config(int flag)//!this is MOCK!
 //location uploads
 		location_s tmp2;
 		tmp2.allowed_methods_.insert("PUT");
+		tmp2.allowed_methods_.insert("DELETE");
 		tmp2.is_autoindex_ = false;
 		tmp2.is_cgi_ = false;
 		tmp2.cgi_root_ = "";

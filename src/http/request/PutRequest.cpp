@@ -3,6 +3,7 @@
 #include "HttpExceptionWithConfig.hpp"
 #include "string.hpp"
 #include <fstream>
+#include <cstdio>// for fdopen
 
 PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
@@ -32,10 +33,11 @@ PutRequest &PutRequest::operator=(PutRequest const &rhs)
 
 Response	PutRequest::generateResponse(void) const
 {
-	uploadData();
+	uploadFile();
 
 	HttpHeader	header;
 	header.setHeader("content-length", "0");
+	// header.setHeader("connection", "keep-alive");
 
 	HttpStatus	status(HttpCode::OK);
 
@@ -50,14 +52,14 @@ static void	assertFileWithNoControlChar(std::string const &data)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
-void	PutRequest::uploadData(void) const
+void	PutRequest::uploadFile(void) const
 {
 	HttpUri const	uri = getLine().getUri();
 	std::string	uploadPath = getConfig().getUploadStore(uri.getPath());
 	std::string const	fileName = uri.getQueryValue("filename");
 
 	if (uploadPath.empty() || fileName.empty())
-		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));
+		throw (HttpException(HttpCode::BAD_REQUEST));
 	uploadPath.append("/" + fileName);
 
 	std::ofstream	ofs(uploadPath.c_str() , std::ios_base::trunc | std::ios_base::binary);//chuncked?

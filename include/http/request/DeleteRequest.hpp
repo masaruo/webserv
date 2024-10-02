@@ -5,9 +5,11 @@
 class DeleteRequest : public ARequest
 {
 private:
+	void	assertFileExist(std::string const &file_path) const;
+	void	removeFile(void) const;
 	DeleteRequest();//=delete
 public:
-	explicit DeleteRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);
+	explicit DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	DeleteRequest(DeleteRequest const &rhs);
 	DeleteRequest &operator=(DeleteRequest const &rsh);
 	~DeleteRequest();

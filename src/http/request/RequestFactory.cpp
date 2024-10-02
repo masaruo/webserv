@@ -1,5 +1,4 @@
 #include "RequestFactory.hpp"
-#include <sstream>
 #include "ARequest.hpp"
 #include "GetRequest.hpp"
 // #include "PostRequest.hpp"
@@ -8,8 +7,10 @@
 #include "HttpHeader.hpp"
 #include "PutRequest.hpp"
 #include "define.hpp"
-// #include "DeleteRequest.hpp"
+#include "DeleteRequest.hpp"
 #include "ConnectionHandler.hpp"
+#include "HttpException.hpp"
+#include <sstream>
 
 ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &config_factory)
 {
@@ -25,13 +26,12 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	HttpUri &uri = requestLine.getUriReference();
 	uri.updateWithHostHeader(host_value);
 
-	std::string	method = requestLine.getMethod();
-	//!ここからのエラーはconfig情報つき
+	std::string	const	method = requestLine.getMethod();
 	if (method == "GET")
-	{
 		return (new GetRequest(requestLine, header, config));
-	}
-	else if (method == "POST" || method == "DELETE" || method == "PUT")
+	else if (method == "DELETE")
+		return (new DeleteRequest(requestLine, header, config));
+	else if (method == "POST" || method == "PUT")
 	{
 		std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
 		bodyStr += ConnectionHandler::recvData(fd, 6000, header.getContentLen() - bodyStr.size());
@@ -39,47 +39,11 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 		HttpBody body(bodyStream, header);
 		if (method == "POST")
 			;
-			// return (new PostRequest(requestLine, header, body, config));
-		else if (method == "DELETE")
-			;
-			// return (new DeleteRequest(requestLine, header, body, config));
 		else
 			return (new PutRequest(requestLine, header, body, config));
 	}
 	else
 	{
-		return (NULL);
+		throw (HttpException(HttpCode::BAD_REQUEST));
 	}
 }
-
-// // ARequest	*RequestFactory::createRequest(ARequest *request)
-// // {
-// 	// std::string const	method = request->getLine().getMethod();
-// 	// RequestLine const	line = request->getLine();
-// 	// HttpHeader const	header = request->getHeader();
-// 	// HttpBody const		body = request->getBody();
-// 	// config::Config const config = request->getConfig();
-
-// 	// if (method == "GET")
-// 	// {
-// 	// 	return (new GetRequest(line, header, config));
-// 	// }
-// 	// else if (method == "POST")
-// 	// {
-// 	// 	// return (new PostRequest(line, header, body, config));
-// 	// 	;
-// 	// }
-// 	// else if (method == "DELETE")
-// 	// {
-// 	// 	return (new DeleteRequest(line, header, body, config));
-// 	// }
-// 	// else if (method == "PUT")
-// 	// {
-// 	// 	// return (new PutRequest(line, header, body, config));
-// 	// 	;
-// 	// }
-// 	// else
-// 	// {
-// 	// 	return (NULL);
-// 	}
-// }

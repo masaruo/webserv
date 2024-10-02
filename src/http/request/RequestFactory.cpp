@@ -6,7 +6,7 @@
 #include "string.hpp"
 #include "RequestLine.hpp"
 #include "HttpHeader.hpp"
-// #include "PutRequest.hpp"
+#include "PutRequest.hpp"
 #include "define.hpp"
 // #include "DeleteRequest.hpp"
 #include "ConnectionHandler.hpp"
@@ -44,8 +44,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 			;
 			// return (new DeleteRequest(requestLine, header, body, config));
 		else
-			;
-			// return (new PutRequest(requestLine, header, body, config));
+			return (new PutRequest(requestLine, header, body, config));
 	}
 	else
 	{

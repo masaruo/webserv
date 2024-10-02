@@ -24,24 +24,27 @@ config::Config::Config(int flag)//!this is MOCK!
 		tmp.is_autoindex_ = true;
 		tmp.is_cgi_ = false;
 		tmp.cgi_root_ = "";
-		tmp.cgi_upload_path_ = "";
+		tmp.upload_store_ = "";
 		locations_.insert(std::make_pair("/", tmp));
 
 //location uploads
-		tmp.allowed_methods_.insert("PUT");
-		tmp.is_autoindex_ = false;
-		tmp.is_cgi_ = false;
-		tmp.cgi_root_ = "";
-		tmp.cgi_upload_path_ = "/webserv/www/save";
-		locations_.insert(std::make_pair("/uploads", tmp));
+		location_s tmp2;
+		tmp2.allowed_methods_.insert("PUT");
+		tmp2.is_autoindex_ = false;
+		tmp2.is_cgi_ = false;
+		tmp2.cgi_root_ = "";
+		tmp2.upload_store_ = "/webserv/www/save";
+		// locations_.insert(std::make_pair("/uploads", tmp));
+		locations_.insert(std::make_pair("/uploads", tmp2));//! no / at first
 
 //location cgi
-		tmp.allowed_methods_.insert("");
-		tmp.is_autoindex_ = false;
-		tmp.is_cgi_ = true;
-		tmp.cgi_root_ = "/webserv/cgi-bin";
-		tmp.cgi_upload_path_ = "";
-		locations_.insert(std::make_pair(".py", tmp));
+		location_s tmp3;
+		tmp3.allowed_methods_.insert("");
+		tmp3.is_autoindex_ = false;
+		tmp3.is_cgi_ = true;
+		tmp3.cgi_root_ = "/webserv/cgi-bin";
+		tmp3.upload_store_ = "";
+		locations_.insert(std::make_pair("/.py", tmp3));
 	}
 	else
 	{
@@ -62,7 +65,7 @@ config::Config::Config(int flag)//!this is MOCK!
 		tmp.is_autoindex_ = true;
 		tmp.is_cgi_ = false;
 		tmp.cgi_root_ = "";
-		tmp.cgi_upload_path_ = "";
+		tmp.upload_store_ = "";
 		locations_.insert(std::make_pair("/", tmp));
 	}
 }
@@ -174,7 +177,7 @@ std::string	config::Config::getCgiRoot(std::string const &path) const
 	return (getLocation(path).cgi_root_);
 }
 
-std::string	config::Config::getCgiUploadPath(std::string const &path) const
+std::string	config::Config::getUploadStore(std::string const &path) const
 {
-	return (getLocation(path).cgi_upload_path_);
+	return (getLocation(path).upload_store_);
 }

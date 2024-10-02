@@ -25,15 +25,16 @@ std::string const	ft::string::WS = ft::string::SP + ft::string::HTAB;
 std::string const	ft::string::CR = "\r";
 std::string const	ft::string::LF = "\n";
 std::string const	ft::string::CRLF = CR + LF;
-std::string const	ft::string::CTL_EX_NUL =
-	"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+std::string const	ft::string::CTL_EX_NUL_HTAB_CR_LF =
+	"\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0E\x0F"
 	"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x7F";
 std::string const	ft::string::NUL = "\x00";
-std::string const	ft::string::CTL =	ft::string::NUL + ft::string::CTL_EX_NUL;
+std::string const	ft::string::CTL =	ft::string::NUL + ft::string::CTL_EX_NUL_HTAB_CR_LF + \
+										 ft::string::HTAB + ft::string::CRLF;
 std::string const	ft::string::DQUOTE = "\"";
 std::string const	ft::string::HEXDIG = ft::string::DIGIT + "ABCDEF";
 std::string const	ft::string::VCHAR = ft::string::ALNUM + "!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~";
-std::string const	ft::string::CHAR = ft::string::VCHAR + ft::string::CTL_EX_NUL + "\x7f";
+std::string const	ft::string::CHAR = ft::string::VCHAR + ft::string::CTL_EX_NUL_HTAB_CR_LF + "\x7f";
 std::string const	ft::string::TOKEN = ft::string::ALNUM + "!#$%&'*+-.^_`|~";
 std::string const	ft::string::OBS_TEXT = 
 	"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F"

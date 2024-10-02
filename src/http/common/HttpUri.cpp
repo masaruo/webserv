@@ -147,9 +147,9 @@ void	HttpUri::parseAuthority(void)
 
 void	HttpUri::parseUri(std::string const &authorityStart)//? check host
 {
-	std::string::size_type	authorityEnd = authorityStart.find_first_of("/?");
+	std::string::size_type	authorityEndPos = authorityStart.find_first_of("/?");
 
-	if (authorityEnd == std::string::npos)
+	if (authorityEndPos == std::string::npos)
 	{
 		authority_ = initial_uri_;
 		path_ = "/";
@@ -157,26 +157,27 @@ void	HttpUri::parseUri(std::string const &authorityStart)//? check host
 	}
 	else
 	{
-		authority_ = authorityStart.substr(0, authorityEnd);
-		if (authorityStart.at(authorityEnd) == '?')
+		authority_ = authorityStart.substr(0, authorityEndPos);
+		std::string const	pathStart = authorityStart.substr(authorityEndPos);
+		if (authorityStart.at(authorityEndPos) == '?')
 		{
 			path_ = "/";
-			std::string queryString = authorityStart.substr(authorityEnd + 1);
+			std::string queryString = authorityStart.substr(authorityEndPos + 1);
 			parseQueryWithDecodePercent(queryString);
 			hasQuery_ = true;
 		}
 		else
 		{
-			std::string::size_type	queryStart = authorityStart.find('?', authorityEnd);
+			std::string::size_type	queryStart = pathStart.find('?');
 			if (queryStart == std::string::npos)
 			{
-				path_ = authorityStart.substr(authorityEnd);
+				path_ = pathStart;
 				hasQuery_ = false;
 			}
 			else
 			{
-				path_ = authorityStart.substr(0, queryStart);
-				std::string queryString = authorityStart.substr(queryStart + 1);
+				path_ = pathStart.substr(0, queryStart);
+				std::string queryString = pathStart.substr(queryStart + 1);
 				parseQueryWithDecodePercent(queryString);
 				hasQuery_ = true;
 			}

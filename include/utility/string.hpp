@@ -34,7 +34,7 @@ public:
 	static std::string const	CR;
 	static std::string const	LF;
 	static std::string const	CRLF;
-	static std::string const	CTL_EX_NUL;
+	static std::string const	CTL_EX_NUL_HTAB_CR_LF;
 	static std::string const	NUL;
 	static std::string const	CTL;
 	static std::string const	DQUOTE;

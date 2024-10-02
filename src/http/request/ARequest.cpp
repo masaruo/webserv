@@ -62,7 +62,8 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 config::Config::location_s	ARequest::setLocation(void)
 {
 	config::Config::location_s loc;
-	loc = config_.getLocation(getLine().getUri().getPath());
+	std::string const	path = getLine().getUri().getPath();
+	loc = config_.getLocation(path);
 	//todo if host == empty? possible? or if loc is empty?
 	return (loc);
 }
@@ -85,10 +86,19 @@ std::string	ARequest::setAbsolutePath(void)
 
 	// create path by concatinate root and path;
 	std::stringstream	ss;
-	ss << config_.getRoot();
+
+	if (path == "/uploads")
+		path = config_.getUploadStore(path);
+	else if (matched_location_.is_cgi_)//! todo if cgi not implemented
+		;
+	else
+		ss << config_.getRoot();
+
 	if (path != "/")
 		ss << "/";
 	ss << path;
+	std::string	tmp = ss.str();//todo delete
+	config::Config	tmpconfig = getConfig();//todo delete
 	if (checkIsDirectory(ss.str(), getConfig()))
 	{
 		std::string	file = config_.getIndex(path);

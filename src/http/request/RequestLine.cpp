@@ -14,6 +14,9 @@ static void	assertRequestLine(std::string const &buf)
 	line.pop_back();// get rid of CR at the end of the line
 	if (line.has(ft::string::CR))// CR in the middle of line
 		is_badReqeust = true;
+
+	if (is_badReqeust)
+		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
 RequestLine::RequestLine(std::istringstream &iss)

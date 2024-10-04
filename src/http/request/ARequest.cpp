@@ -3,6 +3,7 @@
 #include "HttpExceptionWithConfig.hpp"
 #include <sys/stat.h>
 #include <sstream>
+#include <unistd.h>// for access
 
 ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
 :line_(line)
@@ -68,17 +69,17 @@ config::Config::location_s	ARequest::setLocation(void)
 	return (loc);
 }
 
-bool	ARequest::assertIsDir(std::string const &absolute_path) const
-{
-	struct stat	filestat;
-	if (stat(absolute_path.c_str(), &filestat) == ft::err)
-	{
-		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, config_));
-	}
-	bool	isDir;
-	isDir = S_ISDIR(filestat.st_mode);
-	return (isDir);
-}
+// bool	ARequest::assertIsDir(std::string const &absolute_path) const
+// {
+// 	struct stat	filestat;
+// 	if (stat(absolute_path.c_str(), &filestat) == ft::err)
+// 	{
+// 		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, config_));
+// 	}
+// 	bool	isDir;
+// 	isDir = S_ISDIR(filestat.st_mode);
+// 	return (isDir);
+// }
 
 std::string	ARequest::setLocalPath(void)
 {
@@ -92,7 +93,7 @@ std::string	ARequest::setLocalPath(void)
 	// 	fileName =  config_.getIndex(path);
 	// 	localAbsPath += "/" + fileName;
 	// }
-	assertIsDir(localAbsPath);
+	// assertIsDir(localAbsPath);
 	return (localAbsPath);
 }
 
@@ -103,6 +104,12 @@ void	ARequest::assertAllowedMethod(void) const
 	{
 		throw (HttpExceptionWithConfig(HttpCode::METHOD_NOT_ALLOWED, getConfig()));
 	}
+}
+
+void	ARequest::assertFileExist(std::string const &file_path) const
+{
+	if (access(file_path.c_str(), W_OK) == ft::err)
+		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, getConfig()));
 }
 
 // getters

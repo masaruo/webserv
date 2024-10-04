@@ -31,18 +31,28 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 
 Response	GetRequest::generateResponse(void) const
 {
-	std::string	const	path = getLine().getUri().getPath();
-	std::string const	absPath = getLocalPath() + getConfig().getIndex(path);
+	HttpUri const		uri = getLine().getUri();
 
-	HttpBody	body(FileReader::readTextFile(absPath));
+	if (uri.getIsCgi())
+	{
+		CgiRequest	cgi(getLine(), getHeader(), getConfig());
+		Response	r(cgi.generateResponse());
+		return (r);
+	}
+	else
+	{
+		std::string	const	path = uri.getPath();
+		std::string const	absPath = getLocalPath() + getConfig().getIndex(path);
 
-	HttpHeader	header;
-	header.setHeader("content-type", "text/html");
-	header.setHeader("content-length", body.getSizeStr());
+		HttpBody	body(FileReader::readTextFile(absPath));
 
-	HttpStatus	status(HttpCode::OK);
+		HttpHeader	header;
+		header.setHeader("content-type", "text/html");
+		header.setHeader("content-length", body.getSizeStr());
 
-	Response	response(status, header, body);
-	return (response);
+		HttpStatus	status(HttpCode::OK);
+
+		Response	r(status, header, body);
+		return (r);
+	}
 }
-

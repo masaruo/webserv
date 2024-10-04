@@ -4,28 +4,46 @@
 
 class HttpUri
 {
+public:
+	struct Cgi_s
+	{
+		bool		isCgi_;
+		bool		hasPathInfo_;
+		std::string	pathBeforeScript_;
+		std::string	scriptName_;
+		std::string	ext_;
+		std::string	pathInfo_;
+		Cgi_s();
+	};
+
+	struct Query_s
+	{
+		bool		hasQuery_;
+		ft::str_map	QueryMap_;
+		Query_s();
+	};
+	
 private:
 	static std::size_t const	URI_MAX_LEN = 8000;
 	std::string	initial_uri_;
-	std::string	authority_;
 	std::string	host_;
 	std::size_t	port_;
 	std::string	path_;
-	std::string	ext_;
-	std::string	path_info_;
-	ft::str_map	query_;
-	bool		hasQuery_;
-	bool		is_cgi_;
-	void		parseUri(std::string const &authorityStart);
-	void		parseAbsolute(void);
-	void		parseOrigin(std::string const &host);
+	Query_s		query_;
+	Cgi_s		cgi_;
+
+	void		parseAbsoluteFormUri(void);
+	void		parseOriginFormUri(std::string const &host);
+	void		parseUri(std::string const &after_scheme);
+	std::string	extractHost(std::string const &uri_after_scheme);
+	std::string	extractQuery(std::string const &uri_after_host);
+	std::string	extractPort(std::string const &path_wo_query);
+	void		extractCgiInfo(std::string const &path);
 	void		parseAuthority(void);
-	void		parsePort(void);
 	void		parseExtAndPathInfo(void);
 	void		parseQueryWithDecodePercent(std::string const &query);
 	void		formatEachComponentsExQuery(void);
 	void		assertFinalData(void) const;
-	void		checkIsCgi(void);
 public:
 	HttpUri();
 	~HttpUri();
@@ -33,15 +51,14 @@ public:
 	HttpUri &operator=(HttpUri const &rhs);
 	void		init(std::string const &raw);
 	void		updateWithHostHeader(std::string const &host);
-	std::string	getAuthority(void) const;
 	std::string	getHost(void) const;
 	std::size_t	getPort(void) const;
 	std::string	getPortStr(void) const;
 	std::string	getPath(void) const;
-	std::string	getExt(void) const;
-	std::string	getPathInfo(void) const;
-	ft::str_map	getQuery(void) const;
+	Query_s		getQuery(void) const;
+	ft::str_map	getQueryMap(void) const;
 	std::string	getQueryValue(std::string const &key) const;
-	std::string	getQueryString(void) const;
-	bool		getIsCgi(void) const;
+	std::string	getRawQueryString(void) const;
+	Cgi_s		getCgi(void) const;
+	bool		IsCgi(void) const;
 };

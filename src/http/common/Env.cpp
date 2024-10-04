@@ -55,7 +55,7 @@ void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, std::st
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);
 	addEnvItem("path_translated", pathTranslated);
-	addEnvItem("query_string", uri.getQueryString());
+	addEnvItem("query_string", uri.getRawQueryString());
 	addEnvItem("remote_addr", "");//!Must todo
 	addEnvItem("remote_host", "");
 	addEnvItem("remote_ident", "");

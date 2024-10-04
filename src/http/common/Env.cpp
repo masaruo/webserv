@@ -45,7 +45,7 @@ void	Env::addEnvItem(std::string const &key, std::string const &value)
 void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, std::string const &local_path)
 {
 	HttpUri const	uri = line.getUri();
-	std::string const	pathInfo = uri.getPathInfo();
+	std::string const	pathInfo = uri.getCgi().pathInfo_;
 	std::string const	pathTranslated = local_path + "/" + pathInfo;
 	std::string const	scriptName = uri.getPath();
 

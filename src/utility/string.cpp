@@ -406,3 +406,31 @@ ft::string::string_vector	ft::string::split(std::string const &delims) const
 		split_v.push_back(base_.substr(cp_begin, base_.size() - cp_begin));
 	return (split_v);
 }
+
+std::string	ft::concatSplitVector(ft::string::string_vector const &str_vec, char delim)
+{
+	ft::string::string_vector::const_iterator	iter = str_vec.begin();
+	ft::string::string_vector::const_iterator	end = str_vec.end();
+	std::string	concatinated = "";
+
+	while (iter != end)
+	{
+		concatinated += iter->str();
+		if (iter + 1 != end)
+			concatinated += delim;
+		iter++;
+	}
+	return (concatinated);
+}
+
+std::string	ft::removeConsecutiveDelim(std::string const &str, char delim)
+{
+	if (str.empty())
+		return ("");
+
+	ft::string	ftstr(str);
+	std::string	delimStr(1, delim);
+	ft::string::string_vector	strVec = ftstr.split(delimStr);
+	std::string	concat = concatSplitVector(strVec, delim);
+	return (concat);
+}

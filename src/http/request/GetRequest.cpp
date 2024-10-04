@@ -33,7 +33,7 @@ Response	GetRequest::generateResponse(void) const
 {
 	HttpUri const		uri = getLine().getUri();
 
-	if (uri.getIsCgi())
+	if (uri.IsCgi())
 	{
 		CgiRequest	cgi(getLine(), getHeader(), getConfig());
 		Response	r(cgi.generateResponse());

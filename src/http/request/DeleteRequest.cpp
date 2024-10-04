@@ -38,9 +38,9 @@ void	DeleteRequest::assertFileExist(std::string const &file_path) const
 
 void	DeleteRequest::removeFile(void) const
 {
-	HttpUri const	uri = getLine().getUri();
-	std::string	deletePath = getConfig().getUploadStore(uri.getPath());
+	HttpUri const		uri = getLine().getUri();
 	std::string const	fileName = uri.getQueryValue("filename");
+	std::string			deletePath = getLocalPath();
 
 	if (deletePath.empty() || fileName.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));

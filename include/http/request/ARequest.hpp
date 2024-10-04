@@ -15,19 +15,20 @@ private:
 	HttpBody					body_;
 	config::Config				config_;
 	config::Config::location_s	matched_location_;
-	std::string					absolute_path_;
+	std::string					local_path_;
 	bool						is_directory_;
 	ARequest();//=delete:
 	config::Config::location_s	setLocation(void);
-	std::string					setAbsolutePath(void);
+	std::string					setLocalPath(void);
 	void						assertAllowedMethod(void) const;
+	bool						assertIsDir(std::string const &abs_path) const;
 protected:
 	RequestLine 				getLine(void) const;
 	HttpHeader 					getHeader(void) const;
 	HttpBody					getBody(void) const;
 	config::Config				getConfig(void) const;
 	config::Config::location_s	getLocation(void) const;
-	std::string					getAbsolutePath(void) const;
+	std::string					getLocalPath(void) const;
 public:
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);

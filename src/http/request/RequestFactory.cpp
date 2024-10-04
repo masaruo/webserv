@@ -2,12 +2,13 @@
 #include "ARequest.hpp"
 #include "GetRequest.hpp"
 // #include "PostRequest.hpp"
+#include "DeleteRequest.hpp"
+#include "CgiRequest.hpp"
 #include "string.hpp"
 #include "RequestLine.hpp"
 #include "HttpHeader.hpp"
 #include "PutRequest.hpp"
 #include "define.hpp"
-#include "DeleteRequest.hpp"
 #include "ConnectionHandler.hpp"
 #include "HttpException.hpp"
 #include <sstream>
@@ -28,7 +29,12 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 
 	std::string	const	method = requestLine.getMethod();
 	if (method == "GET")
-		return (new GetRequest(requestLine, header, config));
+	{
+		if (uri.getIsCgi() == true)
+			return (new CgiRequest(requestLine, header, config));
+		else
+			return (new GetRequest(requestLine, header, config));
+	}
 	else if (method == "DELETE")
 		return (new DeleteRequest(requestLine, header, config));
 	else if (method == "POST" || method == "PUT")
@@ -38,7 +44,12 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 		std::istringstream	bodyStream(bodyStr);
 		HttpBody body(bodyStream, header);
 		if (method == "POST")
-			;
+		{
+			if (uri.getIsCgi() == true)
+				return (new CgiRequest(requestLine, header, body, config));
+			else
+				; //todo POST Request
+		}
 		else
 			return (new PutRequest(requestLine, header, body, config));
 	}

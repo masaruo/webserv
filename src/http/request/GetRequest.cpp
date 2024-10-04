@@ -1,5 +1,6 @@
 #include "GetRequest.hpp"
 #include "Response.hpp"
+#include "CgiRequest.hpp"
 #include "FileHandler.hpp"
 
 GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
@@ -30,9 +31,10 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 
 Response	GetRequest::generateResponse(void) const
 {
-	std::string	path = getAbsolutePath();
+	std::string	const	path = getLine().getUri().getPath();
+	std::string const	absPath = getLocalPath() + getConfig().getIndex(path);
 
-	HttpBody	body(FileReader::readTextFile(path));
+	HttpBody	body(FileReader::readTextFile(absPath));
 
 	HttpHeader	header;
 	header.setHeader("content-type", "text/html");

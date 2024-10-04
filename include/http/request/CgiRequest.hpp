@@ -10,12 +10,14 @@ public:
 	static int	const	CHILD_PID;
 private:
 	Env	env_;
+	//! add client sock adder? so that can be passed onto env?
 
-	void	execute(void) const;
-	void	exec_child(int pipefd[2]) const;
-	void	exec_parent(int pipefd[2], pid_t child_pid) const; 
+	std::string	execute(void) const;
+	void		exec_child(int pipefd[2]) const;
+	std::string	exec_parent(int pipefd[2], pid_t child_pid) const; 
 	CgiRequest();//=delete
 public:
+	explicit CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	explicit CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);
 	~CgiRequest();
 	CgiRequest(CgiRequest const &rhs);

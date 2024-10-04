@@ -15,6 +15,7 @@ private:
 	std::string	path_info_;
 	ft::str_map	query_;
 	bool		hasQuery_;
+	bool		is_cgi_;
 	void		parseUri(std::string const &authorityStart);
 	void		parseAbsolute(void);
 	void		parseOrigin(std::string const &host);
@@ -24,6 +25,7 @@ private:
 	void		parseQueryWithDecodePercent(std::string const &query);
 	void		formatEachComponentsExQuery(void);
 	void		assertFinalData(void) const;
+	void		checkIsCgi(void);
 public:
 	HttpUri();
 	~HttpUri();
@@ -41,4 +43,5 @@ public:
 	ft::str_map	getQuery(void) const;
 	std::string	getQueryValue(std::string const &key) const;
 	std::string	getQueryString(void) const;
+	bool		getIsCgi(void) const;
 };

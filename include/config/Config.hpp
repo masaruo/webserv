@@ -18,7 +18,7 @@ public:
 		bool					is_autoindex_;
 		bool					is_cgi_;
 		std::string				cgi_root_;
-		std::string				upload_store_;//todo change name to upload_store_;
+		std::string				upload_store_;
 	};
 private:
 	std::string								server_name_;
@@ -40,7 +40,7 @@ public:
 	// getter for attributes (ex location)
 	std::string	getServerName(void) const;
 	std::size_t	getPort(void) const;
-	std::string	getRoot(void) const;
+	std::string	getRoot(std::string const &path = "/") const;
 	std::size_t	getMaxBodySize(void) const;
 	std::string	getErrorPage(HttpCode::code_e error_code) const;
 	std::size_t	getKeepAliveTimeout(void) const;

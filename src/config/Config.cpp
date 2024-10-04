@@ -1,5 +1,6 @@
 #include "Config.hpp"
 #include "HttpException.hpp"
+#include "string.hpp"
 
 config::Config::Config(int flag)//!this is MOCK!
 {
@@ -34,7 +35,7 @@ config::Config::Config(int flag)//!this is MOCK!
 		tmp2.is_autoindex_ = false;
 		tmp2.is_cgi_ = false;
 		tmp2.cgi_root_ = "";
-		tmp2.upload_store_ = "/webserv/www/save";
+		tmp2.upload_store_ = "/webserv/www/uploads";
 		// locations_.insert(std::make_pair("/uploads", tmp));
 		locations_.insert(std::make_pair("/uploads", tmp2));//! no / at first
 
@@ -45,7 +46,7 @@ config::Config::Config(int flag)//!this is MOCK!
 		tmp3.is_cgi_ = true;
 		tmp3.cgi_root_ = "/webserv/cgi-bin";
 		tmp3.upload_store_ = "";
-		locations_.insert(std::make_pair("/.py", tmp3));
+		locations_.insert(std::make_pair("py", tmp3));
 	}
 	else
 	{
@@ -112,9 +113,21 @@ std::size_t	config::Config::getPort(void) const
 	return (port_);
 }
 
-std::string	config::Config::getRoot(void) const
+std::string	config::Config::getRoot(std::string const &path) const
 {
-	return (root_);
+	if (path == "/")
+		return (root_);
+
+	location_s const	location = getLocation(path);
+	ft::string	ftpath(path);
+	ftpath.trim('/');
+
+	if (ftpath == "uploads")
+		return (location.upload_store_);
+	else if (ftpath.end_with_str("py"))
+		return (location.cgi_root_);
+	else
+		return ("");
 }
 
 std::size_t	config::Config::getMaxBodySize(void) const

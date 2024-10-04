@@ -57,6 +57,11 @@ std::string	HttpBody::to_string(void) const
 	return (data_);
 }
 
+char	const *HttpBody::c_str(void) const
+{
+	return (data_.c_str());
+}
+
 std::size_t	HttpBody::getSize(void) const
 {
 	return (data_.size());

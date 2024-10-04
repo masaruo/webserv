@@ -31,20 +31,6 @@ PutRequest &PutRequest::operator=(PutRequest const &rhs)
 	return (*this);
 }
 
-Response	PutRequest::generateResponse(void) const
-{
-	uploadFile();
-
-	HttpHeader	header;
-	header.setHeader("content-length", "0");
-	// header.setHeader("connection", "keep-alive");
-
-	HttpStatus	status(HttpCode::OK);
-
-	Response	response(status, header);
-	return (response);
-}
-
 static void	assertFileWithNoControlChar(std::string const &data)
 {
 	ft::string	ftdata(data);
@@ -55,8 +41,8 @@ static void	assertFileWithNoControlChar(std::string const &data)
 void	PutRequest::uploadFile(void) const
 {
 	HttpUri const	uri = getLine().getUri();
-	std::string	uploadPath = getConfig().getUploadStore(uri.getPath());
 	std::string const	fileName = uri.getQueryValue("filename");
+	std::string			uploadPath = getLocalPath();
 
 	if (uploadPath.empty() || fileName.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
@@ -72,4 +58,18 @@ void	PutRequest::uploadFile(void) const
 	{
 		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));
 	}
+}
+
+Response	PutRequest::generateResponse(void) const
+{
+	uploadFile();
+
+	HttpHeader	header;
+	header.setHeader("content-length", "0");
+	// header.setHeader("connection", "keep-alive");
+
+	HttpStatus	status(HttpCode::OK);
+
+	Response	response(status, header);
+	return (response);
 }

@@ -14,6 +14,7 @@ HttpUri::HttpUri()
 ,path_info_()
 ,query_()
 ,hasQuery_(false)
+,is_cgi_(false)
 {
 	return ;
 }
@@ -33,6 +34,7 @@ HttpUri::HttpUri(HttpUri const &rhs)
 ,path_info_(rhs.path_info_)
 ,query_(rhs.query_)
 ,hasQuery_(rhs.hasQuery_)
+,is_cgi_(rhs.is_cgi_)
 {
 	return ;
 }
@@ -50,6 +52,7 @@ HttpUri &HttpUri::operator=(HttpUri const &rhs)
 		path_info_ = rhs.path_info_;
 		query_ = rhs.query_;
 		hasQuery_ = rhs.hasQuery_;
+		is_cgi_ = rhs.is_cgi_;
 	}
 	return (*this);
 }
@@ -115,7 +118,7 @@ void	HttpUri::parsePort(void)
 
 void	HttpUri::parseExtAndPathInfo(void)
 {
-	std::string				dotDecodedStr = UriNormalizer::decodeDots(authority_);
+	std::string				dotDecodedStr = UriNormalizer::decodeDots(path_);
 	std::string::size_type	lastDotPos = dotDecodedStr.find_last_of('.');
 	std::string::size_type	extEnd = dotDecodedStr.find_first_of("/", lastDotPos + 1);
 	std::string				ext, pathInfo;
@@ -132,7 +135,7 @@ void	HttpUri::parseExtAndPathInfo(void)
 	}
 	else
 	{
-		ext = dotDecodedStr.substr(lastDotPos + 1, extEnd);
+		ext = dotDecodedStr.substr(lastDotPos + 1, extEnd - 1 - lastDotPos);
 		pathInfo = dotDecodedStr.substr(extEnd + 1);
 	}
 	ext_ = ext;
@@ -158,7 +161,7 @@ void	HttpUri::parseUri(std::string const &authorityStart)//? check host
 	else
 	{
 		authority_ = authorityStart.substr(0, authorityEndPos);
-		std::string const	pathStart = authorityStart.substr(authorityEndPos);
+		std::string const	pathStart = authorityStart.substr(authorityEndPos + 1);
 		if (authorityStart.at(authorityEndPos) == '?')
 		{
 			path_ = "/";
@@ -171,12 +174,12 @@ void	HttpUri::parseUri(std::string const &authorityStart)//? check host
 			std::string::size_type	queryStart = pathStart.find('?');
 			if (queryStart == std::string::npos)
 			{
-				path_ = pathStart;
+				path_ = "/" + pathStart;
 				hasQuery_ = false;
 			}
 			else
 			{
-				path_ = pathStart.substr(0, queryStart);
+				path_ = "/" + pathStart.substr(0, queryStart);
 				std::string queryString = pathStart.substr(queryStart + 1);
 				parseQueryWithDecodePercent(queryString);
 				hasQuery_ = true;
@@ -217,6 +220,7 @@ void	HttpUri::updateWithHostHeader(std::string const &hostHeader)
 		parseAbsolute();
 	formatEachComponentsExQuery();
 	assertFinalData();
+	checkIsCgi();
 }
 
 void	HttpUri::formatEachComponentsExQuery(void)
@@ -251,11 +255,22 @@ void	HttpUri::assertFinalData(void) const
 	str = path_;
 	if (!str.has_only(ft::string::PCHAR))
 		is_valid = false;
-	if (ext_ != "py" || ext_ != "cgi")
+	if (!ext_.empty() && ext_ != "py")
 		is_valid = false;
 	str = path_info_;
 	if (!str.has_only(ft::string::VCHAR))
 		is_valid = false;
+	
+	if (is_valid)
+		throw (HttpException(HttpCode::BAD_REQUEST));
+}
+
+void	HttpUri::checkIsCgi(void)
+{
+	if (ext_ == "py")
+		is_cgi_ = true;
+	else
+		is_cgi_ = false;
 }
 
 std::string	HttpUri::getAuthority(void) const
@@ -322,4 +337,9 @@ std::string	HttpUri::getQueryString(void) const
 		iter++;
 	}
 	return(oss.str());
+}
+
+bool	HttpUri::getIsCgi(void) const
+{
+	return (is_cgi_);
 }

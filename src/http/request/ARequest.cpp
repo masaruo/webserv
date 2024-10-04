@@ -10,7 +10,7 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 ,body_()
 ,config_(config)
 ,matched_location_(setLocation())
-,absolute_path_(setAbsolutePath())
+,local_path_(setLocalPath())
 {
 	assertAllowedMethod();
 	return ;
@@ -22,7 +22,7 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody c
 ,body_(body)
 ,config_(config)
 ,matched_location_(setLocation())
-,absolute_path_(setAbsolutePath())
+,local_path_(setLocalPath())
 {
 	assertAllowedMethod();
 	return ;
@@ -34,7 +34,7 @@ ARequest::ARequest(ARequest const &rhs)
 ,body_(rhs.body_)
 ,config_(rhs.config_)
 ,matched_location_(rhs.matched_location_)
-,absolute_path_(rhs.absolute_path_)
+,local_path_(rhs.local_path_)
 {
 	return ;
 }
@@ -53,7 +53,7 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 		body_ = rhs.body_;
 		config_ = rhs.config_;
 		matched_location_ = rhs.matched_location_;
-		absolute_path_ = rhs.absolute_path_;
+		local_path_ = rhs.local_path_;
 	}
 	return (*this);
 }
@@ -68,43 +68,32 @@ config::Config::location_s	ARequest::setLocation(void)
 	return (loc);
 }
 
-static bool	checkIsDirectory(std::string const &absolute_path, config::Config const &config)
+bool	ARequest::assertIsDir(std::string const &absolute_path) const
 {
 	struct stat	filestat;
 	if (stat(absolute_path.c_str(), &filestat) == ft::err)
 	{
-		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, config));
+		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, config_));
 	}
 	bool	isDir;
 	isDir = S_ISDIR(filestat.st_mode);
 	return (isDir);
 }
 
-std::string	ARequest::setAbsolutePath(void)
+std::string	ARequest::setLocalPath(void)
 {
-	std::string	path = getLine().getUri().getPath();
+	std::string const	path = getLine().getUri().getPath();
+	std::string const	root = config_.getRoot(path);
+	std::string localAbsPath = root + path;
 
-	// create path by concatinate root and path;
-	std::stringstream	ss;
-
-	if (path == "/uploads")
-		path = config_.getUploadStore(path);
-	else if (matched_location_.is_cgi_)//! todo if cgi not implemented
-		;
-	else
-		ss << config_.getRoot();
-
-	if (path != "/")
-		ss << "/";
-	ss << path;
-	std::string	tmp = ss.str();//todo delete
-	config::Config	tmpconfig = getConfig();//todo delete
-	if (checkIsDirectory(ss.str(), getConfig()))
-	{
-		std::string	file = config_.getIndex(path);
-		ss << file;
-	}
-	return (ss.str());
+	// if (checkIsDir(localAbsPath))
+	// {
+	// 	std::string	fileName;
+	// 	fileName =  config_.getIndex(path);
+	// 	localAbsPath += "/" + fileName;
+	// }
+	assertIsDir(localAbsPath);
+	return (localAbsPath);
 }
 
 void	ARequest::assertAllowedMethod(void) const
@@ -142,7 +131,7 @@ config::Config::location_s	ARequest::getLocation(void) const
 	return (matched_location_);
 }
 
-std::string	ARequest::getAbsolutePath(void) const
+std::string	ARequest::getLocalPath(void) const
 {
-	return (absolute_path_);
+	return (local_path_);
 }

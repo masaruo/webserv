@@ -1,7 +1,6 @@
 #include "DeleteRequest.hpp"
 #include "Response.hpp"
 #include "HttpExceptionWithConfig.hpp"
-#include <unistd.h>// for access
 #include <cstdio>// for std::remove
 
 DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
@@ -28,12 +27,6 @@ DeleteRequest &DeleteRequest::operator=(DeleteRequest const &rhs)
 		ARequest::operator=(rhs);
 	}
 	return (*this);
-}
-
-void	DeleteRequest::assertFileExist(std::string const &file_path) const
-{
-	if (access(file_path.c_str(), W_OK) == ft::err)
-		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, getConfig()));
 }
 
 void	DeleteRequest::removeFile(void) const

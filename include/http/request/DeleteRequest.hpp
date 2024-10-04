@@ -5,7 +5,6 @@
 class DeleteRequest : public ARequest
 {
 private:
-	void	assertFileExist(std::string const &file_path) const;
 	void	removeFile(void) const;
 	DeleteRequest();//=delete
 public:

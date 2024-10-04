@@ -1,4 +1,5 @@
 #include "FileHandler.hpp"
+#include "HttpException.hpp"
 #include <fstream>
 #include <unistd.h>
 
@@ -7,7 +8,7 @@ std::string FileReader::readTextFile(std::string const &path)
 	std::ifstream	ifs(path.c_str(), std::ios::in | std::ios::binary);
 	if(!ifs)
 	{
-		//todo error
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//? error type
 	}
 	std::string	buf;
 	ifs.seekg(0, std::ios::end);
@@ -16,7 +17,7 @@ std::string FileReader::readTextFile(std::string const &path)
 	buf.resize(static_cast<std::size_t>(size));
 	if (!ifs.read(&buf[0], buf.size()))
 	{
-		//todo error?
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//? error type
 	}
 	return (buf);
 }
@@ -34,7 +35,7 @@ std::string	FileReader::readFdFile(int fd)
 		ssize_t	bytesRead = read(fd, (void*)buf.data(), buf.size());
 		if (bytesRead == ft::err)
 		{
-			//todo err
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//? error type
 		}
 		else if (bytesRead == ft::eof)
 		{

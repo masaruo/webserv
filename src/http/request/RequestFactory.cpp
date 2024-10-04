@@ -30,10 +30,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	std::string	const	method = requestLine.getMethod();
 	if (method == "GET")
 	{
-		if (uri.getIsCgi() == true)
-			return (new CgiRequest(requestLine, header, config));
-		else
-			return (new GetRequest(requestLine, header, config));
+		return (new GetRequest(requestLine, header, config));
 	}
 	else if (method == "DELETE")
 		return (new DeleteRequest(requestLine, header, config));
@@ -45,10 +42,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 		HttpBody body(bodyStream, header);
 		if (method == "POST")
 		{
-			if (uri.getIsCgi() == true)
-				return (new CgiRequest(requestLine, header, body, config));
-			else
-				; //todo POST Request
+			; //todo POST Request
 		}
 		else
 			return (new PutRequest(requestLine, header, body, config));

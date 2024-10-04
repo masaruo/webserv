@@ -21,7 +21,7 @@ private:
 	config::Config::location_s	setLocation(void);
 	std::string					setLocalPath(void);
 	void						assertAllowedMethod(void) const;
-	bool						assertIsDir(std::string const &abs_path) const;
+	// bool						assertIsDir(std::string const &abs_path) const;
 protected:
 	RequestLine 				getLine(void) const;
 	HttpHeader 					getHeader(void) const;
@@ -29,6 +29,7 @@ protected:
 	config::Config				getConfig(void) const;
 	config::Config::location_s	getLocation(void) const;
 	std::string					getLocalPath(void) const;
+	void						assertFileExist(std::string const &filePath) const;
 public:
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);

@@ -150,6 +150,10 @@ void	HttpUri::parseAuthority(void)
 
 void	HttpUri::parseUri(std::string const &authorityStart)//? check host
 {
+	bool	has_no_delim = false;
+	bool	has_question = false;
+	bool	has_pathInfo = false;
+	
 	std::string::size_type	authorityEndPos = authorityStart.find_first_of("/?");
 
 	if (authorityEndPos == std::string::npos)
@@ -267,7 +271,7 @@ void	HttpUri::assertFinalData(void) const
 
 void	HttpUri::checkIsCgi(void)
 {
-	if (ext_ == "py")
+	if (ext_ == "py")//決め打ちでpyのみ
 		is_cgi_ = true;
 	else
 		is_cgi_ = false;

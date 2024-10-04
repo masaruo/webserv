@@ -49,6 +49,8 @@ private:
     bool is_port(Config& config);
     bool is_root(Config& config);
     bool is_max_body_size(Config& config);
+    bool is_timeout(Config& config);
+    bool is_error_page(Config& config);
     bool start_with(const std::string& str);
 public:    
     // Parser(const std::string& file_name);
@@ -94,6 +96,8 @@ bool Parser::is_server(Config& config) {
         is_server_name(config);
         is_root(config);
         is_max_body_size(config);
+        is_timeout(config);
+        is_error_page(config);
     }
     if (consume_token() != "}")
         return false;
@@ -145,6 +149,33 @@ bool Parser::is_max_body_size(Config& config) {
     return true;
 }
 
+bool Parser::is_timeout(Config& config) {
+    if (get_token() != "keep_alive_timeout")
+        return false;
+    consume_token();
+    std::stringstream timeout;
+    timeout << consume_token();
+    timeout >> config.keep_alive_timeout_;
+    if (consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool Parser::is_error_page(Config& config) {
+    if (get_token() != "error_page")
+        return false;
+    consume_token();
+    std::stringstream ss;
+    ss << consume_token();
+    int code;
+    ss >> code;
+    std::string error_page = consume_token();
+    config.error_pages_.insert(std::make_pair(HttpCode::code_e(code), error_page));
+    if (consume_token() != ";")
+        return false;
+    return true;
+}
+
 std::string Parser::get_token()
 {
     while (isspace(content_[buf_idx_]))
@@ -184,7 +215,7 @@ std::string Parser::consume_token()
 
 int main()
 {
-    std::string str = "server {\n\tlisten 8080;\n\tserver_name localhost;\n\troot ./docs/;\n\tmax_body_size 10000;\n\t}\n";
+    std::string str = "server {\n\tlisten 8080;\n\tserver_name localhost; \n\troot ./docs/;\n\tmax_body_size 10000;\n\tkeep_alive_timeout 75;\n\terror_page 404 /404.html;\n\t}\n";
     // std::string str = "server { }";
     std::cout << str << std::endl;
     // std::cout << std::boolalpha << is_config(str) << std::endl;
@@ -195,6 +226,9 @@ int main()
     std::cout << "server_name: " << config.server_name_ << std::endl;
     std::cout << "root: " << config.root_ << std::endl;
     std::cout << "max_body_size: " << config.max_body_size_ << std::endl;
+    std::cout << "keep_alive_timeout: " << config.keep_alive_timeout_ << std::endl;
+    std::cout << "code: " << config.error_pages_.begin()->first << std::endl;
+    std::cout << "error_page: " << config.error_pages_.begin()->second << std::endl;
     // std::cout << parser.get_token() << std::endl;
     // std::cout << parser.get_token() << std::endl;
     // std::cout << parser.get_token() << std::endl;

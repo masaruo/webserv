@@ -132,14 +132,14 @@ std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_p
 		ssize_t	bytesWritten = write(pipe_in[WRITE_FD], body.c_str() + total_written, remaining);
 		if (bytesWritten == ft::err)
 		{
-			if (errno == EINTR)
-				continue ;
-			else
-			{
+			// if (errno == EINTR)
+				// continue ;
+			// else
+			// {
 				close(pipe_in[WRITE_FD]);
 				close(pipe_out[READ_FD]);
 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-			}
+			// }
 		}
 		total_written += bytesWritten;
 		remaining -= bytesWritten;
@@ -207,6 +207,7 @@ std::string	CgiRequest::execute(void) const
 	}
 	else
 	{
+		usleep(50000);//todo need to change, without this, pipe clogging happens (ie. .py failed to read).
 		bodyStr = exec_parent(pipe_in, pipe_out, child_pid);
 	}
 	return (bodyStr);

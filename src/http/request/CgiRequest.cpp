@@ -11,6 +11,7 @@
 int const	CgiRequest::READ_FD = 0;
 int const	CgiRequest::WRITE_FD = 1;
 int const	CgiRequest::CHILD_PID = 0;
+int const	CgiRequest::INTERNAL_SERVER_ERROR = 50;
 
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
 :ARequest(line, header, config)
@@ -48,7 +49,7 @@ CgiRequest &CgiRequest::operator=(CgiRequest const &rhs)
 	return (*this);
 }
 
-static int	closeWithException(int fd1)
+static int	assertClose(int fd1)
 {
 	int	res = close(fd1);
 	if (res == ft::err)
@@ -59,7 +60,7 @@ static int	closeWithException(int fd1)
 		return (res);
 }
 
-static int	dup2nClose(int fd1, int fd2)
+static int	dup2ThenClose(int fd1, int fd2)
 {
 	int const	newfd = dup2(fd1, fd2);
 
@@ -74,26 +75,25 @@ static int	dup2nClose(int fd1, int fd2)
 static char	**generateArgv(std::string const &uri)
 {
 	char	**argv = NULL;
+	std::string	cgiPath;
 
 	argv = new char*[2]();
 	argv[1] = NULL;
 
 	argv[0] = new char[uri.size() + 1]();
-	// std::strcpy(argv[0], uri.c_str());
-	std::strcpy(argv[0], "/webserv/cgi-bin/echo.py");//! mock
-
+	std::strcpy(argv[0], uri.c_str());
 	return (argv);
 }
 
 void	CgiRequest::exec_child(int pipefd[2]) const
 {
-	if (dup2nClose(pipefd[READ_FD], STDIN_FILENO) == ft::err)
+	if (dup2ThenClose(pipefd[READ_FD], STDIN_FILENO) == ft::err)
 	{
-		std::exit(50);
+		std::exit(INTERNAL_SERVER_ERROR);
 	}
-	if (dup2nClose(pipefd[WRITE_FD], STDOUT_FILENO) == ft::err)
+	if (dup2ThenClose(pipefd[WRITE_FD], STDOUT_FILENO) == ft::err)
 	{
-		std::exit(50);
+		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
 	char	**argv = NULL;
@@ -103,7 +103,7 @@ void	CgiRequest::exec_child(int pipefd[2]) const
 	}
 	catch(std::bad_alloc const &e)
 	{
-		std::exit(50);
+		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
 	//todo move to exec dir?
@@ -111,7 +111,7 @@ void	CgiRequest::exec_child(int pipefd[2]) const
 
 	execve(argv[0], argv, env_.c_env());
 
-	std::exit(51);
+	std::exit(INTERNAL_SERVER_ERROR);
 }
 
 std::string	CgiRequest::exec_parent(int pipefd[2], int child_pid) const
@@ -136,12 +136,11 @@ std::string	CgiRequest::exec_parent(int pipefd[2], int child_pid) const
 		total_written += bytesWritten;
 		remaining -= bytesWritten;
 	}
-	closeWithException(pipefd[WRITE_FD]);
+	assertClose(pipefd[WRITE_FD]);
 
 	std::string	result = "";
 	result = FileReader::readFdFile(pipefd[READ_FD]);
-	// close (pipefd[READ_FD]);
-	closeWithException(pipefd[READ_FD]);
+	assertClose(pipefd[READ_FD]);
 
 	int			status = 0;
 	pid_t		pid = 0;
@@ -155,19 +154,12 @@ std::string	CgiRequest::exec_parent(int pipefd[2], int child_pid) const
 		int	exit_status = WEXITSTATUS(status);
 		if (exit_status != 0)
 		{
-			// close (pipefd[READ_FD]);
-			throw (HttpException(static_cast<HttpCode::code_e>(exit_status)));
+			if (exit_status == INTERNAL_SERVER_ERROR)
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+			else
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//todo amend error
 		}
-		// std::string	result = FileReader::readFdFile(pipefd[READ_FD]);
-		// close (pipefd[READ_FD]);
-		// return (result);
 	}
-	// else
-	// {
-	// 	close (pipefd[READ_FD]);
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// }
-
 	return (result);
 }
 

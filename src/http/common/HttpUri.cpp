@@ -97,110 +97,6 @@ void	HttpUri::parseQueryWithDecodePercent(std::string const &query)
 	}
 }
 
-// void	HttpUri::parsePort(void)
-// {
-// 	std::string::size_type	portStart = authority_.find(':');
-// 	if (portStart == std::string::npos)
-// 	{
-// 		host_ = authority_;
-// 		port_ = 80;
-// 	}
-// 	else
-// 	{
-// 		host_ = authority_.substr(0, portStart);
-// 		std::string	hostStr = authority_.substr(portStart + 1);
-// 		try
-// 		{
-// 			port_ = ft::stonum<std::size_t>(hostStr);
-// 		}
-// 		catch(std::invalid_argument const &e)
-// 		{
-// 			throw (HttpException(HttpCode::BAD_REQUEST));
-// 		}
-// 	}
-// 	if (host_.empty() || port_ == 0)
-// 		throw (HttpException(HttpCode::BAD_REQUEST));
-// }
-
-// void	HttpUri::parseExtAndPathInfo(void)
-// {
-// 	std::string				dotDecodedStr = UriNormalizer::decodeDots(path_);
-// 	std::string::size_type	lastDotPos = dotDecodedStr.find_last_of('.');
-// 	std::string::size_type	extEnd = dotDecodedStr.find_first_of("/", lastDotPos + 1);
-// 	std::string				ext, pathInfo;
-
-// 	if (lastDotPos == std::string::npos)
-// 	{
-// 		ext = "";
-// 		pathInfo = "";
-// 	}
-// 	else if (extEnd == std::string::npos)
-// 	{
-// 		ext = dotDecodedStr.substr(lastDotPos + 1);
-// 		pathInfo = "";
-// 	}
-// 	else
-// 	{
-// 		ext = dotDecodedStr.substr(lastDotPos + 1, extEnd - 1 - lastDotPos);
-// 		pathInfo = dotDecodedStr.substr(extEnd + 1);
-// 	}
-// 	ext_ = ext;
-// 	path_info_ = pathInfo;
-// }
-
-// void	HttpUri::parseAuthority(void)
-// {
-// 	parsePort();
-// 	parseExtAndPathInfo();
-// }
-
-// void	HttpUri::parseUri(std::string const &authorityStart)//? check host
-// {
-// 	bool	has_no_delim = false;
-// 	bool	has_question = false;
-// 	bool	has_pathInfo = false;
-	
-// 	std::string::size_type	authorityEndPos = authorityStart.find_first_of("/?");
-
-// 	if (authorityEndPos == std::string::npos)
-// 	{
-// 		authority_ = initial_uri_;
-// 		path_ = "/";
-// 		hasQuery_ = false;
-// 	}
-// 	else
-// 	{
-// 		authority_ = authorityStart.substr(0, authorityEndPos);
-// 		std::string const	pathStart = authorityStart.substr(authorityEndPos + 1);
-// 		if (authorityStart.at(authorityEndPos) == '?')
-// 		{
-// 			path_ = "/";
-// 			std::string queryString = authorityStart.substr(authorityEndPos + 1);
-// 			parseQueryWithDecodePercent(queryString);
-// 			hasQuery_ = true;
-// 		}
-// 		else
-// 		{
-// 			std::string::size_type	queryStart = pathStart.find('?');
-// 			if (queryStart == std::string::npos)
-// 			{
-// 				path_ = "/" + pathStart;
-// 				hasQuery_ = false;
-// 			}
-// 			else
-// 			{
-// 				path_ = "/" + pathStart.substr(0, queryStart);
-// 				std::string queryString = pathStart.substr(queryStart + 1);
-// 				parseQueryWithDecodePercent(queryString);
-// 				hasQuery_ = true;
-// 			}
-// 		}
-// 	}
-// 	if (authority_.empty() || path_.empty())
-// 		throw (HttpException(HttpCode::BAD_REQUEST));
-// 	parseAuthority();
-// }
-
 std::string	HttpUri::extractHost(std::string const &after_scheme)
 {
 	std::string::size_type	hostEndPos = after_scheme.find_first_of("/?");
@@ -240,8 +136,8 @@ std::string	HttpUri::extractQuery(std::string const &after_host)
 		path = after_host.substr(0, queryStartPos);
 		query = after_host.substr(queryStartPos + 1);
 		query_.hasQuery_ = true;
+		parseQueryWithDecodePercent(query);
 	}
-	parseQueryWithDecodePercent(query);
 	return (path);
 }
 
@@ -272,13 +168,13 @@ std::string	HttpUri::extractPort(std::string const &host)
 	return (hostWoPort);
 }
 
-void	HttpUri::extractCgiInfo(std::string const &path)
+std::string	HttpUri::extractPathAndCgi(std::string const &path)
 {
 	std::string::size_type	scriptEndPos = path.find(".py");//! ONLY PYTHON
 	if (scriptEndPos == std::string::npos)
 	{
 		cgi_.isCgi_ = false;
-		return ;
+		return (path);
 	}
 
 	ft::string									ftpath(path);
@@ -322,13 +218,15 @@ void	HttpUri::extractCgiInfo(std::string const &path)
 	cgi.pathInfo_ = ft::concatSplitVector(pathInfoVec, '/');
 
 	cgi_ = cgi;
+	return (cgi.pathBeforeScript_ + "/" + cgi.scriptName_);
 }
 
-void	HttpUri::parseUri(std::string const &after_scheme)
+void	HttpUri::parseUriAndExtractPath(std::string const &after_scheme)
 {
 	std::string const	pathStart = extractHost(after_scheme);
-	std::string const	pathWoQuery = extractQuery(pathStart);
-	extractCgiInfo(pathWoQuery);
+	std::string const	pathStartWoQuery = extractQuery(pathStart);
+	std::string const	path = extractPathAndCgi(pathStartWoQuery);
+	path_ = path;
 }
 
 void	HttpUri::parseAbsoluteFormUri(void)
@@ -342,14 +240,14 @@ void	HttpUri::parseAbsoluteFormUri(void)
 	std::string::size_type	hostStartPos = initial_uri_.find("://") + 3;
 	std::string	raw_after_scheme = initial_uri_.substr(hostStartPos);
 	std::string	raw_after_scheme_dup_slash_removed = ft::removeConsecutiveDelim(raw_after_scheme, '/');
-	parseUri(raw_after_scheme_dup_slash_removed);
+	parseUriAndExtractPath(raw_after_scheme_dup_slash_removed);
 }
 
 void	HttpUri::parseOriginFormUri(std::string const &hostHeader)
 {
 	std::string	concatinated = hostHeader + initial_uri_;
 	std::string	concatinated_dup_slash_removed = ft::removeConsecutiveDelim(concatinated, '/');
-	parseUri(concatinated_dup_slash_removed);
+	parseUriAndExtractPath(concatinated_dup_slash_removed);
 }
 
 void	HttpUri::updateWithHostHeader(std::string const &hostHeader)

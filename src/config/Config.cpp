@@ -41,7 +41,8 @@ config::Config::Config(int flag)//!this is MOCK!
 
 //location cgi
 		location_s tmp3;
-		tmp3.allowed_methods_.insert("");
+		tmp3.allowed_methods_.insert("GET");
+		tmp3.allowed_methods_.insert("POST");
 		tmp3.is_autoindex_ = false;
 		tmp3.is_cgi_ = true;
 		tmp3.cgi_root_ = "/webserv/cgi-bin";
@@ -118,14 +119,13 @@ std::string	config::Config::getRoot(std::string const &path) const
 	if (path == "/")
 		return (root_);
 
-	location_s const	location = getLocation(path);
-	ft::string	ftpath(path);
-	ftpath.trim('/');
+	ft::string const	ftpath(path);
+	location_s const	loc = getLocation(path);
 
-	if (ftpath == "uploads")
-		return (location.upload_store_);
-	else if (ftpath.end_with_str("py"))
-		return (location.cgi_root_);
+	if (ftpath == "/uploads")
+		return (loc.upload_store_);
+	else if (ftpath.end_with_str(".py"))
+		return (loc.cgi_root_);
 	else
 		return ("");
 }
@@ -155,7 +155,11 @@ std::size_t	config::Config::getKeepAliveTimeout(void) const
 config::Config::location_s	config::Config::getLocation(std::string const &path) const
 {
 	location_s	loc;
-	if (locations_.find(path) == locations_.end())
+	ft::string const	ftpath(path);
+
+	if (ftpath.end_with_str(".py"))
+		loc = locations_.at("py");
+	else if (locations_.find(path) == locations_.end())
 		loc = locations_.at("/");
 	else
 		loc = locations_.at(path);

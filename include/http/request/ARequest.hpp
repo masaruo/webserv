@@ -21,7 +21,6 @@ private:
 	config::Config::location_s	setLocation(void);
 	std::string					setLocalPath(void);
 	void						assertAllowedMethod(void) const;
-	// bool						assertIsDir(std::string const &abs_path) const;
 protected:
 	RequestLine 				getLine(void) const;
 	HttpHeader 					getHeader(void) const;

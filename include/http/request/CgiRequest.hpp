@@ -8,6 +8,7 @@ public:
 	static int	const	READ_FD;
 	static int	const	WRITE_FD;
 	static int	const	CHILD_PID;
+	static int	const	INTERNAL_SERVER_ERROR;
 private:
 	Env	env_;
 	//! add client sock adder? so that can be passed onto env?

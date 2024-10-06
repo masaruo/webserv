@@ -34,11 +34,11 @@ private:
 
 	void		parseAbsoluteFormUri(void);
 	void		parseOriginFormUri(std::string const &host);
-	void		parseUri(std::string const &after_scheme);
+	void		parseUriAndExtractPath(std::string const &after_scheme);
 	std::string	extractHost(std::string const &uri_after_scheme);
 	std::string	extractQuery(std::string const &uri_after_host);
 	std::string	extractPort(std::string const &path_wo_query);
-	void		extractCgiInfo(std::string const &path);
+	std::string	extractPathAndCgi(std::string const &path);
 	void		parseAuthority(void);
 	void		parseExtAndPathInfo(void);
 	void		parseQueryWithDecodePercent(std::string const &query);

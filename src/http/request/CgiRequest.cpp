@@ -49,9 +49,9 @@ CgiRequest &CgiRequest::operator=(CgiRequest const &rhs)
 	return (*this);
 }
 
-static int	assertClose(int fd1)
+static int	assertClose(int fd)
 {
-	int	res = close(fd1);
+	int	res = close(fd);
 	if (res == ft::err)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
@@ -95,7 +95,6 @@ void	CgiRequest::exec_child(int pipefd[2]) const
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
-
 	char	**argv = NULL;
 	try
 	{
@@ -108,23 +107,22 @@ void	CgiRequest::exec_child(int pipefd[2]) const
 
 	//todo move to exec dir?
 	//! relative path
-
 	execve(argv[0], argv, env_.c_env());
-
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
 std::string	CgiRequest::exec_parent(int pipefd[2], int child_pid) const
 {
+	std::string const	&body = getBody().to_string();
 	ssize_t		total_written = 0;
 	std::size_t	remaining = getBody().getSize();
 
 	while (remaining > 0)
 	{
-		ssize_t	bytesWritten = write(pipefd[WRITE_FD], getBody().c_str() + total_written, remaining);
+		ssize_t	bytesWritten = write(pipefd[WRITE_FD], body.c_str() + total_written, remaining);
 		if (bytesWritten == ft::err)
 		{
-			if (errno = EINTR)
+			if (errno == EINTR)
 				continue ;
 			else
 			{
@@ -139,15 +137,25 @@ std::string	CgiRequest::exec_parent(int pipefd[2], int child_pid) const
 	assertClose(pipefd[WRITE_FD]);
 
 	std::string	result = "";
-	result = FileReader::readFdFile(pipefd[READ_FD]);
+	try
+	{
+		result = FileReader::readFdFile(pipefd[READ_FD]);
+	}
+	catch(...)
+	{
+		assertClose(pipefd[READ_FD]);
+		throw;
+	}
+	
 	assertClose(pipefd[READ_FD]);
 
 	int			status = 0;
 	pid_t		pid = 0;
-	int const	NOHANG = 0;
-	while (pid == NOHANG)
+	while (pid == 0)
 	{
 		pid = waitpid(child_pid, &status, WNOHANG);
+		// if (pid == 0)
+			// usleep(10000);
 	}
 	if (WIFEXITED(status))
 	{
@@ -176,6 +184,8 @@ std::string	CgiRequest::execute(void) const
 	child_pid = fork();
 	if (child_pid == ft::err)
 	{
+		close(pipefd[WRITE_FD]);
+		close(pipefd[READ_FD]);
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 	else if (child_pid == CHILD_PID)
@@ -191,12 +201,12 @@ std::string	CgiRequest::execute(void) const
 
 Response	CgiRequest::generateResponse(void) const
 {
-	std::string const	bodyStr = execute();
+	std::string const	resBody = execute();
 
-	if (bodyStr.empty())
+	if (resBody.empty())
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
-	HttpBody	body(bodyStr);
+	HttpBody	body(resBody);
 
 	HttpStatus	status(HttpCode::OK);
 

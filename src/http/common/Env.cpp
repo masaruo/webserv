@@ -71,30 +71,27 @@ void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, std::st
 void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body, std::string const &local_path)
 {
 	HttpUri	const	uri = line.getUri();
+	std::string const	pathInfo = uri.getCgi().pathInfo_;
+	std::string const	pathTranslated = local_path + "/" + pathInfo;
+	std::string const	scriptName = uri.getPath();
 
-	// env["auth_type"] = "";
-	// env["content_length"] = body.getSizeStr();
-	// env["content_type"] = header.getFirstValue("Content-Type");
-	// env["gateway_interface"] = "CGI/1.1";
-	// env["path_info"] = "";//todo fix
-	// env["SERVER_SOFTWARE"] = "test/x.x";
-	// env["SERVER_NAME"] = uri.getHost();
-	// env["GATEWAY_INTERFACE"] = "testCGI/x.x";
-	// env["SERVER_PROTOCOL"] = "testProtocol/x.x";
-	// env["SERVER_PORT"] = uri.getPort();
-	// env["REQUEST_METHOD"] = line.getMethod();
-	// env["PATH_INFO"] = line.getUri().getPath();
-	// env["PATH_TRANSLATED"] = "???";//?
-	// env["SCRIPT_NAME"] = "echo.cgi";//!
-	// env["QUERY_STRING"] = uri.getQueryString();
-	// env["REMOTE_HOST"] = "REMOTE_ADDR";
-	// env["REMOTE_ADDR"] = "???.???.???.???";//?
-	// env["AUTH_TYPE"] = "TEST";//?
-	// // env["REMOTE_USER"] = "Is it necessary?";//?
-	// // env["REMOTE_IDENT"] = "Is it necessary?";//?
-	// env["CONTENT_TYPE"] = header.getFirstValue("Content-Type");
-	// env["CONTENT_LENGTH"] = header.getFirstValue("Content-Length");
-	// return (env);
+	addEnvItem("auth_type", "");
+	addEnvItem("content_length", body.getSizeStr());
+	addEnvItem("content_type", header.getFirstValue("content-type"));
+	addEnvItem("gateway_interface", "CGI/1.1");
+	addEnvItem("path_info", pathInfo);
+	addEnvItem("path_translated", pathTranslated);
+	addEnvItem("query_string", "");
+	addEnvItem("remote_addr", "");//!Must todo
+	addEnvItem("remote_host", "");
+	addEnvItem("remote_ident", "");
+	addEnvItem("remote_user", "");
+	addEnvItem("request_method", line.getMethod());
+	addEnvItem("script_name", scriptName);
+	addEnvItem("server_name", uri.getHost());
+	addEnvItem("server_port", uri.getPortStr());
+	addEnvItem("server_protocol", "HTTP/1.1");
+	addEnvItem("server_software", "webserv");
 }
 
 ft::str_map	Env::getEnviron(void) const

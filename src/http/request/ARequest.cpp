@@ -87,7 +87,7 @@ void	ARequest::assertRedirection(void) const
 	// std::string error_code_str = loc.getValue("return").at(0);
 	// std::string	redirect_path = loc.getValue("return").at(1);
 
-	throw (HttpRedirection(HttpCode::MOVED_PERMANENTLY, config));
+	// throw (HttpRedirection(HttpCode::MOVED_PERMANENTLY, config));
 }
 
 void	ARequest::assertAllowedMethod(void) const

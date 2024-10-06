@@ -12,5 +12,5 @@ public:
 	PostRequest(PostRequest const &rhs);
 	PostRequest &operator=(PostRequest const &rhs);
 	~PostRequest();
-	Response	createResponse(void) const;
+	Response	generateResponse(void) const;
 };

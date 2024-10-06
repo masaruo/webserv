@@ -1,7 +1,7 @@
 #include "RequestFactory.hpp"
 #include "ARequest.hpp"
 #include "GetRequest.hpp"
-// #include "PostRequest.hpp"
+#include "PostRequest.hpp"
 #include "DeleteRequest.hpp"
 #include "CgiRequest.hpp"
 #include "string.hpp"
@@ -42,7 +42,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 		HttpBody body(bodyStream, header);
 		if (method == "POST")
 		{
-			; //todo POST Request
+			return (new PostRequest(requestLine, header, body, config));
 		}
 		else
 			return (new PutRequest(requestLine, header, body, config));

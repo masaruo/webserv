@@ -48,6 +48,7 @@ config::Config::Config(int flag)//!this is MOCK!
 		tmp3.cgi_root_ = "/webserv/cgi-bin";
 		tmp3.upload_store_ = "";
 		locations_.insert(std::make_pair("py", tmp3));
+
 	}
 	else
 	{

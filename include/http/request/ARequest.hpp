@@ -20,6 +20,7 @@ private:
 	ARequest();//=delete:
 	config::Config::location_s	setLocation(void);
 	std::string					setLocalPath(void);
+	void						assertRedirection(void) const;
 	void						assertAllowedMethod(void) const;
 protected:
 	RequestLine 				getLine(void) const;

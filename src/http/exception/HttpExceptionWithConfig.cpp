@@ -29,10 +29,10 @@ HttpBody	HttpExceptionWithConfig::generateBody(std::string const &path) const
 	return (resBody);
 }
 
-// static HttpHeader	generateHeader(std::size_t body_length)
-// {
-// 	//todo
-// }
+config::Config	HttpExceptionWithConfig::getConfig(void) const
+{
+	return (config_);
+}
 
 Response	HttpExceptionWithConfig::generateResponse(void) const
 {

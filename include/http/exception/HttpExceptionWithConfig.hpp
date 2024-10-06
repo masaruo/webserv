@@ -11,10 +11,11 @@ private:
 
 	//helpder func
 	HttpBody	generateBody(std::string const &path) const;
-	// void		updateHeader(HttpHeader &header) const;
+protected:
+	config::Config	getConfig(void) const;
 public:
 	explicit HttpExceptionWithConfig(HttpCode::code_e error_code, config::Config const &config);
-	~HttpExceptionWithConfig() throw();
+	virtual ~HttpExceptionWithConfig() throw();
 	HttpExceptionWithConfig(HttpExceptionWithConfig const &rhs);
-	Response generateResponse(void) const;
+	virtual Response	generateResponse(void) const;
 };

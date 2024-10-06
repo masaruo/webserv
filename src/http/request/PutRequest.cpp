@@ -65,7 +65,7 @@ Response	PutRequest::generateResponse(void) const
 	uploadFile();
 
 	HttpHeader	header;
-	header.setHeader("content-length", "0");
+	header.setElem("content-length", "0");
 	// header.setHeader("connection", "keep-alive");
 
 	HttpStatus	status(HttpCode::OK);

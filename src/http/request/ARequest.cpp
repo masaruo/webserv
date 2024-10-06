@@ -1,6 +1,7 @@
 #include "ARequest.hpp"
 #include "string.hpp"
 #include "HttpExceptionWithConfig.hpp"
+#include "HttpRedirection.hpp"
 #include <sys/stat.h>
 #include <sstream>
 #include <unistd.h>// for access
@@ -76,6 +77,17 @@ std::string	ARequest::setLocalPath(void)
 	std::string const	root = config_.getRoot(path);
 	std::string localAbsPath = root + path;
 	return (localAbsPath);
+}
+
+void	ARequest::assertRedirection(void) const
+{
+	std::string const	path = getLine().getUri().getPath();
+
+	// config::Config::location_s const	loc = config_.getLocation(path);
+	// std::string error_code_str = loc.getValue("return").at(0);
+	// std::string	redirect_path = loc.getValue("return").at(1);
+
+	// throw (HttpRedirection(HttpCode::MOVED_PERMANENTLY, config));
 }
 
 void	ARequest::assertAllowedMethod(void) const

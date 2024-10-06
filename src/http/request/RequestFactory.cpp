@@ -20,7 +20,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
 
-	std::string	host_value = header.getFirstValue("host");
+	std::string	host_value = header.getValueAtFirst("host");
 
 	config::Config	config = config_factory.getConfig(host_value);
 
@@ -33,7 +33,9 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 		return (new GetRequest(requestLine, header, config));
 	}
 	else if (method == "DELETE")
+	{
 		return (new DeleteRequest(requestLine, header, config));
+	}
 	else if (method == "POST" || method == "PUT")
 	{
 		std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);

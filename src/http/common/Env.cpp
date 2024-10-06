@@ -51,7 +51,7 @@ void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, std::st
 
 	addEnvItem("auth_type", "");
 	addEnvItem("content_length", "0");
-	addEnvItem("content_type", header.getFirstValue("content-type"));
+	addEnvItem("content_type", header.getValueAtFirst("content-type"));
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);
 	addEnvItem("path_translated", pathTranslated);
@@ -77,7 +77,7 @@ void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, HttpBod
 
 	addEnvItem("auth_type", "");
 	addEnvItem("content_length", body.getSizeStr());
-	addEnvItem("content_type", header.getFirstValue("content-type"));
+	addEnvItem("content_type", header.getValueAtFirst("content-type"));
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);
 	addEnvItem("path_translated", pathTranslated);

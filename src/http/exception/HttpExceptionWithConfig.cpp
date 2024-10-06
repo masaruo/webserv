@@ -29,10 +29,10 @@ HttpBody	HttpExceptionWithConfig::generateBody(std::string const &path) const
 	return (resBody);
 }
 
-// static HttpHeader	generateHeader(std::size_t body_length)
-// {
-// 	//todo
-// }
+config::Config	HttpExceptionWithConfig::getConfig(void) const
+{
+	return (config_);
+}
 
 Response	HttpExceptionWithConfig::generateResponse(void) const
 {
@@ -48,8 +48,8 @@ Response	HttpExceptionWithConfig::generateResponse(void) const
 		std::string	absErrPath = config_.getRoot() + "/" + errorPath;
 		body = generateBody(absErrPath);
 		hasBody = true;
-		header.setHeader("content-type", "text/html");
-		header.setHeader("content-length", body.getSizeStr());
+		header.setElem("content-type", "text/html");
+		header.setElem("content-length", body.getSizeStr());
 	}
 
 	//todo send date

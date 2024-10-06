@@ -368,20 +368,6 @@ void	ft::string::to_upper(void)
 	}
 }
 
-ft::bytes_vec	ft::string::to_binary(void) const
-{
-	const_iterator	iter = base_.begin();
-	const_iterator	end = base_.end();
-	ft::bytes_vec	binary;
-
-	while (iter != end)
-	{
-		binary.push_back(static_cast<u_int8_t>(*iter));
-		iter++;
-	}
-	return (binary);
-}
-
 ft::string::string_vector	ft::string::split(std::string const &delims) const
 {
 	string_vector	split_v;

@@ -20,6 +20,7 @@ public:
 		std::string				cgi_root_;
 		std::string				upload_store_;
 	};
+	//! todo implement map str
 private:
 	std::string								server_name_;
 	std::size_t								port_;

@@ -112,7 +112,6 @@ public:
 	void		trim(char target);
 	void		to_lower(void);
 	void		to_upper(void);
-	ft::bytes_vec	to_binary(void) const;
 	string_vector	split(std::string const &to_split) const;
 };
 

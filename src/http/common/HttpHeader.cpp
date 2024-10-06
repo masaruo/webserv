@@ -11,13 +11,13 @@ void	HttpHeader::assertSemanticValue(void) const
 {
 	bool	is_invalid = false;
 
-	if (!hasHeader("host"))
+	if (!hasElem("host"))
 		is_invalid = true;
-	if (hasHeader("content-length"))
+	if (hasElem("content-length"))
 	{
 		try
 		{
-			ft::stonum<std::size_t>(getFirstValue("content-length"));
+			ft::stonum<std::size_t>(getValueAtFirst("content-length"));
 		}
 		catch(const std::invalid_argument& e)
 		{
@@ -31,7 +31,7 @@ void	HttpHeader::assertSemanticValue(void) const
 	//transfer-encoding
 }
 
-void	HttpHeader::setupHeaderWithNoDuplication(void)
+void	HttpHeader::setupNoDupHeaderSet(void)
 {
 	noDupHeaderSet_.insert("host");
 	noDupHeaderSet_.insert("content-type");
@@ -45,14 +45,14 @@ void	HttpHeader::setupHeaderWithNoDuplication(void)
 }
 
 HttpHeader::HttpHeader()
-:headers_()
+:svm::StrVecMap()
 {
 	if (!noDupHeaderSet_.empty())
-		setupHeaderWithNoDuplication();
+		setupNoDupHeaderSet();
 	return ;
 }
 
-static void	assetHeaderLine(std::string const &line)
+static void	asserttHeaderLine(std::string const &line)
 {
 	ft::string	ftline(line);
 	bool		is_invalid = false;
@@ -115,6 +115,7 @@ static void	assetHeaderValue(std::string const &a_value)
 }
 
 HttpHeader::HttpHeader(std::istringstream &iss)
+:svm::StrVecMap()
 {
 	std::string	line;
 	while (true)
@@ -122,10 +123,10 @@ HttpHeader::HttpHeader(std::istringstream &iss)
 		std::getline(iss, line);
 		if (line == ft::string::CR)//!ヘッダーの最後（CRLFCRLF）だが、LFはGETLINEで削除される＝single CR
 			break ;
-		assetHeaderLine(line);
+		asserttHeaderLine(line);
 		ft::string ftline = line;
 		ftline.trim(ft::string::CR);
-		setHeader(ftline.str());
+		setElem(ftline.str());
 	}
 	assertSemanticValue();
 }
@@ -136,7 +137,7 @@ HttpHeader::~HttpHeader()
 }
 
 HttpHeader::HttpHeader(HttpHeader const &rhs)
-:headers_(rhs.headers_)
+:svm::StrVecMap(rhs)
 {
 	return ;
 }
@@ -145,32 +146,36 @@ HttpHeader &HttpHeader::operator=(HttpHeader const &rhs)
 {
 	if (this != &rhs)
 	{
-		headers_ = rhs.headers_;
+		svm::StrVecMap::operator = (rhs);
 	}
 	return (*this);
 }
 
-void	HttpHeader::setHeader(std::string const &line)
+void	HttpHeader::setElem(std::string const &line)
 {
-	ft::string	name, values;
+	ft::string	key, values;
 	std::string::size_type loc = line.find(':');
 
-	name = line.substr(0, loc);
-	assertDupHeaderName(name);
+	key = line.substr(0, loc);
+	assertDupHeaderName(key);
 
 	values = line.substr(loc + 1);
 	assertHeaderValueLine(values);
-	values.trim(ft::string::WS);
 
-	setHeader(name.str(), values.str());
-}
+	ft::string::string_vector					split_by_comma = values.split(",");
+	ft::string::string_vector_const_iterator	iter = split_by_comma.begin();
+	ft::string::string_vector_const_iterator	end = split_by_comma.end();
 
-bool	HttpHeader::hasHeader(std::string const &key) const
-{
-	if (headers_.find(key) == headers_.end())
-		return (false);
-	else
-		return (true);
+	while (iter != end)
+	{
+		if (!iter->empty())
+		{
+			ft::string	value = *iter;
+			value.trim(ft::string::WS);
+			setElem(key, value);
+		}
+		iter++;
+	}
 }
 
 void	HttpHeader::assertDupHeaderName(std::string const &name) const
@@ -182,46 +187,25 @@ void	HttpHeader::assertDupHeaderName(std::string const &name) const
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
-void	HttpHeader::setHeader(std::string const &name, std::string const &value)
+void	HttpHeader::setElem(std::string const &name, std::string const &value)
 {
 	ft::string	ftname(name), ftvalue(value);
 
 	ftname.to_lower();
 
-	if (hasHeader(ftname.str()))
+	if (hasElem(ftname.str()))
 		assertDupHeaderName(ftname.str());
-	if (headers_.size() > MAX_HEADERS)
+	if (data().size() > MAX_HEADERS)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
-	headers_[ftname].push_back(ftvalue);
-}
-
-std::string	HttpHeader::getFirstValue(std::string const &key) const
-{
-	if (hasHeader(key))
-		return (headers_.at(key).front());
-	else
-		return ("");
-}
-
-std::string	HttpHeader::getLastValue(std::string const &key) const
-{
-	if (hasHeader(key))
-		return (headers_.at(key).back());
-	else
-		return ("");
-}
-
-ft::str_vec	HttpHeader::getValues(std::string const &key) const
-{
-	return (headers_.at(key));
+	StrVecMap::setElem(name, value);
 }
 
 std::size_t	HttpHeader::getContentLen(void) const
 {
 	try
 	{
-		std::size_t	res = ft::stonum<std::size_t>(getFirstValue("content-length"));
+		std::size_t	res = ft::stonum<std::size_t>(getValueAtFirst("content-length"));
 		return (res);
 	}
 	catch(const std::invalid_argument& e)
@@ -230,30 +214,29 @@ std::size_t	HttpHeader::getContentLen(void) const
 	}
 }
 
-HttpHeader::map_vec_t	HttpHeader::data(void) const
-{
-	return (headers_);
-}
-
 std::string 	HttpHeader::to_string(void) const
 {
-	const_iterator		iter = headers_.begin();
-	const_iterator		end = headers_.end();
-	std::ostringstream	oss;
+	svm::StrVecMap::const_iterator	iter = data().begin();
+	svm::StrVecMap::const_iterator	end = data().end();
+	std::stringstream	ss;
 
 	while (iter != end)
 	{
-		oss << iter->first << ":";
+		ss << iter->first;
+		ss << ":";
 
-		ft::str_vec::const_iterator it = iter->second.begin();
-		ft::str_vec::const_iterator end = iter->second.end();
-		while (it != end)
+		ft::str_vec	value = iter->second;
+		ft::str_vec::const_iterator	vec_iter = value.begin();
+		ft::str_vec::const_iterator vec_end = value.end();
+		while (vec_iter != vec_end)
 		{
-			oss << *it;
-			it++;
+			ss << *vec_iter;
+			if (vec_iter + 1 != vec_end)
+				ss << ",";
+			vec_iter++;
 		}
-		oss << ft::string::CR << ft::string::LF;
+		ss << ft::string::CR << ft::string::LF;
 		iter++;
 	}
-	return (oss.str());
+	return (ss.str());
 }

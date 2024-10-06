@@ -47,8 +47,8 @@ Response	GetRequest::generateResponse(void) const
 		HttpBody	body(FileReader::readTextFile(absPath));
 
 		HttpHeader	header;
-		header.setHeader("content-type", "text/html");
-		header.setHeader("content-length", body.getSizeStr());
+		header.setElem("content-type", "text/html");
+		header.setElem("content-length", body.getSizeStr());
 
 		HttpStatus	status(HttpCode::OK);
 

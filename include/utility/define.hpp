@@ -33,13 +33,6 @@ namespace ft
 	typedef str_map::size_type					str_map_size_type;
 	typedef str_map::difference_type			str_map_diff_type;
 
-//! vec_for_bin_data
-	typedef std::vector<uint8_t>		bytes_vec;
-	typedef bytes_vec::iterator			bytes_vec_iter;
-	typedef bytes_vec::const_iterator	bytes_vec_const_iter;
-	typedef bytes_vec::size_type		bytes_vec_size_type;
-	typedef bytes_vec::difference_type	bytes_vec_diff_type;
-
 	template <typename T>
 	T stonum(std::string const &str)
 	{

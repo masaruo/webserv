@@ -1,5 +1,6 @@
 #include "PostRequest.hpp"
 #include "Response.hpp"
+#include "CgiRequest.hpp"
 
 PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
@@ -29,5 +30,9 @@ PostRequest &PostRequest::operator=(PostRequest const &rhs)
 
 Response	PostRequest::createResponse(void) const
 {
-	
+	HttpUri const	uri = getLine().getUri();
+
+	CgiRequest	cgi(getLine(), getHeader(), getBody(), getConfig());
+	Response	r(cgi.generateResponse());
+	return (r);
 }

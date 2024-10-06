@@ -69,31 +69,12 @@ config::Config::location_s	ARequest::setLocation(void)
 	return (loc);
 }
 
-// bool	ARequest::assertIsDir(std::string const &absolute_path) const
-// {
-// 	struct stat	filestat;
-// 	if (stat(absolute_path.c_str(), &filestat) == ft::err)
-// 	{
-// 		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, config_));
-// 	}
-// 	bool	isDir;
-// 	isDir = S_ISDIR(filestat.st_mode);
-// 	return (isDir);
-// }
-
 std::string	ARequest::setLocalPath(void)
 {
-	std::string const	path = getLine().getUri().getPath();
+	HttpUri const		uri = getLine().getUri();
+	std::string const	path = uri.getPath();
 	std::string const	root = config_.getRoot(path);
 	std::string localAbsPath = root + path;
-
-	// if (checkIsDir(localAbsPath))
-	// {
-	// 	std::string	fileName;
-	// 	fileName =  config_.getIndex(path);
-	// 	localAbsPath += "/" + fileName;
-	// }
-	// assertIsDir(localAbsPath);
 	return (localAbsPath);
 }
 

@@ -1,6 +1,7 @@
 #include "StrVecMap.hpp"
 #include "string.hpp"
 #include <limits>
+#include <algorithm>
 
 svm::StrVecMap::StrVecMap()
 {
@@ -18,7 +19,7 @@ svm::StrVecMap::StrVecMap(StrVecMap const &rhs)
 	return ;
 }
 
-svm::StrVecMap svm::StrVecMap::operator=(StrVecMap const &rhs)
+svm::StrVecMap &svm::StrVecMap::operator=(StrVecMap const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -31,11 +32,7 @@ void	svm::StrVecMap::setElem(std::string const &key, std::string const &value)
 {
 	ft::string	ftKey(key);
 	ftKey.to_lower();
-
-	if (hasElem(ftKey))
-		data_[ftKey].push_back(value);
-	else
-		data_.insert(std::make_pair(ftKey, value));
+	data_[ftKey].push_back(value);
 }
 
 void	svm::StrVecMap::setElem(std::string const &line)
@@ -98,16 +95,16 @@ std::size_t	svm::StrVecMap::getIndex(std::string const &key, std::string const &
 	if (strVec.empty())
 		return (index);
 
-	while (iter != end)
+	iter = std::find(strVec.begin(), end, value);
+
+	if (iter != end)
 	{
-		if (*iter == value)
-			index = std::distance(strVec.begin(), iter);
-		iter++;
+		index = std::distance(strVec.begin(), iter);
 	}
 	return (index);
 }
 
-svm::StrVecMap::map_vec_t	svm::StrVecMap::data(void) const
+svm::StrVecMap::map_vec_t const	&svm::StrVecMap::data(void) const
 {
 	return (data_);
 }
@@ -132,7 +129,6 @@ bool	svm::StrVecMap::hasValue(std::string const &key, std::string const &value) 
 	else
 		return (true);
 }
-
 
 svm::StrVecMap::StrVecMapException::StrVecMapException(std::string const &msg)
 :std::runtime_error(msg)

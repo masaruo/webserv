@@ -78,12 +78,12 @@ HttpBody	Response::getBody(void) const
 
 std::string	Response::to_string(void) const
 {
-	std::ostringstream	oss;
+	std::stringstream	ss;
 
-	oss << status_.to_string();
-	oss << header_.to_string();
-	oss << ft::string::CR +ft::string::LF;
+	ss << status_.to_string();
+	ss << header_.to_string();
+	ss << ft::string::CR +ft::string::LF;
 	if (has_body_)
-		oss << body_.to_string();
-	return (oss.str());
+		ss << body_.to_string();
+	return (ss.str());
 }

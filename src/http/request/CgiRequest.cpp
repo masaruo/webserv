@@ -225,8 +225,8 @@ Response	CgiRequest::generateResponse(void) const
 	HttpStatus	status(HttpCode::OK);
 
 	HttpHeader	header;
-	header.setHeader("content-type", "text/html");
-	header.setHeader("content-length", body.getSizeStr());
+	header.setElem("content-type", "text/html");
+	header.setElem("content-length", body.getSizeStr());
 
 	Response	r(status, header, body);
 	return (r);

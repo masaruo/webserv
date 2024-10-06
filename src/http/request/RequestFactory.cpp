@@ -20,7 +20,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
 
-	std::string	host_value = header.getFirstValue("host");
+	std::string	host_value = header.getValueAtFirst("host");
 
 	config::Config	config = config_factory.getConfig(host_value);
 

@@ -48,8 +48,8 @@ Response	HttpExceptionWithConfig::generateResponse(void) const
 		std::string	absErrPath = config_.getRoot() + "/" + errorPath;
 		body = generateBody(absErrPath);
 		hasBody = true;
-		header.setHeader("content-type", "text/html");
-		header.setHeader("content-length", body.getSizeStr());
+		header.setElem("content-type", "text/html");
+		header.setElem("content-length", body.getSizeStr());
 	}
 
 	//todo send date

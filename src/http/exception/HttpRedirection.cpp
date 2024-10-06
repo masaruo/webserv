@@ -8,7 +8,7 @@ HttpRedirection::HttpRedirection(HttpCode::code_e error_code, std::string const 
 	return ;
 }
 
-HttpRedirection::~HttpRedirection()
+HttpRedirection::~HttpRedirection() throw()
 {
 	return ;
 }
@@ -24,11 +24,10 @@ Response	HttpRedirection::generateResponse(void) const
 {
 	HttpCode::code_e	error_code = getErrorCode();
 	HttpStatus const	status(error_code);
-	HttpHeader			header;
 
 	HttpHeader	header;
-	header.setHeader("content-length", "0");
-	header.setHeader("location", location_);
+	header.setElem("content-length", "0");
+	header.setElem("location", location_);
 
 	Response	r(status, header);
 	return (r);

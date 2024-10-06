@@ -19,18 +19,18 @@ public:
 private:
 	map_vec_t	data_;
 protected:
-	void			setElem(std::string const &key, std::string const &value);
-	virtual void	setElem(std::string const &line);
+	virtual void		setElem(std::string const &line);
 public:
 	StrVecMap();
 	virtual ~StrVecMap();
 	StrVecMap(StrVecMap const &rhs);
 	StrVecMap &operator=(StrVecMap const &rhs);
+	virtual void		setElem(std::string const &key, std::string const &value);
 	ft::str_vec			getValue(std::string const &key) const;
 	std::string			getValueAtFirst(std::string const &key) const;
 	std::string			getValueAtLast(std::string const &key) const;
 	std::size_t			getIndex(std::string const &key, std::string const &value) const;
-	map_vec_t			data(void) const;
+	map_vec_t const		&data(void) const;
 	bool				hasElem(std::string const &key) const;
 	bool				hasValue(std::string const &key, std::string const &value) const;
 

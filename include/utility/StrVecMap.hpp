@@ -26,7 +26,7 @@ public:
 	StrVecMap(StrVecMap const &rhs);
 	StrVecMap &operator=(StrVecMap const &rhs);
 	virtual void		setElem(std::string const &key, std::string const &value);
-	ft::str_vec			getValue(std::string const &key) const;
+	ft::str_vec			getValueVector(std::string const &key) const;
 	std::string			getValueAtFirst(std::string const &key) const;
 	std::string			getValueAtLast(std::string const &key) const;
 	std::size_t			getIndex(std::string const &key, std::string const &value) const;

@@ -227,6 +227,7 @@ Response	CgiRequest::generateResponse(void) const
 	HttpHeader	header;
 	header.setElem("content-type", "text/html");
 	header.setElem("content-length", body.getSizeStr());
+	header.setElem("Connection", "close");
 
 	Response	r(status, header, body);
 	return (r);

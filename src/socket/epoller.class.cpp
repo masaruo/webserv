@@ -17,7 +17,6 @@
 #include "define.hpp"
 #include <sys/epoll.h>
 #include <unistd.h>
-// #include <iostream>
 
 Epoller::Epoller(int size, int timeout, std::string const &config_path)
 :epfd_(epoll_create(size))

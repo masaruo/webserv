@@ -83,6 +83,7 @@ Response	GetRequest::generateResponse(void) const
 		HttpHeader	header;
 		header.setElem("content-type", "text/html");
 		header.setElem("content-length", body.getSizeStr());
+		header.setElem("Connection", "close");
 
 		HttpStatus	status(HttpCode::OK);
 

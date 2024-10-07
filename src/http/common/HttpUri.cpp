@@ -2,6 +2,7 @@
 #include "HttpException.hpp"
 #include "string.hpp"
 #include "UriNormalizer.hpp"
+#include "HttpRedirection.hpp"
 #include <sstream>
 
 HttpUri::Cgi_s::Cgi_s()
@@ -226,6 +227,7 @@ void	HttpUri::parseUriAndExtractPath(std::string const &after_scheme)
 	std::string const	pathStart = extractHost(after_scheme);
 	std::string const	pathStartWoQuery = extractQuery(pathStart);
 	std::string const	path = extractPathAndCgi(pathStartWoQuery);
+	
 	path_ = path;
 }
 

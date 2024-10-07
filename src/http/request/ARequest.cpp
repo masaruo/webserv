@@ -15,6 +15,7 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 ,local_path_(setLocalPath())
 {
 	assertAllowedMethod();
+	assertRedirection();
 	return ;
 }
 
@@ -27,6 +28,7 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody c
 ,local_path_(setLocalPath())
 {
 	assertAllowedMethod();
+	assertRedirection();
 	return ;
 }
 
@@ -82,12 +84,16 @@ std::string	ARequest::setLocalPath(void)
 void	ARequest::assertRedirection(void) const
 {
 	std::string const	path = getLine().getUri().getPath();
+	config::Config::location_s const	loc = config_.getLocation(path);
+	if (!loc.is_redirect_)
+		return ;
 
-	// config::Config::location_s const	loc = config_.getLocation(path);
-	// std::string error_code_str = loc.getValue("return").at(0);
-	// std::string	redirect_path = loc.getValue("return").at(1);
-
-	// throw (HttpRedirection(HttpCode::MOVED_PERMANENTLY, config));
+	
+	// std::string	error_code_str = loc.return_code_;//! only moved permanently 301
+	
+	std::string	redirectPath = loc.return_path_;
+	
+	throw (HttpRedirection(HttpCode::MOVED_PERMANENTLY, redirectPath));
 }
 
 void	ARequest::assertAllowedMethod(void) const

@@ -19,6 +19,9 @@ public:
 		bool					is_cgi_;
 		std::string				cgi_root_;
 		std::string				upload_store_;
+		bool					is_redirect_;
+		std::string				return_code_;
+		std::string				return_path_;
 	};
 	//! todo implement map str
 private:

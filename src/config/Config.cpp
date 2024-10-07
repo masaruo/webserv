@@ -49,28 +49,17 @@ config::Config::Config(int flag)//!this is MOCK!
 		tmp3.upload_store_ = "";
 		locations_.insert(std::make_pair("py", tmp3));
 
-	}
-	else
-	{
-		server_name_ = "example.com";
-		port_ = 7777;
-		root_ = "/webserv/www/example";
-		max_body_size_ = 5000000;
-		error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
-		error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
+//location redirect
+		location_s tmp4;
+		tmp4.allowed_methods_.insert("GET");
+		tmp4.allowed_methods_.insert("PUT");
+		tmp4.allowed_methods_.insert("POST");
+		tmp4.allowed_methods_.insert("DELETE");
+		tmp4.is_redirect_ = true;
+		tmp4.return_code_ = "301";//! only implement moved permanently
+		locations_.insert(std::make_pair("/redirect", tmp4));
 
-//location /
-		location_s tmp;
-		tmp.index_ = "index.html";
-		tmp.allowed_methods_.insert("GET");
-		tmp.is_autoindex_ = true;
-		tmp.is_cgi_ = false;
-		tmp.cgi_root_ = "";
-		tmp.upload_store_ = "";
-		locations_.insert(std::make_pair("/", tmp));
+
 	}
 }
 

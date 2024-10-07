@@ -55,7 +55,7 @@ void	svm::StrVecMap::setElem(std::string const &line)
 	}
 }
 
-ft::str_vec	svm::StrVecMap::getValue(std::string const &key) const
+ft::str_vec	svm::StrVecMap::getValueVector(std::string const &key) const
 {
 	ft::str_vec strVec;
 
@@ -67,7 +67,7 @@ ft::str_vec	svm::StrVecMap::getValue(std::string const &key) const
 
 std::string	svm::StrVecMap::getValueAtFirst(std::string const &key) const
 {
-	ft::str_vec strVec = getValue(key);
+	ft::str_vec strVec = getValueVector(key);
 
 	if (strVec.empty())
 		return ("");
@@ -77,7 +77,7 @@ std::string	svm::StrVecMap::getValueAtFirst(std::string const &key) const
 
 std::string	svm::StrVecMap::getValueAtLast(std::string const &key) const
 {
-	ft::str_vec strVec = getValue(key);
+	ft::str_vec strVec = getValueVector(key);
 
 	if (strVec.empty())
 		return ("");
@@ -87,7 +87,7 @@ std::string	svm::StrVecMap::getValueAtLast(std::string const &key) const
 
 std::size_t	svm::StrVecMap::getIndex(std::string const &key, std::string const &value) const
 {
-	ft::str_vec const	strVec = getValue(key);
+	ft::str_vec const	strVec = getValueVector(key);
 	ft::str_vec::const_iterator	iter = strVec.begin();
 	ft::str_vec::const_iterator	end = strVec.end();
 	ft::str_vec::size_type		index = std::numeric_limits<std::size_t>::max();

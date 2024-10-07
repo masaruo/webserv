@@ -350,14 +350,14 @@ std::string	HttpUri::getQueryValue(std::string const &key) const
 
 std::string	HttpUri::getRawQueryString(void) const
 {
-	ft::str_map_const_iter	iter = query_.QueryMap_.begin();
-	ft::str_map_const_iter	end = query_.QueryMap_.end();
+	ft::str_map::const_iterator iter = query_.QueryMap_.begin();
+	ft::str_map::const_iterator	end = query_.QueryMap_.end();
 	std::ostringstream	oss;
 
 	while (iter != end)
 	{
 		oss << iter->first << "=" << iter->second;
-		ft::str_map_const_iter	next = iter;
+		ft::str_map::const_iterator	next = iter;
 		std::advance(next, 1);
 		if (next != end)
 		{

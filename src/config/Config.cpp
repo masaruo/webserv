@@ -32,9 +32,10 @@ config::Config::Config(int flag)//!this is MOCK!
 		location_s tmp2;
 		tmp2.allowed_methods_.insert("PUT");
 		tmp2.allowed_methods_.insert("DELETE");
-		tmp2.is_autoindex_ = false;
+		tmp2.allowed_methods_.insert("GET");
 		tmp2.is_cgi_ = false;
 		tmp2.cgi_root_ = "";
+		tmp2.is_autoindex_ = true;
 		tmp2.upload_store_ = "/webserv/www/uploads";
 		// locations_.insert(std::make_pair("/uploads", tmp));
 		locations_.insert(std::make_pair("/uploads", tmp2));//! no / at first
@@ -58,8 +59,6 @@ config::Config::Config(int flag)//!this is MOCK!
 		tmp4.is_redirect_ = true;
 		tmp4.return_code_ = "301";//! only implement moved permanently
 		locations_.insert(std::make_pair("/redirect", tmp4));
-
-
 	}
 }
 

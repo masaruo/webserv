@@ -21,17 +21,9 @@ namespace ft
 
 //! str_vec
 	typedef std::vector<std::string>	str_vec;
-	typedef str_vec::iterator			str_vec_iter;
-	typedef str_vec::const_iterator		str_vec_const_iter;
-	typedef str_vec::size_type			str_vec_size_type;
-	typedef str_vec::difference_type	str_vec_diff_type;
 
 //! str_map
 	typedef std::map<std::string, std::string>	str_map;
-	typedef str_map::iterator					str_map_iter;
-	typedef str_map::const_iterator				str_map_const_iter;
-	typedef str_map::size_type					str_map_size_type;
-	typedef str_map::difference_type			str_map_diff_type;
 
 	template <typename T>
 	T stonum(std::string const &str)

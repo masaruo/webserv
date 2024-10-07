@@ -66,7 +66,7 @@ Response	PutRequest::generateResponse(void) const
 
 	HttpHeader	header;
 	header.setElem("content-length", "0");
-	// header.setHeader("connection", "keep-alive");
+	header.setElem("Connection", "close");
 
 	HttpStatus	status(HttpCode::OK);
 

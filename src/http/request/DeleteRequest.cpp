@@ -51,7 +51,7 @@ Response	DeleteRequest::generateResponse(void) const
 
 	HttpHeader	header;
 	header.setElem("content-length", "0");
-	// header.setHeader("connection", "keep-alive");
+	header.setElem("connection", "close");
 
 	HttpStatus	status(HttpCode::NO_CONTENT);
 

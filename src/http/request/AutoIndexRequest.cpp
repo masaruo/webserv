@@ -71,6 +71,7 @@ Response	AutoIndexRequest::generateResponse(void) const
 	HttpHeader header;
 	header.setElem("Content-Type", "text/plain");
 	header.setElem("Content-Length", body.getSizeStr());
+	header.setElem("Connection", "close");
 
 	Response	r(status, header, body);
 	return (r);

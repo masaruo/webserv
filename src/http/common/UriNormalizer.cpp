@@ -6,7 +6,7 @@
 #include <sstream>
 
 static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim);
-static char			decodeHex(std::string const &str);
+// static char			decodeHex(std::string const &str);
 
 std::string	UriNormalizer::uniformSlashAndHandleDots(std::string const &raw)
 {
@@ -70,17 +70,17 @@ std::string	UriNormalizer::decodeDots(std::string const &raw)
 	return (res);
 }
 
-static char	decodeHex(std::string const &str)
-{
-	std::istringstream	iss(str.substr(1));
-	int	value;
-	iss >> std::hex >> value;
-	if (iss.fail())
-	{
-		throw (HttpException(HttpCode::BAD_REQUEST));
-	}
-	return (static_cast<char>(value));
-}
+// static char	decodeHex(std::string const &str)
+// {
+// 	std::istringstream	iss(str.substr(1));
+// 	int	value;
+// 	iss >> std::hex >> value;
+// 	if (iss.fail())
+// 	{
+// 		throw (HttpException(HttpCode::BAD_REQUEST));
+// 	}
+// 	return (static_cast<char>(value));
+// }
 
 std::string	UriNormalizer::decodePercent(std::string const &raw)
 {

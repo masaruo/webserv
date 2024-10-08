@@ -11,13 +11,13 @@ namespace ft
 	int const	eof = 0;
 	int const	err = -1;
 
-	typedef enum 
-	{
-		GET,
-		POST,
-		DELETE,
-		ERROR
-	}	http_method_t;
+	// typedef enum 
+	// {
+	// 	GET,
+	// 	POST,
+	// 	DELETE,
+	// 	ERROR
+	// }	http_method_t;
 
 //! str_vec
 	typedef std::vector<std::string>	str_vec;
@@ -57,5 +57,17 @@ namespace ft
 			return (true);
 		else
 			return (false);
+	}
+
+	char	decodeHex(std::string const &str)
+	{
+		std::istringstream	iss(str.substr(1));
+		int	value;
+		iss >> std::hex >> value;
+		if (iss.fail())
+		{
+			throw (std::invalid_argument("Convesion error in decodeHex at define.hpp:69."));
+		}
+		return (static_cast<char>(value));
 	}
 }

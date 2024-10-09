@@ -43,7 +43,12 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	{
 		// std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
 		// bodyStr += ConnectionHandler::recvData(fd, 6000, header.getContentLen() - bodyStr.size());
-		std::string bodyStr = input.recv(header.getContentLen());
+		std::string	isChunked = header.getValueAtLast("transfer-encoding");
+		std::string bodyStr = "";
+		if (isChunked == "chunked")
+			bodyStr = input.recv("chunked");
+		else
+			bodyStr = input.recv(header.getContentLen());
 		std::istringstream	bodyStream(bodyStr);
 		HttpBody body(bodyStream, header);
 		if (method == "POST")

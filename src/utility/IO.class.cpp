@@ -5,17 +5,19 @@
 #include <cerrno>
 #include <stdexcept>
 #include <limits>
+#include <unistd.h>
+
+static std::size_t	getChunkSize(std::string const &line);
 
 io::IO::IO(int fd, std::size_t dataSize, std::size_t bufSize, bool isChunked)
 :fd_(fd)
 ,data_()
-,keep_()
+
 ,max_data_size_(dataSize)
 ,buf_size_(bufSize)
 ,isChunked_(isChunked)
 {
-	// data_.reserve(dataSize);
-	// keep_.reserve(bufSize);
+
 	return ;
 }
 
@@ -27,7 +29,6 @@ io::IO::~IO()
 io::IO::IO(IO const &rhs)
 :fd_(rhs.fd_)
 ,data_(rhs.data_)
-,keep_(rhs.keep_)
 ,max_data_size_(rhs.max_data_size_)
 ,buf_size_(rhs.buf_size_)
 ,isChunked_(rhs.isChunked_)
@@ -41,7 +42,6 @@ io::IO &io::IO::operator=(IO const &rhs)
 	{
 		fd_ = rhs.fd_;
 		data_ = rhs.data_;
-		keep_ = rhs.keep_;
 		max_data_size_ = rhs.max_data_size_;
 		buf_size_ = rhs.buf_size_;
 		isChunked_ = rhs.isChunked_;
@@ -49,47 +49,97 @@ io::IO &io::IO::operator=(IO const &rhs)
 	return (*this);
 }
 
-bool	io::IO::parseRecv(std::string const &buf, std::size_t readSize)
+ssize_t	io::IO::smartRecv(int fd, std::string &buf, std::size_t readsize) const
 {
-	std::string::size_type	combinedSize = data_.size() + buf.size();
-	std::string::size_type	posCRLFCRLF = buf.find("\r\n\r\n");
-	if (combinedSize > max_data_size_)
+	ssize_t	bytes;
+	std::string	peekStr = "";
+	std::size_t	remainToRead = buf_size_;
+
+	peekStr.resize(buf_size_);
+	bytes = ::recv(fd, &peekStr[0], buf_size_, MSG_PEEK);
+	if (bytes == ft::err)
+		return (bytes);
+
+	peekStr.resize(bytes);
+
+	std::string::size_type posCRLFCRLF = peekStr.find("\r\n\r\n");
+	if (posCRLFCRLF != std::string::npos)
 	{
-		throw (std::out_of_range("IO.cpp:52. recv data surpassed max size."));
+		remainToRead = posCRLFCRLF + 4;
 	}
-	if (combinedSize > readSize)
+	if (readsize != std::numeric_limits<std::size_t>::max())
 	{
-		std::size_t const	appendSize = combinedSize - readSize;
-		data_.append(buf.substr(0, appendSize));
-		return (true);
+		remainToRead = readsize - data_.size();
 	}
-	else if (posCRLFCRLF != std::string::npos)
+
+	buf.resize(remainToRead);
+	bytes = ::recv(fd, &buf[0], remainToRead, 0);
+	return (bytes);
+}
+
+ssize_t	io::IO::smartRecv(int fd, std::string &buf) const
+{
+	ssize_t	bytes = 0;
+	ssize_t	sizeToRead = 0;
+	std::string	peekSizeStr = "";
+	std::string	contentStr = "";
+	std::string::size_type	posCRLF = 0;
+
+	peekSizeStr.resize(buf_size_);
+	bytes = ::recv(fd, &peekSizeStr[0], buf_size_, MSG_PEEK);
+	if (bytes == ft::err)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+
+
+	peekSizeStr.resize(bytes);
+	posCRLF = peekSizeStr.find("\r\n");
+	if (posCRLF == std::string::npos)// /r/n not in buf size => error
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	peekSizeStr.resize(posCRLF + 2);
+	bytes = ::recv(fd, &peekSizeStr[0], posCRLF + 2, 0);
+	if (bytes == ft::err)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+
+	sizeToRead = getChunkSize(peekSizeStr);
+
+	if (data_.size() + sizeToRead > max_data_size_)
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	contentStr.resize(sizeToRead + 2);
+	bytes = ::recv(fd, &contentStr[0], sizeToRead + 2, 0);
+	if (bytes == ft::err)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	else if (bytes != sizeToRead + 2)
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	contentStr.resize(bytes);
+
+	if (sizeToRead == 0)
 	{
-		data_.append(buf, 0, posCRLFCRLF + 4);//CRLFCRLFは残す
-		keep_ = buf.substr(posCRLFCRLF + 4);
-		return (true);
+		if (contentStr != "\r\n")
+			throw (HttpException(HttpCode::BAD_REQUEST));
+		buf = contentStr;
+		return (0);
 	}
-	else
-	{
-		data_.append(buf, 0, buf.size());
-		return (false);
-	}
+
+	ft::string	ftContent(contentStr);
+	if (!ftContent.end_with_str("\r\n"))
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	ftContent.trim(ft::string::CRLF);
+	buf = ftContent;
+	return (bytes);
 }
 
 void	io::IO::recv_internal(std::size_t readSize  = std::numeric_limits<std::size_t>::max())
 {
 	std::string	buf;
 
-	if (!keep_.empty())
-	{
-		data_.append(keep_);
-		keep_.clear();
-	}
-
 	while (true)
 	{
 		buf.resize(buf_size_);
-		ssize_t bytes = ::recv(fd_, (void*)buf.data(), buf_size_, 0);
+		ssize_t	bytes = smartRecv(fd_, buf, readSize);
 		if (bytes == ft::err)
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -101,49 +151,14 @@ void	io::IO::recv_internal(std::size_t readSize  = std::numeric_limits<std::size
 			break ;
 		else
 		{
-			buf.resize(bytes);
-			bool toBreak = parseRecv(buf, readSize);
-			if (toBreak == true)
+			data_.append(buf);
+			std::string::size_type	posCRLFCRLF = buf.find("\r\n\r\n");
+			if (posCRLFCRLF != std::string::npos)
 				break ;
 		}
 		buf.clear();
 	}
 }
-
-// std::size_t	io::IO::getChunkSize(void)
-// {
-// 	std::string	buf;
-// 	std::size_t	chunk_size = 0;
-
-// 	buf.resize(buf_size_);
-// 	ssize_t	bytes = ::recv(fd_, (void*)buf.data(), buf_size_, 0);
-// 	if (bytes <= 0)
-// 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-
-// 	std::string::size_type	posCRLF = buf.find("\r\n");
-// 	if (posCRLF == std::string::npos)
-// 		throw (HttpException(HttpCode::BAD_REQUEST));
-// 	buf.resize(bytes);
-// 	std::string	chunkline = buf.substr(0, posCRLF);
-// 	keep_ = buf.substr(posCRLF + 2);
-
-// 	ft::string					ftChunk(chunkline);
-// 	ft::string::string_vector	splt = ftChunk.split(ft::string::WS + ";=");
-// 	if (splt.empty() || splt[0].empty())
-// 		throw (HttpException(HttpCode::BAD_REQUEST));
-// 	try
-// 	{
-// 		char		hexChar = ft::decodeHex(splt[0]);
-// 		std::string	hexStr(hexChar, 1);
-// 		chunk_size = ft::stonum<std::size_t>(hexStr);
-// 	}
-// 	catch(std::invalid_argument const &e)
-// 	{
-// 		throw (HttpException(HttpCode::BAD_REQUEST));
-// 	}
-// 	chunk_size -= keep_.size();
-// 	return (chunk_size);
-// }
 
 static std::size_t	getChunkSize(std::string const &line)
 {
@@ -163,113 +178,35 @@ static std::size_t	getChunkSize(std::string const &line)
 	return (chunk_size);
 }
 
-// std::size_t	io::IO::parseChunkSize(void)
-// {
-// 	std::string 				buf;
-// 	ft::string::string_vector	splitted;
-// 	std::string::size_type		posCRLF;
-// 	std::size_t					bytes = 0;
-// 	std::size_t					chunk_size = 0;
-
-// 	while (true)
-// 	{
-// 		buf.resize(buf_size_);
-// 		buf = recv(buf_size_);
-
-// 		keep_.append(buf);
-// 		posCRLF = keep_.find("/r/n");
-// 		if (posCRLF != std::string::npos)
-// 			break ;
-// 	}
-// 	std::string const	chunkSizeLine = keep_.substr(0, posCRLF + 2);
-// 	std::string const	rest = keep_.substr(posCRLF + 2);
-
-// 	chunk_size = getChunkSize(chunkSizeLine);
-
-// 	if (rest.size() > chunk_size)
-
-
-
-// 	chunk_size -= keep_.size();
-// 	return (chunk_size);
-
-	// if (!keep_.empty())
-	// {
-	// 	buf = recv(buf_size_ - keep_.size());
-	// }
-
-	// if (!keep_.empty())
-	// {
-	// 	bytes = keep_.size();
-	// 	buf.resize(bytes);
-	// 	buf = keep_;
-	// }
-	// else
-	// {
-	// 	buf.resize(buf_size_);
-	// 	bytes = ::recv(fd_, (void*) buf.data(), buf_size_, 0);
-	// }
-
-	// std::string::size_type	posCRLF = keep_.find("/r/n");
-	// if (posCRLF == std::string::npos)
-	// 	//todo continue
-
-
-	// std::string const	firstLine = buf.substr()
-	// 	buf = keep_.substr(0, posCRLF + 2);
-	// 	std::string afterCRLF = keep_.substr(posCRLF + 2);
-// }
-
-std::string	io::IO::parseChunkContent(std::size_t size, std::string const &line)
-{
-	ft::string	ftline(line);
-
-	
-}
-
-bool	io::IO::parseChunkLine(std::string const &line)
-{
-	ft::string const				ftline(line);
-	ft::string::string_vector const	split_by_lf = ftline.split(ft::string::LF);
-	ft::string::string_vector_const_iterator	iter = split_by_lf.begin();
-	ft::string::string_vector_const_iterator	next = split_by_lf.begin() + 1;
-	ft::string::string_vector_const_iterator	end = split_by_lf.end();
-
-	if (split_by_lf.empty() || split_by_lf[0].empty())
-		throw (HttpException(HttpCode::BAD_REQUEST));
-
-	while (next != end)
-	{
-		std::size_t	size = getChunkSize(iter->str());
-
-		iter++; next++;
-	}
-
-}
 
 std::string	io::IO::recv(std::string const &transfer_ecoding_value)
 {
 	if (transfer_ecoding_value != "chunked")
 		return (recv());
 
-	std::string	buf;
-	buf.resize(buf_size_);
-
+	clear();
+	std::string	buf = "";
+	std::size_t	bytes = 0;
 	while (true)
 	{
-		buf = recv();
-
+		bytes = smartRecv(fd_, buf);
+		if (bytes == 0)
+			break ;
+		data_.append(buf);
 	}
+	return (data_);
 }
 
 std::string	io::IO::recv(void)
 {
+	clear();
 	recv_internal();
 	return (data_);
 }
 
 std::string	io::IO::recv(std::size_t readSize)
 {
+	clear();
 	recv_internal(readSize);
 	return (data_);
 }
@@ -277,7 +214,6 @@ std::string	io::IO::recv(std::size_t readSize)
 void	io::IO::clear(void)
 {
 	data_.clear();
-	keep_.clear();
 }
 
 std::size_t	io::IO::getSize(void) const

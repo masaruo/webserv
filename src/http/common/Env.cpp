@@ -48,10 +48,13 @@ void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, std::st
 	std::string const	pathInfo = uri.getCgi().pathInfo_;
 	std::string const	pathTranslated = local_path + "/" + pathInfo;
 	std::string const	scriptName = uri.getPath();
+	std::string			contentType = "";
+	if (header.hasKey("content-type"))
+		contentType = header.getFirstValue("content-type");
 
 	addEnvItem("auth_type", "");
 	addEnvItem("content_length", "0");
-	addEnvItem("content_type", header.getValueAtFirst("content-type"));
+	addEnvItem("content_type", contentType);
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);
 	addEnvItem("path_translated", pathTranslated);
@@ -74,10 +77,13 @@ void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, HttpBod
 	std::string const	pathInfo = uri.getCgi().pathInfo_;
 	std::string const	pathTranslated = local_path + "/" + pathInfo;
 	std::string const	scriptName = uri.getPath();
+	std::string			contentType = "";
+	if (header.hasKey("content-type"))
+		contentType = header.getFirstValue("content-type");
 
 	addEnvItem("auth_type", "");
 	addEnvItem("content_length", body.getSizeStr());
-	addEnvItem("content_type", header.getValueAtFirst("content-type"));
+	addEnvItem("content_type", contentType);
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);
 	addEnvItem("path_translated", pathTranslated);

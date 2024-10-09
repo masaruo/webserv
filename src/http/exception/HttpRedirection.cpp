@@ -26,8 +26,8 @@ Response	HttpRedirection::generateResponse(void) const
 	HttpStatus const	status(error_code);
 
 	HttpHeader	header;
-	header.setElem("content-length", "0");
-	header.setElem("location", location_);
+	header.addValue("content-length", "0");
+	header.addValue("location", location_);
 
 	Response	r(status, header);
 	return (r);

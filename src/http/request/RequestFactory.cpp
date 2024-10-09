@@ -23,7 +23,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
 
-	std::string	host_value = header.getValueAtFirst("host");
+	std::string	host_value = header.getFirstValue("host");
 
 	config::Config	config = config_factory.getConfig(host_value);
 
@@ -43,9 +43,8 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	{
 		// std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
 		// bodyStr += ConnectionHandler::recvData(fd, 6000, header.getContentLen() - bodyStr.size());
-		std::string	isChunked = header.getValueAtLast("transfer-encoding");
-		std::string bodyStr = "";
-		if (isChunked == "chunked")
+		std::string bodyStr;
+		if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
 			bodyStr = input.recv("chunked");
 		else
 			bodyStr = input.recv(header.getContentLen());

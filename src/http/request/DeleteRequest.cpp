@@ -50,8 +50,8 @@ Response	DeleteRequest::generateResponse(void) const
 	removeFile();
 
 	HttpHeader	header;
-	header.setElem("content-length", "0");
-	header.setElem("connection", "close");
+	header.addValue("content-length", "0");
+	header.addValue("connection", "close");
 
 	HttpStatus	status(HttpCode::NO_CONTENT);
 

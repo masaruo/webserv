@@ -11,3 +11,7 @@ obj/*
 !.devcontainer/*
 !.gdbinit
 !.pretty_printer.py
+!config/*
+!cgi-bin/*
+!www/*
+asset/*

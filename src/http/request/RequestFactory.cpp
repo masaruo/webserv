@@ -9,13 +9,16 @@
 #include "HttpHeader.hpp"
 #include "PutRequest.hpp"
 #include "define.hpp"
-#include "ConnectionHandler.hpp"
+// #include "ConnectionHandler.hpp"
+#include "IO.class.hpp"
 #include "HttpException.hpp"
 #include <sstream>
 
 ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &config_factory)
 {
-	std::string	raw_request = ConnectionHandler::recvData(fd, 6000);//todo buff size
+	io::IO	input(fd);
+	// std::string	raw_request = ConnectionHandler::recvData(fd, 6000);//todo buff size
+	std::string	raw_request = input.recv();
 	std::istringstream	requestStream(raw_request);
 	RequestLine	requestLine(requestStream);
 	HttpHeader	header(requestStream);
@@ -38,8 +41,14 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	}
 	else if (method == "POST" || method == "PUT")
 	{
-		std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
-		bodyStr += ConnectionHandler::recvData(fd, 6000, header.getContentLen() - bodyStr.size());
+		// std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
+		// bodyStr += ConnectionHandler::recvData(fd, 6000, header.getContentLen() - bodyStr.size());
+		std::string	isChunked = header.getValueAtLast("transfer-encoding");
+		std::string bodyStr = "";
+		if (isChunked == "chunked")
+			bodyStr = input.recv("chunked");
+		else
+			bodyStr = input.recv(header.getContentLen());
 		std::istringstream	bodyStream(bodyStr);
 		HttpBody body(bodyStream, header);
 		if (method == "POST")

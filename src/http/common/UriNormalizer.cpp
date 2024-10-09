@@ -1,12 +1,11 @@
 #include "UriNormalizer.hpp"
 #include "string.hpp"
 #include "HttpException.hpp"
-#include "define.hpp"
+// #include "define.hpp"
 #include <algorithm>
 #include <sstream>
 
 static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim);
-static char			decodeHex(std::string const &str);
 
 std::string	UriNormalizer::uniformSlashAndHandleDots(std::string const &raw)
 {
@@ -70,18 +69,6 @@ std::string	UriNormalizer::decodeDots(std::string const &raw)
 	return (res);
 }
 
-static char	decodeHex(std::string const &str)
-{
-	std::istringstream	iss(str.substr(1));
-	int	value;
-	iss >> std::hex >> value;
-	if (iss.fail())
-	{
-		throw (HttpException(HttpCode::BAD_REQUEST));
-	}
-	return (static_cast<char>(value));
-}
-
 std::string	UriNormalizer::decodePercent(std::string const &raw)
 {
 	if (ft::is_empty(raw))
@@ -102,7 +89,14 @@ std::string	UriNormalizer::decodePercent(std::string const &raw)
 				throw (HttpException(HttpCode::BAD_REQUEST));
 			}
 			percentStr = raw.substr(std::distance(begin, iter), UriNormalizer::PERCENT_ENCODE_LEN);
-			decorded.push_back(decodeHex(percentStr));
+			// decorded.push_back(ft::decodeHex(percentStr));
+			std::istringstream iss(percentStr.substr(1));
+			int value;
+			iss >> std::hex >> value;
+			if (iss.fail())
+				throw (HttpException(HttpCode::BAD_REQUEST));
+			decorded.push_back(static_cast<char>(value));
+
 			std::advance(iter, UriNormalizer::PERCENT_ENCODE_LEN);
 		}
 		else

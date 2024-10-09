@@ -52,7 +52,7 @@ HttpHeader::HttpHeader()
 	return ;
 }
 
-static void	asserttHeaderLine(std::string const &line)
+static void	assertHeaderLine(std::string const &line)
 {
 	ft::string	ftline(line);
 	bool		is_invalid = false;
@@ -123,7 +123,7 @@ HttpHeader::HttpHeader(std::istringstream &iss)
 		std::getline(iss, line);
 		if (line == ft::string::CR)//!ヘッダーの最後（CRLFCRLF）だが、LFはGETLINEで削除される＝single CR
 			break ;
-		asserttHeaderLine(line);
+		assertHeaderLine(line);
 		ft::string ftline = line;
 		ftline.trim(ft::string::CR);
 		setElem(ftline.str());

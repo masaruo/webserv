@@ -42,8 +42,8 @@ std::string	HttpException::to_string(void) const
 Response	HttpException::generateResponse(void) const
 {
 	HttpHeader	header;
-	header.setElem("content-type", "text/plain");
-	header.setElem("content-length", "0");
+	header.addValue("content-type", "text/plain");
+	header.addValue("content-length", "0");
 
 	HttpStatus	status(error_code_);
 

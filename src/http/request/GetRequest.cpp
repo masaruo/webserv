@@ -81,9 +81,9 @@ Response	GetRequest::generateResponse(void) const
 		HttpBody	body(FileReader::readTextFile(absPath));
 
 		HttpHeader	header;
-		header.setElem("content-type", "text/html");
-		header.setElem("content-length", body.getSizeStr());
-		header.setElem("Connection", "close");
+		header.addValue("content-type", "text/html");
+		header.addValue("content-length", body.getSizeStr());
+		header.addValue("Connection", "close");
 
 		HttpStatus	status(HttpCode::OK);
 

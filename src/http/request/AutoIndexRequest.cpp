@@ -69,9 +69,9 @@ Response	AutoIndexRequest::generateResponse(void) const
 	HttpStatus status(HttpCode::OK);
 
 	HttpHeader header;
-	header.setElem("Content-Type", "text/plain");
-	header.setElem("Content-Length", body.getSizeStr());
-	header.setElem("Connection", "close");
+	header.addValue("Content-Type", "text/plain");
+	header.addValue("Content-Length", body.getSizeStr());
+	header.addValue("Connection", "close");
 
 	Response	r(status, header, body);
 	return (r);

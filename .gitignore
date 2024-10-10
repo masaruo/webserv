@@ -3,6 +3,7 @@ obj/*
 !*/
 !*.cpp
 !*.hpp
+!*.tpp
 !*.cc
 !*.h
 !*.a

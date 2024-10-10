@@ -1,6 +1,7 @@
 #pragma once
 #include "HttpException.hpp"
 #include "HttpBody.hpp"
+#include "Config.hpp"
 
 class HttpExceptionWithConfig : public HttpException
 {
@@ -14,7 +15,7 @@ private:
 protected:
 	config::Config	getConfig(void) const;
 public:
-	explicit HttpExceptionWithConfig(HttpCode::code_e error_code, config::Config const &config);
+	explicit HttpExceptionWithConfig(HttpCode::StatusCode error_code, config::Config const &config);
 	virtual ~HttpExceptionWithConfig() throw();
 	HttpExceptionWithConfig(HttpExceptionWithConfig const &rhs);
 	virtual Response	generateResponse(void) const;

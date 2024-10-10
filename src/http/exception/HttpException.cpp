@@ -4,7 +4,7 @@
 #include "Response.hpp"
 
 //! HttpException
-HttpException::HttpException(HttpCode::code_e error_code)
+HttpException::HttpException(HttpCode::StatusCode error_code)
 :std::runtime_error(HttpCode::str(error_code))
 ,error_code_(error_code)
 {
@@ -23,7 +23,7 @@ HttpException::HttpException(HttpException const &rhs)
 	return ;
 }
 
-HttpCode::code_e	HttpException::getErrorCode(void) const
+HttpCode::StatusCode	HttpException::getErrorCode(void) const
 {
 	return (error_code_);
 }

@@ -17,7 +17,6 @@
 ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &config_factory)
 {
 	io::IO	input(fd);
-	// std::string	raw_request = ConnectionHandler::recvData(fd, 6000);//todo buff size
 	std::string	raw_request = input.recv();
 	std::istringstream	requestStream(raw_request);
 	RequestLine	requestLine(requestStream);
@@ -41,11 +40,9 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	}
 	else if (method == "POST" || method == "PUT")
 	{
-		// std::string bodyStr = raw_request.substr(raw_request.rfind("\r\n\r\n") + 4);
-		// bodyStr += ConnectionHandler::recvData(fd, 6000, header.getContentLen() - bodyStr.size());
 		std::string bodyStr;
 		if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
-			bodyStr = input.recv("chunked");
+			bodyStr = input.recv("chunked");//* chunkの読み取り
 		else
 			bodyStr = input.recv(header.getContentLen());
 		std::istringstream	bodyStream(bodyStr);

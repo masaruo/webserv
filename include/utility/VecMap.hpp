@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VEC_MAP_HPP
+#define VEC_MAP_HPP
 #include <string>
 #include <map>
 #include <vector>
@@ -47,25 +48,26 @@ public:
 	bool	hasValue(K const &key, V const &value) const;
 
 	// getter
+	virtual	valueVec_t	at(K const &key) const;
 	virtual valueVec_t	getValueVector(K const &key) const;
-	virtual V			getFirstValue(K const &key);
 	virtual V			getFirstValue(K const &key) const;
-	virtual V			getLastValue(K const &key);
 	virtual V			getLastValue(K const &key) const;
+	virtual V			getValueAtIdx(K const &key, std::size_t idx) const;
+	virtual std::size_t	getIdxOfValue(K const &key, V const &value) const;
 	vecmap_t			data(void) const;
 
 	// exception
 	class VecMapException : public std::runtime_error
 	{
 	public:
-		VecMapException(std::string const &msg)
+		explicit VecMapException(std::string const &msg)
 		:std::runtime_error(msg){ return; }
 	};
 
 	class VecMapHttpException : public HttpException
 	{
 	public:
-		VecMapHttpException(std::string const &msg)
+		explicit VecMapHttpException(std::string const &msg)
 		:HttpException(msg){ return; }
 	};
 };
@@ -73,3 +75,5 @@ public:
 }// end of namespace ft
 
 #include "VecMap.tpp"
+
+#endif

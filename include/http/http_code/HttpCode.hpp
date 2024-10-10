@@ -1,12 +1,12 @@
 #pragma once
 #include <string>
-#include <stdexcept>
+// #include <stdexcept>
 #include <map>
 
 class HttpCode
 {
 public:
-	enum code_e {
+	enum StatusCode {
 		// 1xx: Informational
 		CONTINUE = 100,
 		SWITCHING_PROTOCOLS = 101,
@@ -79,17 +79,19 @@ public:
 		NETWORK_AUTHENTICATION_REQUIRED = 511,
 
 		// custom
-		UNINITIALIZED = 1000,
+		INVALID_IN_WEBSERV = 1000,
 	};
 private:
-	static std::map<code_e, std::string>	msg_map_;
-	static bool								is_initialized_;
-	static void								initialize(void);
+	static std::map<StatusCode, std::string>	StatusCodeMap_;
+	static bool									is_initialized_;
+	static void									initialize(void);
 	HttpCode();//=delete
 	~HttpCode();//=delete
 	HttpCode(HttpCode const &rhs);//=delete
 	HttpCode &operator=(HttpCode const &rhs);//=delete
 public:
-	static std::string	getMessage(code_e code);
-	static std::string	str(code_e code);
+	static std::string		getMessage(StatusCode code);
+	static std::string		str(StatusCode code);
+	static HttpCode::StatusCode	getStatusCode(std::size_t errorNum);
+	static HttpCode::StatusCode	getStatusCode(std::string const &errorNumStr);
 };

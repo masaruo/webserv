@@ -10,26 +10,26 @@ class Response;
 class ARequest
 {
 private:
-	RequestLine					line_;
-	HttpHeader					header_;
-	HttpBody					body_;
-	config::Config				config_;
-	config::Config::location_s	matched_location_;
-	std::string					local_path_;
-	bool						is_directory_;
+	RequestLine						requestLine_;
+	HttpHeader						header_;
+	HttpBody						body_;
+	config::Config					config_;
+	config::Config::LocationConfig	configLocation_;//? delete
+	std::string						localPath_;
+	bool							isDirectory_;
 	ARequest();//=delete:
-	config::Config::location_s	setLocation(void);
-	std::string					setLocalPath(void);
-	void						assertRedirection(void) const;
-	void						assertAllowedMethod(void) const;
+	config::Config::LocationConfig	setServerConfigLocation(void);
+	std::string						setLocalPath(void);
+	void							assertRedirection(void) const;
+	void							assertAllowedMethod(void) const;
 protected:
-	RequestLine 				getLine(void) const;
-	HttpHeader 					getHeader(void) const;
-	HttpBody					getBody(void) const;
-	config::Config				getConfig(void) const;
-	config::Config::location_s	getLocation(void) const;
-	std::string					getLocalPath(void) const;
-	void						assertFileExist(std::string const &filePath) const;
+	RequestLine 					getLine(void) const;
+	HttpHeader 						getHeader(void) const;
+	HttpBody						getBody(void) const;
+	config::Config					getConfig(void) const;
+	config::Config::LocationConfig	getConfigLocation(void) const;
+	std::string						getLocalPath(void) const;
+	void							assertFileExist(std::string const &filePath) const;
 public:
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);

@@ -8,7 +8,7 @@ private:
 	HttpRedirection();//=delete
 	HttpRedirection &operator=(HttpRedirection const &rhs);//=delete
 public:
-	explicit HttpRedirection(HttpCode::code_e error_code, std::string const &location);
+	explicit HttpRedirection(HttpCode::StatusCode statuscode, std::string const &location);
 	~HttpRedirection() throw();
 	HttpRedirection(HttpRedirection const &rhs);
 	Response	generateResponse(void) const;

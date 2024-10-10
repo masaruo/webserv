@@ -75,3 +75,8 @@ std::string	HttpBody::getSizeStr(void) const
 	sizeStr = ft::to_string<std::size_t>(size);
 	return (sizeStr);
 }
+
+bool	HttpBody::empty(void) const
+{
+	return (data_.empty());
+}

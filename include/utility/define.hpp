@@ -50,24 +50,4 @@ namespace ft
 		return (numStr.str());
 	}
 
-	template <typename CONTAINER>
-	bool	is_empty(CONTAINER const &c)
-	{
-		if (c.empty())
-			return (true);
-		else
-			return (false);
-	}
-
-	// char	decodeHex(std::string const &str)
-	// {
-	// 	std::istringstream	iss(str.substr(1));
-	// 	int	value;
-	// 	iss >> std::hex >> value;
-	// 	if (iss.fail())
-	// 	{
-	// 		throw (std::invalid_argument("Convesion error in decodeHex at define.hpp:69."));
-	// 	}
-	// 	return (static_cast<char>(value));
-	// }
 }

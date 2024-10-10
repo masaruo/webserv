@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include <define.hpp>
+#include "define.hpp"
+#include "VecMap.hpp"
 
 class HttpUri
 {
@@ -24,8 +25,8 @@ public:
 	};
 	
 private:
-	static std::size_t const	URI_MAX_LEN = 8000;
-	std::string	initial_uri_;
+	static std::size_t const	URI_MAX_LEN;//414 uri too long
+	std::string	rawUri_;
 	std::string	host_;
 	std::size_t	port_;
 	std::string	path_;
@@ -39,8 +40,6 @@ private:
 	std::string	extractQuery(std::string const &uri_after_host);
 	std::string	extractPort(std::string const &path_wo_query);
 	std::string	extractPathAndCgi(std::string const &path);
-	void		parseAuthority(void);
-	void		parseExtAndPathInfo(void);
 	void		parseQueryWithDecodePercent(std::string const &query);
 	void		formatEachComponentsExQuery(void);
 	void		assertFinalData(void) const;
@@ -49,8 +48,12 @@ public:
 	~HttpUri();
 	HttpUri(HttpUri const &rhs);
 	HttpUri &operator=(HttpUri const &rhs);
+
+	//setter
 	void		init(std::string const &raw);
 	void		updateWithHostHeader(std::string const &host);
+
+	//getter
 	std::string	getHost(void) const;
 	std::size_t	getPort(void) const;
 	std::string	getPortStr(void) const;

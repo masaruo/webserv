@@ -39,9 +39,9 @@ Config::Config(int flag)//!this is MOCK!
 	upload.addValue(AUTOINDEX, "on");
 	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploads");
 	LocationConfig	uploader;
-	uploader.pathType_ = CGI_PATH;
+	uploader.pathType_ = UPLOAD_PATH;
 	uploader.directive_ = upload;
-	location_.insert(std::make_pair("/upload", uploader));
+	location_.insert(std::make_pair("/uploads", uploader));
 
 	DirectiveMap	cgi;
 	cgi.addValue(ALLOWED_METHOD, "GET");
@@ -145,37 +145,3 @@ Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 	return (loc);
 }
 }// end of namespace config
-
-// std::string	Config::getIndex(std::string const &path) const
-// {
-// 	return (getLocation(path).index_);
-// }
-
-// bool	Config::isAllowedMethod(std::string const &path, std::string const &method) const
-// {
-// 	location_s	loc = getLocation(path);
-// 	if (loc.allowed_methods_.find(method) == loc.allowed_methods_.end())
-// 		return (false);
-// 	else
-// 		return (true);
-// }
-
-// bool	Config::isAutoIndex(std::string const &path) const
-// {
-// 	return (getLocation(path).is_autoindex_);
-// }
-
-// bool	Config::isCgi(std::string const &path) const
-// {
-// 	return (getLocation(path).is_cgi_);
-// }
-
-// std::string	Config::getCgiRoot(std::string const &path) const
-// {
-// 	return (getLocation(path).cgi_root_);
-// }
-
-// std::string	Config::getUploadStore(std::string const &path) const
-// {
-// 	return (getLocation(path).upload_store_);
-// }

@@ -2,7 +2,7 @@
 #include "Response.hpp"
 #include "HttpException.hpp"
 #include "FileHandler.hpp"
-#include <unistd.h>// execve
+#include <unistd.h>// execve & chdir
 #include <cstdlib>// std::exit
 #include <cstring>// std::strcpy
 #include <cerrno>
@@ -15,14 +15,12 @@ int const	CgiRequest::INTERNAL_SERVER_ERROR = 50;
 
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
 :ARequest(line, header, config)
-,env_(getLine(), getHeader(), getLocalPath())
 {
 	return ;
 }
 
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
-,env_(getLine(), getHeader(), getBody(), getLocalPath())
 {
 	return ;
 }
@@ -34,7 +32,6 @@ CgiRequest::~CgiRequest()
 
 CgiRequest::CgiRequest(CgiRequest const &rhs)
 :ARequest(rhs)
-,env_(rhs.env_)
 {
 	return ;
 }
@@ -44,7 +41,6 @@ CgiRequest &CgiRequest::operator=(CgiRequest const &rhs)
 	if (this != &rhs)
 	{
 		ARequest::operator=(rhs);
-		env_ = rhs.env_;
 	}
 	return (*this);
 }
@@ -110,9 +106,17 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2]) const
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
-	//todo move to exec dir?
-	//! relative path
-	execve(argv[0], argv, env_.c_env());
+	//cgi-binのフォルダに移動
+	std::string	chdir_target = getConfigLocation().directive_.getFirstValue(config::Config::CGI_ROOT);
+	chdir_target += getLine().getUri().getCgi().pathBeforeScript_;
+	if (chdir(chdir_target.c_str()) == ft::err)
+	{
+		std::exit(INTERNAL_SERVER_ERROR);
+	}
+
+	Env env(getLine(), getHeader(), getBody(), getLocalPath());
+
+	execve(argv[0], argv, env.c_env());
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 

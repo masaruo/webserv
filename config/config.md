@@ -21,7 +21,8 @@ server {
     }
 
     location /uploads {
-        allowed_methods PUT DELETE;
+        allowed_methods PUT DELETE GET;
+        autoindex on;
         upload_store /webserv/www/uploads;
     }
 

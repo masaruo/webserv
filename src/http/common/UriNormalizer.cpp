@@ -5,38 +5,22 @@
 #include <algorithm>
 #include <sstream>
 
+std::size_t const	UriNormalizer::PERCENT_ENCODE_LEN = 3;
 static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim);
 
-std::string	UriNormalizer::uniformSlashAndHandleDots(std::string const &raw)
+std::string	UriNormalizer::uniformSlash(std::string const &raw)
 {
-	if (ft::is_empty<std::string>(raw))
+	if (raw.empty())
 		return ("");
 
 	std::string	uri(raw);
-
 	std::replace(uri.begin(), uri.end(), '\\', '/');
-	
-	std::string	DotsHandled = decodeDots(uri);
-	return (DotsHandled);
-}
-
-std::string	UriNormalizer::decodePercentAndHandleDots(std::string const &raw)
-{
-	if (ft::is_empty(raw))
-		return ("");
-
-	ft::string	ftraw(raw);
-	std::string	decoded, dotsHandled;
-
-	decoded = decodePercent(ftraw);
-	dotsHandled = decodeDots(decoded);
-
-	return (dotsHandled);
+	return (uri);
 }
 
 std::string	UriNormalizer::decodeDots(std::string const &raw)
 {
-	if (ft::is_empty(raw))
+	if (raw.empty())
 		return ("");
 
 	ft::string									ftraw(raw);
@@ -71,7 +55,7 @@ std::string	UriNormalizer::decodeDots(std::string const &raw)
 
 std::string	UriNormalizer::decodePercent(std::string const &raw)
 {
-	if (ft::is_empty(raw))
+	if (raw.empty())
 		return ("");
 
 	ft::string::const_iterator	iter = raw.begin();
@@ -89,7 +73,6 @@ std::string	UriNormalizer::decodePercent(std::string const &raw)
 				throw (HttpException(HttpCode::BAD_REQUEST));
 			}
 			percentStr = raw.substr(std::distance(begin, iter), UriNormalizer::PERCENT_ENCODE_LEN);
-			// decorded.push_back(ft::decodeHex(percentStr));
 			std::istringstream iss(percentStr.substr(1));
 			int value;
 			iss >> std::hex >> value;

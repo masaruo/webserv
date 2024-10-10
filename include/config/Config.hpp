@@ -18,9 +18,9 @@ public:
 
 	enum	DirectiveType
 	{
-		LISTEN,
-		SERVER_NAME,
-		ERROR_PAGE,
+		// LISTEN,
+		// SERVER_NAME,
+		// ERROR_PAGE,
 		LOCATION,
 		INDEX,
 		ALLOWED_METHOD,
@@ -39,7 +39,6 @@ public:
 		PathType		pathType_;
 		DirectiveMap	directive_;
 	};
-
 	typedef std::map<std::string, LocationConfig>	LocationConfigMap;
 
 private:
@@ -65,13 +64,5 @@ public:
 	std::string		getErrorPage(HttpCode::StatusCode error_code) const;
 	std::string		getOtherDirective(DirectiveType type) const;
 	LocationConfig	getConfigLocation(std::string const &path) const;
-
-	// // getter for location directives
-	// std::string	getIndex(std::string const &path) const;
-	// bool		isAllowedMethod(std::string const &path, std::string const &method) const;
-	// bool		isAutoIndex(std::string const &path) const;
-	// bool		isCgi(std::string const &path) const;
-	// std::string	getCgiRoot(std::string const &path) const;
-	// std::string	getUploadStore(std::string const &path) const;
 };
 }

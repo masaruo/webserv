@@ -21,4 +21,5 @@ public:
 	char const	*c_str(void) const;
 	std::size_t	getSize(void) const;
 	std::string	getSizeStr(void) const;
+	bool		empty(void) const;
 };

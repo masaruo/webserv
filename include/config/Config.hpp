@@ -1,37 +1,63 @@
 #pragma once
-#include <string>
-#include <map>
-#include <set>
-#include <vector>
-#include <stdexcept>
+#include "VecMap.hpp"
+// #include "VecMap.hpp"
+// #include <string>
+// #include <map>
+// #include <set>
+// #include <vector>
 #include "HttpCode.hpp"
+
+using namespace vm;
 
 namespace config
 {
 class Config
 {
 public:
-	struct location_s
+	enum	PathType
 	{
-		std::string				index_;
-		std::set<std::string>	allowed_methods_;
-		bool					is_autoindex_;
-		bool					is_cgi_;
-		std::string				cgi_root_;
-		std::string				upload_store_;
-		bool					is_redirect_;
-		std::string				return_code_;
-		std::string				return_path_;
+		ROOT,
+		STATIC,
+		UPLOAD,
+		CGI,
+		REDIRECT,
 	};
-	//! todo implement map str
+
+	enum	DirectiveType
+	{
+		LISTEN,
+		SERVER_NAME,
+		ERROR_PAGE,
+		LOCATION,
+		INDEX,
+		ALLOWED_METHOD,
+		AUTOINDEX,
+		UPLOAD_ROOT,
+		CGI_ROOT,
+		REDIRECT_TO,
+		MAX_BODY_SIZE,
+	};
+
+	typedef vm::VecMap<DirectiveType, std::string>		directive_map_t;
+	typedef std::map<HttpCode::code_e, std::string>		error_map_t;
+
+	struct Location_s
+	{
+		PathType		type_;
+		// vm::VecMap<DirectiveType, std::string> directive_;
+		directive_map_t	directive_;
+	};
+
+	typedef std::map<std::string, Location_s>			location_map_t;
+
 private:
-	std::string								server_name_;
-	std::size_t								port_;
-	std::string								root_;
-	std::size_t								max_body_size_;
-	std::map<HttpCode::code_e, std::string>	error_pages_;
-	std::size_t								keep_alive_timeout_;
-	std::map<std::string, location_s>		locations_;
+	std::size_t		port_;
+	std::string		server_name_;
+	std::string		root_;
+	error_map_t		error_pages_;
+	directive_map_t	others_;
+	// vm::VecMap<DirectiveType, std::string> others;
+	location_map_t	location_;
 	Config();//=delete
 public:
 	// consturctor and destructor
@@ -42,20 +68,19 @@ public:
 	~Config();
 
 	// getter for attributes (ex location)
-	std::string	getServerName(void) const;
 	std::size_t	getPort(void) const;
-	std::string	getRoot(std::string const &path = "/") const;
-	std::size_t	getMaxBodySize(void) const;
+	std::string	getServerName(void) const;
+	std::string	getRoot(std::string const &path = "") const;
 	std::string	getErrorPage(HttpCode::code_e error_code) const;
-	std::size_t	getKeepAliveTimeout(void) const;
-	location_s	getLocation(std::string const &path) const;
+	std::string	getOtherDirective(DirectiveType type) const;
+	Location_s	getLocation(std::string const &path) const;
 
-	// getter for location directives
-	std::string	getIndex(std::string const &path) const;
-	bool		isAllowedMethod(std::string const &path, std::string const &method) const;
-	bool		isAutoIndex(std::string const &path) const;
-	bool		isCgi(std::string const &path) const;
-	std::string	getCgiRoot(std::string const &path) const;
-	std::string	getUploadStore(std::string const &path) const;
+	// // getter for location directives
+	// std::string	getIndex(std::string const &path) const;
+	// bool		isAllowedMethod(std::string const &path, std::string const &method) const;
+	// bool		isAutoIndex(std::string const &path) const;
+	// bool		isCgi(std::string const &path) const;
+	// std::string	getCgiRoot(std::string const &path) const;
+	// std::string	getUploadStore(std::string const &path) const;
 };
 }

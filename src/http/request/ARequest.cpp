@@ -7,12 +7,12 @@
 #include <unistd.h>// for access
 
 ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
-:line_(line)
+:requestLine_(line)
 ,header_(header)
 ,body_()
 ,config_(config)
-,matched_location_(setLocation())
-,local_path_(setLocalPath())
+,configLocation_(setServerConfigLocation())
+,localPath_(setLocalPath())
 {
 	assertAllowedMethod();
 	assertRedirection();
@@ -20,12 +20,12 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 }
 
 ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
-:line_(line)
+:requestLine_(line)
 ,header_(header)
 ,body_(body)
 ,config_(config)
-,matched_location_(setLocation())
-,local_path_(setLocalPath())
+,configLocation_(setServerConfigLocation())
+,localPath_(setLocalPath())
 {
 	assertAllowedMethod();
 	assertRedirection();
@@ -33,12 +33,12 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody c
 }
 
 ARequest::ARequest(ARequest const &rhs)
-:line_(rhs.line_)
+:requestLine_(rhs.requestLine_)
 ,header_(rhs.header_)
 ,body_(rhs.body_)
 ,config_(rhs.config_)
-,matched_location_(rhs.matched_location_)
-,local_path_(rhs.local_path_)
+,configLocation_(rhs.configLocation_)
+,localPath_(rhs.localPath_)
 {
 	return ;
 }
@@ -52,22 +52,22 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 {
 	if (this != &rhs)
 	{
-		line_ = rhs.line_;
+		requestLine_ = rhs.requestLine_;
 		header_ = rhs.header_;
 		body_ = rhs.body_;
 		config_ = rhs.config_;
-		matched_location_ = rhs.matched_location_;
-		local_path_ = rhs.local_path_;
+		configLocation_ = rhs.configLocation_;
+		localPath_ = rhs.localPath_;
 	}
 	return (*this);
 }
 
 // setters
-config::Config::location_s	ARequest::setLocation(void)
+config::Config::LocationConfig	ARequest::setServerConfigLocation(void)
 {
-	config::Config::location_s loc;
-	std::string const	path = getLine().getUri().getPath();
-	loc = config_.getLocation(path);
+	config::Config::LocationConfig loc;
+	std::string const	&path = getLine().getUri().getPath();
+	loc = config_.getConfigLocation(path);
 	//todo if host == empty? possible? or if loc is empty?
 	return (loc);
 }
@@ -83,23 +83,22 @@ std::string	ARequest::setLocalPath(void)
 
 void	ARequest::assertRedirection(void) const
 {
-	std::string const	path = getLine().getUri().getPath();
-	config::Config::location_s const	loc = config_.getLocation(path);
-	if (!loc.is_redirect_)
+	std::string const	&path = getLine().getUri().getPath();
+	config::Config::LocationConfig const	loc = config_.getConfigLocation(path);
+	if (loc.pathType_ != config::Config::REDIRECTION_PATH)
 		return ;
 
-	
-	// std::string	error_code_str = loc.return_code_;//! only moved permanently 301
-	
-	std::string	redirectPath = loc.return_path_;
-	
-	throw (HttpRedirection(HttpCode::MOVED_PERMANENTLY, redirectPath));
+	std::string const				&codeStr = loc.directive_.getFirstValue(config::Config::REDIRECT_TO);
+	HttpCode::StatusCode	const	statuscode = HttpCode::getStatusCode(codeStr);
+	std::string const				&redirectPath = loc.directive_.getLastValue(config::Config::REDIRECT_TO);
+	throw (HttpRedirection(statuscode, redirectPath));
 }
 
 void	ARequest::assertAllowedMethod(void) const
 {
-	std::string const	method = line_.getMethod();
-	if (!config_.isAllowedMethod(line_.getUri().getPath(), method))
+	std::string const	&method = requestLine_.getMethod();
+
+	if (!configLocation_.directive_.hasValue(config::Config::ALLOWED_METHOD, method))
 	{
 		throw (HttpExceptionWithConfig(HttpCode::METHOD_NOT_ALLOWED, getConfig()));
 	}
@@ -114,7 +113,7 @@ void	ARequest::assertFileExist(std::string const &file_path) const
 // getters
 RequestLine	ARequest::getLine(void) const
 {
-	return (line_);
+	return (requestLine_);
 }
 
 HttpHeader	ARequest::getHeader(void) const
@@ -132,12 +131,12 @@ config::Config	ARequest::getConfig(void) const
 	return (config_);
 }
 
-config::Config::location_s	ARequest::getLocation(void) const
+config::Config::LocationConfig	ARequest::getConfigLocation(void) const
 {
-	return (matched_location_);
+	return (configLocation_);
 }
 
 std::string	ARequest::getLocalPath(void) const
 {
-	return (local_path_);
+	return (localPath_);
 }

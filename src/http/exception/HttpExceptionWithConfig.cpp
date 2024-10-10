@@ -3,7 +3,7 @@
 #include "FileHandler.hpp"
 #include <sstream>
 
-HttpExceptionWithConfig::HttpExceptionWithConfig(HttpCode::code_e error_code, config::Config const &config)
+HttpExceptionWithConfig::HttpExceptionWithConfig(HttpCode::StatusCode error_code, config::Config const &config)
 :HttpException(error_code)
 ,config_(config)
 {
@@ -36,7 +36,7 @@ config::Config	HttpExceptionWithConfig::getConfig(void) const
 
 Response	HttpExceptionWithConfig::generateResponse(void) const
 {
-	HttpCode::code_e	error_code = HttpException::getErrorCode();
+	HttpCode::StatusCode	error_code = HttpException::getErrorCode();
 	HttpStatus	const	status(error_code);
 	HttpHeader			header;
 	HttpBody			body;

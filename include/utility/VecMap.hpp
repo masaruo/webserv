@@ -72,8 +72,8 @@ public:
 	};
 };
 
-#include "VecMap.tpp"
-
 }// end of namespace ft
+
+#include "VecMap.tpp"
 
 #endif

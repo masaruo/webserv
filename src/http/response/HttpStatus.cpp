@@ -3,12 +3,12 @@
 #include "Response.hpp"
 
 HttpStatus::HttpStatus()
-:code_(HttpCode::UNINITIALIZED)
+:code_(HttpCode::INVALID_IN_WEBSERV)
 {
 	return ;
 }
 
-HttpStatus::HttpStatus(HttpCode::code_e code)
+HttpStatus::HttpStatus(HttpCode::StatusCode code)
 :code_(code)
 {
 	return ;
@@ -34,13 +34,13 @@ HttpStatus &HttpStatus::operator=(HttpStatus const &rhs)
 	return (*this);
 }
 
-void				HttpStatus::setCode(HttpCode::code_e code)
+void	HttpStatus::setCode(HttpCode::StatusCode code)
 {
 	code_ = code;
 	return ;
 }
 
-HttpCode::code_e	HttpStatus::getCode(void) const
+HttpCode::StatusCode	HttpStatus::getCode(void) const
 {
 	return (code_);
 }

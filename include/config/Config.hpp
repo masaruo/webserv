@@ -1,13 +1,6 @@
 #pragma once
 #include "VecMap.hpp"
-// #include "VecMap.hpp"
-// #include <string>
-// #include <map>
-// #include <set>
-// #include <vector>
 #include "HttpCode.hpp"
-
-using namespace vm;
 
 namespace config
 {
@@ -16,11 +9,11 @@ class Config
 public:
 	enum	PathType
 	{
-		ROOT,
-		STATIC,
-		UPLOAD,
-		CGI,
-		REDIRECT,
+		ROOT_PATH,
+		STATIC_PATH,
+		UPLOAD_PATH,
+		CGI_PATH,
+		REDIRECTION_PATH,
 	};
 
 	enum	DirectiveType
@@ -38,26 +31,24 @@ public:
 		MAX_BODY_SIZE,
 	};
 
-	typedef vm::VecMap<DirectiveType, std::string>		directive_map_t;
-	typedef std::map<HttpCode::code_e, std::string>		error_map_t;
+	typedef vm::VecMap<DirectiveType, std::string>	DirectiveMap;
+	typedef std::map<HttpCode::StatusCode, std::string>	ErrorPageMap;
 
-	struct Location_s
+	struct LocationConfig
 	{
-		PathType		type_;
-		// vm::VecMap<DirectiveType, std::string> directive_;
-		directive_map_t	directive_;
+		PathType		pathType_;
+		DirectiveMap	directive_;
 	};
 
-	typedef std::map<std::string, Location_s>			location_map_t;
+	typedef std::map<std::string, LocationConfig>	LocationConfigMap;
 
 private:
-	std::size_t		port_;
-	std::string		server_name_;
-	std::string		root_;
-	error_map_t		error_pages_;
-	directive_map_t	others_;
-	// vm::VecMap<DirectiveType, std::string> others;
-	location_map_t	location_;
+	std::size_t			port_;
+	std::string			server_name_;
+	std::string			root_;
+	ErrorPageMap		error_pages_;
+	DirectiveMap		others_;
+	LocationConfigMap	location_;
 	Config();//=delete
 public:
 	// consturctor and destructor
@@ -68,12 +59,12 @@ public:
 	~Config();
 
 	// getter for attributes (ex location)
-	std::size_t	getPort(void) const;
-	std::string	getServerName(void) const;
-	std::string	getRoot(std::string const &path = "") const;
-	std::string	getErrorPage(HttpCode::code_e error_code) const;
-	std::string	getOtherDirective(DirectiveType type) const;
-	Location_s	getLocation(std::string const &path) const;
+	std::size_t		getPort(void) const;
+	std::string		getServerName(void) const;
+	std::string		getRoot(std::string const &path = "") const;
+	std::string		getErrorPage(HttpCode::StatusCode error_code) const;
+	std::string		getOtherDirective(DirectiveType type) const;
+	LocationConfig	getConfigLocation(std::string const &path) const;
 
 	// // getter for location directives
 	// std::string	getIndex(std::string const &path) const;

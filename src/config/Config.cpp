@@ -21,47 +21,47 @@ Config::Config(int flag)//!this is MOCK!
 	error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
 
 	// locations
-	directive_map_t	slash;
+	DirectiveMap	slash;
 	slash.addValue(INDEX, "index.html");
 	slash.addValue(ALLOWED_METHOD, "GET");
 	slash.addValue(ALLOWED_METHOD, "POST");
 	slash.addValue(ALLOWED_METHOD, "DELETE");
 	slash.addValue(AUTOINDEX, "on");
-	Location_s	root;
-	root.type_ = ROOT;
+	LocationConfig	root;
+	root.pathType_ = ROOT_PATH;
 	root.directive_ = slash;
 	location_.insert(std::make_pair("/", root));
 
-	directive_map_t	upload;
+	DirectiveMap	upload;
 	upload.addValue(ALLOWED_METHOD, "PUT");
 	upload.addValue(ALLOWED_METHOD, "DELETE");
 	upload.addValue(ALLOWED_METHOD, "GET");
 	upload.addValue(AUTOINDEX, "on");
 	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploads");
-	Location_s	uploader;
-	uploader.type_ = CGI;
+	LocationConfig	uploader;
+	uploader.pathType_ = CGI_PATH;
 	uploader.directive_ = upload;
 	location_.insert(std::make_pair("/upload", uploader));
 
-	directive_map_t	cgi;
+	DirectiveMap	cgi;
 	cgi.addValue(ALLOWED_METHOD, "GET");
 	cgi.addValue(ALLOWED_METHOD, "POST");
 	cgi.addValue(AUTOINDEX, "off");
 	cgi.addValue(CGI_ROOT, "/webserv/cgi-bin");
-	Location_s cgier;
-	cgier.type_ = CGI;
+	LocationConfig cgier;
+	cgier.pathType_ = CGI_PATH;
 	cgier.directive_ = cgi;
 	location_.insert(std::make_pair("/py", cgier));
 
-	directive_map_t	re;
+	DirectiveMap	re;
 	re.addValue(ALLOWED_METHOD, "GET");
 	re.addValue(ALLOWED_METHOD, "PUT");
 	re.addValue(ALLOWED_METHOD, "POST");
 	re.addValue(ALLOWED_METHOD, "DELETE");
 	re.addValue(REDIRECT_TO, "301");
 	re.addValue(REDIRECT_TO, "http://example.com");
-	Location_s redir;
-	redir.type_ = REDIRECT;
+	LocationConfig redir;
+	redir.pathType_ = REDIRECTION_PATH;
 	redir.directive_ = re;
 	location_.insert(std::make_pair("/redirect", redir));
 }
@@ -82,7 +82,7 @@ Config::Config(Config const &rhs)
 	return ;
 }
 
-Config &cConfig::operator=(Config const &rhs)
+Config &Config::operator=(Config const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -109,19 +109,19 @@ std::string	Config::getServerName(void) const
 
 std::string	Config::getRoot(std::string const &path) const
 {
-	Location_s const &loc = getLocation(path);
+	LocationConfig const &loc = getConfigLocation(path);
 
-	if (loc.type_ == CGI)
+	if (loc.pathType_ == CGI_PATH)
 		return (loc.directive_.getFirstValue(CGI_ROOT));
-	else if (loc.type_ == UPLOAD)
+	else if (loc.pathType_ == UPLOAD_PATH)
 		return (loc.directive_.getFirstValue(UPLOAD_ROOT));
 	else
 		return (root_);
 }
 
-std::string	Config::getErrorPage(HttpCode::code_e error_code) const
+std::string	Config::getErrorPage(HttpCode::StatusCode error_code) const
 {
-	std::map<HttpCode::code_e, std::string>::size_type	findCount;
+	std::map<HttpCode::StatusCode, std::string>::size_type	findCount;
 	findCount = error_pages_.count(error_code);
 
 	if (findCount == 0)
@@ -131,9 +131,9 @@ std::string	Config::getErrorPage(HttpCode::code_e error_code) const
 	return (error_path);
 }
 
-Config::Location_s	Config::getLocation(std::string const &path) const
+Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 {
-	Location_s	loc;
+	LocationConfig	loc;
 	ft::string const	ftpath(path);
 
 	if (ftpath.end_with_str(".py"))
@@ -144,6 +144,7 @@ Config::Location_s	Config::getLocation(std::string const &path) const
 		loc = location_.at(path);
 	return (loc);
 }
+}// end of namespace config
 
 // std::string	Config::getIndex(std::string const &path) const
 // {
@@ -178,4 +179,3 @@ Config::Location_s	Config::getLocation(std::string const &path) const
 // {
 // 	return (getLocation(path).upload_store_);
 // }
-}// end of namespace config

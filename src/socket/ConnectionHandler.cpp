@@ -91,7 +91,7 @@ void	ConnectionHandler::sendData(int sock_fd, std::string const &data)
 
 	while (total_sent < data.length())
 	{
-		bytes_sent = send(sock_fd, data.c_str() + total_sent, data.length() - total_sent, 0);
+		bytes_sent = send(sock_fd, data.c_str() + total_sent, data.length() - total_sent, MSG_NOSIGNAL);
 		if (bytes_sent == ft::err)
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK)

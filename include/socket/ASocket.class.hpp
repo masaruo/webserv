@@ -30,7 +30,7 @@ protected:
 	int				fd_;//todo const
 	socket_type_t	type_;
 	sockaddr_t		addr_;
-	explicit ASocket(socket_type_t type);
+	explicit	ASocket(socket_type_t type);
 public:
 	virtual			~ASocket() = 0;
 	virtual void	setSockaddr(void) = 0;

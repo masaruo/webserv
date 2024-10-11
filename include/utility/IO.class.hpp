@@ -29,7 +29,7 @@ public:
 	std::string		recv(void);
 	std::string		recv(std::size_t readSize);
 	std::string		recv(std::string const &transfer_encoding_value);
-	// void			send(void);
+	void			send(std::string const &data) const;
 	// ssize_t		read(void);
 	// ssize_t		write(void);
 	void			clear(void);

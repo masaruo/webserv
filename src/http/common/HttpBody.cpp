@@ -11,7 +11,6 @@ std::string	HttpBody::checkBodyLen(std::string const &body)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	else
 		return (body);
-
 }
 
 HttpBody::HttpBody()

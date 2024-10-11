@@ -97,7 +97,7 @@ void	HttpUri::parseQueryWithDecodePercent(std::string const &query)
 		std::string	value(UriNormalizer::decodePercent(split_by_equal.at(1)));
 		ft::string ftkey(key);
 		ft::string ftvalue(value);
-		if (!ftkey.has_only(ft::string::VCHAR) || !ftvalue.has_only(ft::string::VCHAR))
+		if (ftkey.has(ft::string::CTL_EX_NUL_HTAB_CR_LF) || ftvalue.has(ft::string::CTL_EX_NUL_HTAB_CR_LF))
 			throw (HttpException(HttpCode::BAD_REQUEST));
 		query_.QueryMap_[key] = value;
 		iter++;

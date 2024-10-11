@@ -76,7 +76,9 @@ def process_form():
     message = parsed.get("message", [""])[0]
 
     print_header()
-    
+
+    print(f">>>cwd is: {os.getcwd()}<<<", file=sys.stderr)
+
     if name and message:
         print(f"<p>this reply is created followed by {html.escape(method)} request. </p>")
         print(f"<p>name is: {html.escape(name)}</p>")

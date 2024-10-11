@@ -81,6 +81,7 @@ static char	**generateArgv(std::string const &uri)
 	return (argv);
 }
 
+#include <iostream>
 void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2]) const
 {
 	if (close(pipe_in[WRITE_FD]) == ft::err)
@@ -106,7 +107,6 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2]) const
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
-	//cgi-binのフォルダに移動
 	std::string	chdir_target = getConfigLocation().directive_.getFirstValue(config::Config::CGI_ROOT);
 	chdir_target += getLine().getUri().getCgi().pathBeforeScript_;
 	if (chdir(chdir_target.c_str()) == ft::err)
@@ -169,8 +169,6 @@ std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_p
 	while (pid == 0)
 	{
 		pid = waitpid(child_pid, &status, WNOHANG);
-		// if (pid == 0)
-			// usleep(10000);
 	}
 	if (WIFEXITED(status))
 	{

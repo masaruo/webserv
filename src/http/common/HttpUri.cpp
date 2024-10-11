@@ -73,8 +73,9 @@ void	HttpUri::init(std::string const &raw)
 		throw (HttpException(HttpCode::URI_TOO_LONG));
 	else if (raw.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
-	std::string slashUniformStr = UriNormalizer::uniformSlash(raw);
-	std::string dotsDecodedStr = UriNormalizer::decodeDots(slashUniformStr);
+
+	std::string slashUniformStr = UriNormalizer::uniformSlash(raw);// windows type \ -> /
+	std::string dotsDecodedStr = UriNormalizer::decodeDots(slashUniformStr);// ../などを対応
 	rawUri_ = dotsDecodedStr;
 }
 
@@ -161,8 +162,6 @@ std::string	HttpUri::extractPort(std::string const &host)
 	else
 	{
 		hostWoutPort = host.substr(0, portStartPos);
-		// std::string::size_type	portEndPos = host.find_first_of('/', portStartPos);
-		// std::string	portStr = host.substr(portStartPos + 1, portEndPos - portStartPos);
 		std::string	portStr = host.substr(portStartPos + 1);
 		try
 		{
@@ -299,31 +298,36 @@ void	HttpUri::formatEachComponentsExQuery(void)
 	path_ = UriNormalizer::decodeDots(path_);
 	cgi_.pathBeforeScript_ = UriNormalizer::decodeDots(cgi_.pathBeforeScript_);
 	cgi_.scriptName_ = UriNormalizer::decodeDots(cgi_.scriptName_);
+	cgi_.pathInfo_ = UriNormalizer::decodeDots(cgi_.pathInfo_);
 }
 
 void	HttpUri::assertFinalData(void) const
 {
-	bool	is_valid = true;
+	ft::string	const	&host(host_);
+	ft::string const	&path(path_);
+	ft::string			cgi(cgi_.pathBeforeScript_);
 
-	ft::string	str;
-	str = host_;
-	if (!str.has_only(ft::string::HOST))
-		is_valid = false;
+	if (host.empty() || !host.has_only(ft::string::URI_UNRESERVED + ft::string::SUBDELIMS))
+		throw (HttpException(HttpCode::BAD_REQUEST));
+		
 	if (port_ < 1 || 65535 < port_)
-		is_valid = false;
-	str = path_;
-	if (!str.has_only(ft::string::PCHAR + "/"))
-		is_valid = false;
-	str = cgi_.pathBeforeScript_;
-	if (!str.has_only(ft::string::PCHAR + "/"))
-		is_valid = false;
-	str = cgi_.scriptName_;
-	if (!str.has_only(ft::string::PCHAR + "/"))
-	str = cgi_.pathInfo_;
-	if (!str.has_only(ft::string::VCHAR))
-		is_valid = false;
+		throw (HttpException(HttpCode::BAD_REQUEST));
 
-	if (!is_valid)
+	if (path.empty() || !path.has_only(ft::string::PCHAR + "/"))
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	if (cgi.empty())
+		return ;
+
+	if (!cgi.has_only(ft::string::PCHAR + "/"))
+		throw (HttpException(HttpCode::BAD_REQUEST));
+		
+	cgi = cgi_.scriptName_;
+	if (!cgi.has_only(ft::string::PCHAR + "/"))
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	cgi = cgi_.pathInfo_;
+	if (cgi.empty() || !cgi.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 

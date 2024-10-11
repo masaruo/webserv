@@ -7,17 +7,52 @@
 
 std::set<std::string>	HttpHeader::noDupHeaderSet_;
 
+const std::size_t HttpHeader::MAX_FIELD_LEN = 4000;
+const std::size_t HttpHeader::MAX_HEADERS = 100;
+const std::string HttpHeader::HOST = "host";
+const std::string HttpHeader::CONTENT_TYPE = "content-type";
+const std::string HttpHeader::CONTENT_LENGTH = "content-length";
+const std::string HttpHeader::CONTENT_ENCODING = "content-encoding";
+const std::string HttpHeader::TRANSFER_ENCODING = "transfer-encoding";
+const std::string HttpHeader::CONNECTION = "connection";
+const std::string HttpHeader::USER_AGENT = "user-agent";
+const std::string HttpHeader::ACCEPT = "accept";
+const std::string HttpHeader::ACCEPT_ENCODING = "accept-encoding";
+const std::string HttpHeader::ACCEPT_LANGUAGE = "accept-language";
+const std::string HttpHeader::REFERER = "referer";
+const std::string HttpHeader::AUTHORIZATION = "authorization";
+const std::string HttpHeader::COOKIE = "cookie";
+const std::string HttpHeader::SERVER = "server";
+const std::string HttpHeader::LOCATION = "location";
+const std::string HttpHeader::DATE = "date";
+const std::string HttpHeader::LAST_MODIFIED = "last-modified";
+const std::string HttpHeader::ETAG = "etag";
+const std::string HttpHeader::CACHE_CONTROL = "cache-control";
+const std::string HttpHeader::PRAGMA = "pragma";
+const std::string HttpHeader::EXPIRES = "expires";
+const std::string HttpHeader::CONTENT_DISPOSITION = "content-disposition";
+
 void	HttpHeader::assertSemanticValue(void) const
 {
 	bool	is_invalid = false;
 
-	if (!hasKey("host"))
+	if (!hasKey(HOST))
 		is_invalid = true;
-	if (hasKey("content-length"))
+	if (hasKey(TRANSFER_ENCODING))
+	{
+		if (hasKey(CONTENT_LENGTH))
+			is_invalid = true;
+		std::string const &is_chunk = getLastValue(TRANSFER_ENCODING);
+		if (is_chunk != "chunked")
+			is_invalid = true;
+	}
+	if (hasKey(CONTENT_LENGTH) && hasKey(TRANSFER_ENCODING))
+		is_invalid = true;
+	if (hasKey(CONTENT_LENGTH))
 	{
 		try
 		{
-			ft::stonum<std::size_t>(getFirstValue("content-length"));
+			ft::stonum<std::size_t>(getFirstValue(CONTENT_LENGTH));
 		}
 		catch(const std::invalid_argument& e)
 		{
@@ -26,18 +61,15 @@ void	HttpHeader::assertSemanticValue(void) const
 	}
 	if (is_invalid)
 		throw (HttpException(HttpCode::BAD_REQUEST));
-	//todo 
-	//connection header
-	//transfer-encoding
 }
 
 void	HttpHeader::setupNoDupHeaderSet(void)
 {
-	noDupHeaderSet_.insert("host");
-	noDupHeaderSet_.insert("content-type");
-	noDupHeaderSet_.insert("content-length");
-	noDupHeaderSet_.insert("content-encoding");
-	noDupHeaderSet_.insert("transfer-encoding");
+	noDupHeaderSet_.insert(HOST);
+	noDupHeaderSet_.insert(CONTENT_TYPE);
+	noDupHeaderSet_.insert(CONTENT_LENGTH);
+	noDupHeaderSet_.insert(CONTENT_ENCODING);
+	noDupHeaderSet_.insert(TRANSFER_ENCODING);
 	noDupHeaderSet_.insert("if-modified-since");
 	noDupHeaderSet_.insert("if-unmodified-since");
 	noDupHeaderSet_.insert("if-none-match");
@@ -203,7 +235,7 @@ std::size_t	HttpHeader::getContentLen(void) const
 {
 	try
 	{
-		std::size_t	res = ft::stonum<std::size_t>(getFirstValue("content-length"));
+		std::size_t	res = ft::stonum<std::size_t>(getFirstValue(CONTENT_LENGTH));
 		return (res);
 	}
 	catch(const std::invalid_argument& e)

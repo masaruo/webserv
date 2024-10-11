@@ -7,7 +7,6 @@
 class RequestLine
 {
 private:
-	std::size_t const	URI_MAX_LEN = 1024;//? from config?
 	std::string	method_;
 	HttpUri		uri_;
 	// std::string	uri_;

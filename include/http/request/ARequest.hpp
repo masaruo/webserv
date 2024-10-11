@@ -23,11 +23,6 @@ private:
 	void							assertRedirection(void) const;
 	void							assertAllowedMethod(void) const;
 protected:
-	RequestLine 					getLine(void) const;
-	HttpHeader 						getHeader(void) const;
-	HttpBody						getBody(void) const;
-	config::Config					getConfig(void) const;
-	config::Config::LocationConfig	getConfigLocation(void) const;
 	std::string						getLocalPath(void) const;
 	void							assertFileExist(std::string const &filePath) const;
 public:
@@ -36,5 +31,10 @@ public:
 	virtual ~ARequest();
 	ARequest(ARequest const &rhs);
 	ARequest &operator=(ARequest const &rhs);
-	virtual	Response	generateResponse(void) const = 0;
+	RequestLine 					getLine(void) const;
+	HttpHeader 						getHeader(void) const;
+	HttpBody						getBody(void) const;
+	config::Config					getConfig(void) const;
+	config::Config::LocationConfig	getConfigLocation(void) const;
+	virtual	Response				generateResponse(void) const = 0;
 };

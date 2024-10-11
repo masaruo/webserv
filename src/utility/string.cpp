@@ -46,13 +46,12 @@ std::string const	ft::string::OBS_TEXT =
 	"\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF"
 	"\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF";
 std::string const	ft::string::FIELD_VALUE = ft::string::VCHAR + ft::string::WS + ft::string::OBS_TEXT;
+std::string const	ft::string::SUBDELIMS = "!$&'()*+,;=";
 std::string const	ft::string::URI_RESERVED = ":/?#[]@!$&'()*+,;=";
 std::string const	ft::string::URI_UNRESERVED = ft::string::ALNUM + "-._~";
 std::string const	ft::string::QUERY = ft::string::URI_UNRESERVED + "/?:@!$'()*+,;=";
-std::string const	ft::string::PCHAR = ft::string::URI_UNRESERVED + ":@&=+$,";
+std::string const	ft::string::PCHAR = ft::string::URI_UNRESERVED + ft::string::SUBDELIMS + ":@";
 std::string const	ft::string::SCHEME = ft::string::ALNUM + "+-,";
-std::string const	ft::string::SUBDELIMS = "!$&'()*+,;=";
-std::string const	ft::string::HOST = ft::string::URI_UNRESERVED + ft::string::SUBDELIMS;
 //constructor / destructor
 ft::string::string()
 :base_()

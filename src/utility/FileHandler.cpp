@@ -3,7 +3,7 @@
 #include <fstream>
 #include <unistd.h>
 
-std::string FileReader::readTextFile(std::string const &path)
+std::string FileReader::read(std::string const &path)
 {
 	std::ifstream	ifs(path.c_str(), std::ios::in | std::ios::binary);
 	if(!ifs)
@@ -22,17 +22,15 @@ std::string FileReader::readTextFile(std::string const &path)
 	return (buf);
 }
 
-std::string	FileReader::readFdFile(int fd)
+std::string	FileReader::read(int fd)
 {
 	const std::size_t BUFFSIZE = 4096;
-		// ft::bytes_vec	buf(BUFFSIZE);//todo buffer size
-		// ft::bytes_vec	result;
 	std::string buf(BUFFSIZE, '\0');
 	std::string	result;
 
 	while (true)
 	{
-		ssize_t	bytesRead = read(fd, (void*)buf.data(), buf.size());
+		ssize_t	bytesRead = ::read(fd, (void*)buf.data(), buf.size());
 		if (bytesRead == ft::err)
 		{
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//? error type

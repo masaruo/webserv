@@ -7,9 +7,12 @@
 #include <limits>
 #include <unistd.h>
 
+namespace io
+{
+
 static std::size_t	getChunkSize(std::string const &line);
 
-io::IO::IO(int fd, std::size_t dataSize, std::size_t bufSize, bool isChunked)
+IO::IO(int fd, std::size_t dataSize, std::size_t bufSize, bool isChunked)
 :fd_(fd)
 ,data_()
 
@@ -21,12 +24,12 @@ io::IO::IO(int fd, std::size_t dataSize, std::size_t bufSize, bool isChunked)
 	return ;
 }
 
-io::IO::~IO()
+IO::~IO()
 {
 	return ;
 }
 
-io::IO::IO(IO const &rhs)
+IO::IO(IO const &rhs)
 :fd_(rhs.fd_)
 ,data_(rhs.data_)
 ,max_data_size_(rhs.max_data_size_)
@@ -36,7 +39,7 @@ io::IO::IO(IO const &rhs)
 	return ;
 }
 
-io::IO &io::IO::operator=(IO const &rhs)
+IO &io::IO::operator=(IO const &rhs)
 {
 	if (this != &rhs)
 	{
@@ -49,14 +52,14 @@ io::IO &io::IO::operator=(IO const &rhs)
 	return (*this);
 }
 
-ssize_t	io::IO::smartRecv(int fd, std::string &buf, std::size_t readsize) const
+ssize_t	IO::smartRecv(int fd, std::string &buf, std::size_t readsize) const
 {
 	ssize_t	bytes;
 	std::string	peekStr = "";
 	std::size_t	remainToRead = buf_size_;
 
 	peekStr.resize(buf_size_);
-	bytes = ::recv(fd, &peekStr[0], buf_size_, MSG_PEEK);
+	bytes = ::recv(fd, &peekStr[0], buf_size_, MSG_PEEK | MSG_DONTWAIT);
 	if (bytes == ft::err)
 		return (bytes);
 
@@ -73,11 +76,11 @@ ssize_t	io::IO::smartRecv(int fd, std::string &buf, std::size_t readsize) const
 	}
 
 	buf.resize(remainToRead);
-	bytes = ::recv(fd, &buf[0], remainToRead, 0);
+	bytes = ::recv(fd, &buf[0], remainToRead, MSG_DONTWAIT);
 	return (bytes);
 }
 
-ssize_t	io::IO::smartRecv(int fd, std::string &buf) const
+ssize_t	IO::smartRecv(int fd, std::string &buf) const
 {
 	ssize_t	bytes = 0;
 	ssize_t	sizeToRead = 0;
@@ -86,7 +89,7 @@ ssize_t	io::IO::smartRecv(int fd, std::string &buf) const
 	std::string::size_type	posCRLF = 0;
 
 	peekSizeStr.resize(buf_size_);
-	bytes = ::recv(fd, &peekSizeStr[0], buf_size_, MSG_PEEK);
+	bytes = ::recv(fd, &peekSizeStr[0], buf_size_, MSG_PEEK | MSG_DONTWAIT);
 	if (bytes == ft::err)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
@@ -97,7 +100,7 @@ ssize_t	io::IO::smartRecv(int fd, std::string &buf) const
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
 	peekSizeStr.resize(posCRLF + 2);
-	bytes = ::recv(fd, &peekSizeStr[0], posCRLF + 2, 0);
+	bytes = ::recv(fd, &peekSizeStr[0], posCRLF + 2, MSG_DONTWAIT);
 	if (bytes == ft::err)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
@@ -107,7 +110,7 @@ ssize_t	io::IO::smartRecv(int fd, std::string &buf) const
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
 	contentStr.resize(sizeToRead + 2);
-	bytes = ::recv(fd, &contentStr[0], sizeToRead + 2, 0);
+	bytes = ::recv(fd, &contentStr[0], sizeToRead + 2, MSG_DONTWAIT);
 	if (bytes == ft::err)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	else if (bytes != sizeToRead + 2)
@@ -132,7 +135,7 @@ ssize_t	io::IO::smartRecv(int fd, std::string &buf) const
 	return (bytes);
 }
 
-void	io::IO::recv_internal(std::size_t readSize  = std::numeric_limits<std::size_t>::max())
+void	IO::recv_internal(std::size_t readSize  = std::numeric_limits<std::size_t>::max())
 {
 	std::string	buf;
 
@@ -179,7 +182,7 @@ static std::size_t	getChunkSize(std::string const &line)
 }
 
 
-std::string	io::IO::recv(std::string const &transfer_ecoding_value)
+std::string	IO::recv(std::string const &transfer_ecoding_value)
 {
 	if (transfer_ecoding_value != "chunked")
 		return (recv());
@@ -197,26 +200,47 @@ std::string	io::IO::recv(std::string const &transfer_ecoding_value)
 	return (data_);
 }
 
-std::string	io::IO::recv(void)
+std::string	IO::recv(void)
 {
 	clear();
 	recv_internal();
 	return (data_);
 }
 
-std::string	io::IO::recv(std::size_t readSize)
+std::string	IO::recv(std::size_t readSize)
 {
 	clear();
 	recv_internal(readSize);
 	return (data_);
 }
 
-void	io::IO::clear(void)
+void	IO::send(std::string const &data) const
+{
+	std::size_t	total_sent = 0;
+	ssize_t		bytes_sent = 0;
+
+	while (total_sent < data.size())
+	{
+		bytes_sent = ::send(fd_, data.c_str() + total_sent, data.size() - total_sent, MSG_NOSIGNAL);
+		if (bytes_sent == ft::err)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				continue ;
+			else
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		}
+		total_sent += bytes_sent;
+	}
+}
+
+void	IO::clear(void)
 {
 	data_.clear();
 }
 
-std::size_t	io::IO::getSize(void) const
+std::size_t	IO::getSize(void) const
 {
 	return (data_.size());
 }
+
+}//end of namespace io

@@ -84,12 +84,11 @@ Response	GetRequest::generateResponse(void) const
 		std::string	const	&path = uri.getPath();
 		std::string const	&absPath = getLocalPath() + getConfigLocation().directive_.getFirstValue(config::Config::INDEX);
 
-		HttpBody	body(FileReader::readTextFile(absPath));//todo IOclass
+		HttpBody	body(FileReader::read(absPath));//todo IOclass
 
 		HttpHeader	header;
-		header.addValue("content-type", "text/html");
-		header.addValue("content-length", body.getSizeStr());
-		header.addValue("Connection", "close");
+		header.addValue(HttpHeader::CONTENT_TYPE, "text/html");
+		header.addValue(HttpHeader::CONTENT_LENGTH, body.getSizeStr());
 
 		HttpStatus	status(HttpCode::OK);
 

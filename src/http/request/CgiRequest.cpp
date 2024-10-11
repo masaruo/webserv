@@ -114,6 +114,7 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2]) const
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
+	//generate ENV with chdir dir
 	Env env(getLine(), getHeader(), getBody(), getLocalPath());
 
 	execve(argv[0], argv, env.c_env());
@@ -136,14 +137,14 @@ std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_p
 		ssize_t	bytesWritten = write(pipe_in[WRITE_FD], body.c_str() + total_written, remaining);
 		if (bytesWritten == ft::err)
 		{
-			// if (errno == EINTR)
-				// continue ;
-			// else
-			// {
+			if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
+				continue ;
+			else
+			{
 				close(pipe_in[WRITE_FD]);
 				close(pipe_out[READ_FD]);
 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-			// }
+			}
 		}
 		total_written += bytesWritten;
 		remaining -= bytesWritten;
@@ -153,7 +154,7 @@ std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_p
 	std::string	result = "";
 	try
 	{
-		result = FileReader::readFdFile(pipe_out[READ_FD]);
+		result = FileReader::read(pipe_out[READ_FD]);
 	}
 	catch(...)
 	{
@@ -211,7 +212,6 @@ std::string	CgiRequest::execute(void) const
 	}
 	else
 	{
-		usleep(50000);//todo need to change, without this, pipe clogging happens (ie. .py failed to read).
 		bodyStr = exec_parent(pipe_in, pipe_out, child_pid);
 	}
 	return (bodyStr);
@@ -229,9 +229,8 @@ Response	CgiRequest::generateResponse(void) const
 	HttpStatus	status(HttpCode::OK);
 
 	HttpHeader	header;
-	header.addValue("content-type", "text/html");
-	header.addValue("content-length", body.getSizeStr());
-	header.addValue("Connection", "close");
+	header.addValue(HttpHeader::CONTENT_TYPE, "text/html");
+	header.addValue(HttpHeader::CONTENT_LENGTH, body.getSizeStr());
 
 	Response	r(status, header, body);
 	return (r);

@@ -24,7 +24,7 @@ HttpExceptionWithConfig::HttpExceptionWithConfig(HttpExceptionWithConfig const &
 
 HttpBody	HttpExceptionWithConfig::generateBody(std::string const &path) const
 {
-	std::string const	read = FileReader::readTextFile(path);
+	std::string const	read = FileReader::read(path);
 	HttpBody			resBody(read);
 	return (resBody);
 }

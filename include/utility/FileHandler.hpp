@@ -10,6 +10,6 @@ private:
 	FileReader(FileReader const &rhs);
 	FileReader &operator=(FileReader const &rhs){ (void) rhs; };
 public:
-	static std::string	readTextFile(std::string const &path);
-	static std::string	readFdFile(int fd);
+	static std::string	read(std::string const &path);
+	static std::string	read(int fd);
 };

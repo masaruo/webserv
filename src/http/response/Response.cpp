@@ -1,5 +1,6 @@
 #include "Response.hpp"
 #include "string.hpp"
+#include "Date.hpp"
 #include <sstream>
 
 Response::Response(HttpStatus const &status, HttpHeader const &header)
@@ -8,6 +9,7 @@ Response::Response(HttpStatus const &status, HttpHeader const &header)
 ,body_()
 ,has_body_(false)
 {
+	addMandetaryHeader();
 	return ;
 }
 
@@ -17,6 +19,7 @@ Response::Response(HttpStatus const &status, HttpHeader const &header, HttpBody 
 ,body_(body)
 ,has_body_(true)
 {
+	addMandetaryHeader();
 	return ;
 }
 
@@ -61,19 +64,12 @@ void	Response::setBody(HttpBody const &body)
 	body_ = body;
 }
 
-HttpStatus	Response::getStatus(void) const
+void	Response::addMandetaryHeader(void)
 {
-	return (status_);
-}
+	header_.addValue(HttpHeader::CONNECTION, "close");
 
-HttpHeader	Response::getHeader(void) const
-{
-	return (header_);
-}
-
-HttpBody	Response::getBody(void) const
-{
-	return (body_);
+	std::string const &now = Date::time();
+	header_.addValue(HttpHeader::DATE, now);
 }
 
 std::string	Response::to_string(void) const
@@ -81,6 +77,7 @@ std::string	Response::to_string(void) const
 	std::stringstream	ss;
 
 	ss << status_.to_string();
+	// header_.addValue(HttpHeader::DATE, Date::time());
 	ss << header_.to_string();
 	ss << ft::string::CR +ft::string::LF;
 	if (has_body_)

@@ -2,7 +2,6 @@
 #include "string.hpp"
 #include "HttpExceptionWithConfig.hpp"
 #include "HttpRedirection.hpp"
-#include <sys/stat.h>
 #include <sstream>
 #include <unistd.h>// for access
 

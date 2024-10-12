@@ -84,7 +84,7 @@ Response	GetRequest::generateResponse(void) const
 		std::string	const	&path = uri.getPath();
 		std::string const	&absPath = getLocalPath() + getConfigLocation().directive_.getFirstValue(config::Config::INDEX);
 
-		HttpBody	body(FileReader::read(absPath));//todo IOclass
+		HttpBody	body(FileHandler::read(absPath));//todo IOclass
 
 		HttpHeader	header;
 		header.addValue(HttpHeader::CONTENT_TYPE, "text/html");

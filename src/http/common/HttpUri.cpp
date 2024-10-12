@@ -66,7 +66,7 @@ HttpUri &HttpUri::operator=(HttpUri const &rhs)
 
 void	HttpUri::init(std::string const &raw)
 {
-	if (raw.size() > URI_MAX_LEN)
+	if (raw.size() > ft::URI_MAX_LEN)
 		throw (HttpException(HttpCode::URI_TOO_LONG));
 	else if (raw.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));

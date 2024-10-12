@@ -93,7 +93,7 @@ static void	assertHeaderLine(std::string const &line)
 		is_invalid = true;
 	if (!ftline.end_with(ft::string::CR))
 		is_invalid = true;
-	if (ftline.size() > MAX_FIELD_LEN)
+	if (ftline.size() > ft::MAX_FIELD_LEN)
 		is_invalid = true;
 	if (!ftline.has(":"))
 		is_invalid = true;
@@ -224,7 +224,7 @@ void	HttpHeader::addValue(std::string const &key, std::string const &value)
 	ftkey.to_lower();
 
 	assertDupHeaderName(ftkey);
-	if (data().size() > MAX_HEADERS_NUM)
+	if (data().size() > ft::MAX_HEADERS_NUM)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	vm::VecMap<std::string, std::string>::addValue(ftkey, ftvalue);
 }

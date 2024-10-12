@@ -6,23 +6,21 @@
 #include <stdint.h> // uint8_t
 #include <stdexcept>
 
-#define MAX_BODY_SIZE (6000000)
-#define MAX_FIELD_LEN (4000)
-#define MAX_HEADERS_NUM (100)
-#define URI_MAX_LEN (8000)
-
 namespace ft
 {
-	int const	eof = 0;
-	int const	err = -1;
+	// constants
+	int const			eof = 0;
+	int const			err = -1;
+	std::size_t const	MAX_BODY_SIZE = 600000;
+	std::size_t const	MAX_FIELD_LEN = 4000;
+	std::size_t const	MAX_HEADERS_NUM = 100;
+	std::size_t const	URI_MAX_LEN = 8000;
 
-
-//! str_vec
-	typedef std::vector<std::string>	str_vec;
-
-//! str_map
+	// typedef
+	typedef std::vector<std::string>			str_vec;
 	typedef std::map<std::string, std::string>	str_map;
 
+	// communal functions
 	template <typename T>
 	T stonum(std::string const &str)
 	{
@@ -47,5 +45,4 @@ namespace ft
 		}
 		return (numStr.str());
 	}
-
-}
+}// end of namespace ft

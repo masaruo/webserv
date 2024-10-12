@@ -2,6 +2,7 @@
 #include "Response.hpp"
 #include "HttpExceptionWithConfig.hpp"
 #include "string.hpp"
+#include "FileHandler.hpp"
 #include <fstream>
 #include <cstdio>// for fdopen
 
@@ -58,6 +59,29 @@ void	PutRequest::uploadFile(void) const
 	{
 		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));
 	}
+}
+
+std::string	PutRequest::setLocalPath(void) const
+{
+	std::string			finalPath;
+	HttpUri const		&uri = getLine().getUri();
+	std::string const	&path = uri.getPath();
+	std::string const	&root = getConfig().getRoot(path);
+	std::string const	&pathWithRoot = root + path;
+	bool const			isDir = FileHandler::checkIfDirectory(pathWithRoot);
+
+	if (isDir)
+	{
+		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
+	}
+	else
+	{
+		bool const	isFileExist = access(pathWithRoot.c_str(), F_OK);//todo
+		bool const	isFileR_OK = access(pathWithRoot.c_str(), W_OK);//todo
+		finalPath = pathWithRoot;
+	}
+	FileHandler::assertAccess(finalPath, R_OK);
+	return (finalPath);
 }
 
 Response	PutRequest::generateResponse(void) const

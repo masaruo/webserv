@@ -25,7 +25,6 @@ public:
 	};
 	
 private:
-	static std::size_t const	URI_MAX_LEN;//414 uri too long
 	std::string	rawUri_;
 	std::string	host_;
 	std::size_t	port_;

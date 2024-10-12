@@ -7,8 +7,6 @@
 
 std::set<std::string>	HttpHeader::noDupHeaderSet_;
 
-const std::size_t HttpHeader::MAX_FIELD_LEN = 4000;
-const std::size_t HttpHeader::MAX_HEADERS = 100;
 const std::string HttpHeader::HOST = "host";
 const std::string HttpHeader::CONTENT_TYPE = "content-type";
 const std::string HttpHeader::CONTENT_LENGTH = "content-length";
@@ -95,7 +93,7 @@ static void	assertHeaderLine(std::string const &line)
 		is_invalid = true;
 	if (!ftline.end_with(ft::string::CR))
 		is_invalid = true;
-	if (ftline.size() > HttpHeader::MAX_FIELD_LEN)
+	if (ftline.size() > MAX_FIELD_LEN)
 		is_invalid = true;
 	if (!ftline.has(":"))
 		is_invalid = true;
@@ -226,7 +224,7 @@ void	HttpHeader::addValue(std::string const &key, std::string const &value)
 	ftkey.to_lower();
 
 	assertDupHeaderName(ftkey);
-	if (data().size() > MAX_HEADERS)
+	if (data().size() > MAX_HEADERS_NUM)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	vm::VecMap<std::string, std::string>::addValue(ftkey, ftvalue);
 }

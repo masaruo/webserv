@@ -6,9 +6,6 @@
 class HttpHeader : public vm::VecMap<std::string, std::string>
 {
 public:
-	static std::size_t const	MAX_FIELD_LEN;
-	static std::size_t const	MAX_HEADERS;
-
 	// よく使用されるHTTPヘッダーキーの静的定数
 	static const std::string HOST;
 	static const std::string CONTENT_TYPE;

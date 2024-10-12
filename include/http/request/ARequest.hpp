@@ -16,7 +16,7 @@ private:
 	config::Config					config_;
 	config::Config::LocationConfig	configLocation_;//? delete
 	std::string						localPath_;
-	bool							isDirectory_;
+	// bool							isDirectory_;
 	ARequest();//=delete:
 	config::Config::LocationConfig	setServerConfigLocation(void);
 	std::string						setLocalPath(void);

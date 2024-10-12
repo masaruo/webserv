@@ -154,7 +154,7 @@ std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_p
 	std::string	result = "";
 	try
 	{
-		result = FileReader::read(pipe_out[READ_FD]);
+		result = FileHandler::read(pipe_out[READ_FD]);
 	}
 	catch(...)
 	{

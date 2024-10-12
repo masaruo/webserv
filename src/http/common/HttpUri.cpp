@@ -5,9 +5,6 @@
 #include "HttpRedirection.hpp"
 #include <sstream>
 
-//static const
-std::size_t	const HttpUri::URI_MAX_LEN = 8000;
-
 HttpUri::Cgi_s::Cgi_s()
 :isCgi_(false)
 ,hasPathInfo_(false)
@@ -69,7 +66,7 @@ HttpUri &HttpUri::operator=(HttpUri const &rhs)
 
 void	HttpUri::init(std::string const &raw)
 {
-	if (raw.size() > URI_MAX_LEN)
+	if (raw.size() > ft::URI_MAX_LEN)
 		throw (HttpException(HttpCode::URI_TOO_LONG));
 	else if (raw.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));

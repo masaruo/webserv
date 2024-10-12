@@ -2,14 +2,15 @@
 #include <string>
 #include "define.hpp"
 
-class FileReader
+class FileHandler
 {
 private:
-	FileReader(){};
-	~FileReader(){};
-	FileReader(FileReader const &rhs);
-	FileReader &operator=(FileReader const &rhs){ (void) rhs; };
+	FileHandler(){};
+	~FileHandler(){};
+	FileHandler(FileHandler const &rhs);
+	FileHandler &operator=(FileHandler const &rhs){ (void) rhs; };
 public:
 	static std::string	read(std::string const &path);
 	static std::string	read(int fd);
+	static bool			isDir(std::string const &path);
 };

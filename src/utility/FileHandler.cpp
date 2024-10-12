@@ -1,9 +1,10 @@
 #include "FileHandler.hpp"
 #include "HttpException.hpp"
 #include <fstream>
-#include <unistd.h>
+#include <unistd.h>// read
+#include <sys/stat.h>// stat
 
-std::string FileReader::read(std::string const &path)
+std::string FileHandler::read(std::string const &path)
 {
 	std::ifstream	ifs(path.c_str(), std::ios::in | std::ios::binary);
 	if(!ifs)
@@ -22,7 +23,7 @@ std::string FileReader::read(std::string const &path)
 	return (buf);
 }
 
-std::string	FileReader::read(int fd)
+std::string	FileHandler::read(int fd)
 {
 	const std::size_t BUFFSIZE = 4096;
 	std::string buf(BUFFSIZE, '\0');
@@ -45,4 +46,17 @@ std::string	FileReader::read(int fd)
 		}
 	}
 	return (result);
+}
+
+bool	FileHandler::isDir(std::string const &path)
+{
+	struct stat	buf;
+
+	int res = stat(path.c_str(), &buf);
+	if (res == ft::err)
+		return (false);
+	else if (S_ISDIR(buf.st_mode))
+		return (true);
+	else
+		return (false);
 }

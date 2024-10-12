@@ -1,11 +1,12 @@
 #include "HttpBody.hpp"
 #include "HttpException.hpp"
+#include "define.hpp"
 
 std::string	HttpBody::checkBodyLen(std::string const &body)
 {
 	bool	is_valid = true;
 
-	if (body.size() > HttpBody::MAX_BODY_SIZE)
+	if (body.size() > ft::MAX_BODY_SIZE)
 		is_valid = false;
 	if (!is_valid)
 		throw (HttpException(HttpCode::BAD_REQUEST));

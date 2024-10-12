@@ -3,7 +3,6 @@
 #include <map>
 #include <vector>
 #include <sstream>
-#include <stdint.h> // uint8_t
 #include <stdexcept>
 
 namespace ft

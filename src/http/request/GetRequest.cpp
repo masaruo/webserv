@@ -1,7 +1,8 @@
 #include "GetRequest.hpp"
 #include "Response.hpp"
 #include "CgiRequest.hpp"
-#include "AutoIndexRequest.hpp"
+// #include "AutoIndexRequest.hpp"
+#include "autoIndexException.hpp"
 #include "FileHandler.hpp"
 #include <sys/stat.h>
 
@@ -42,7 +43,7 @@ std::string	GetRequest::setLocalPath(void) const
 
 	if (isDir)
 	{
-		assertAutoIndex(path);
+		assertAutoIndex(path, pathWithRoot);
 		std::string const &indexFileName = getIndexFileName(path);
 		finalPath = pathWithRoot + "/" + indexFileName;
 	}
@@ -54,14 +55,14 @@ std::string	GetRequest::setLocalPath(void) const
 	return (finalPath);
 }
 
-void	GetRequest::assertAutoIndex(std::string const &path) const
+void	GetRequest::assertAutoIndex(std::string const &path, std::string const &pathWithRoot) const
 {
 	config::Config::LocationConfig	const &loc = getConfig().getConfigLocation(path);
 	if (loc.directive_.hasKey(config::Config::AUTOINDEX))
 	{
 		if (loc.directive_.getFirstValue(config::Config::AUTOINDEX) == "on")
 		{
-			//todo throw autoindex exception
+			throw (AutoIndexException(HttpCode::OK, pathWithRoot));
 		}
 	}
 }

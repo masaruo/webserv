@@ -4,7 +4,7 @@ class GetRequest : public ARequest
 {
 private:
 	std::string	setLocalPath(void) const;
-	void		assertAutoIndex(std::string const &path) const;
+	void		assertAutoIndex(std::string const &path, std::string const &pathWithRoot) const;
 	std::string	getIndexFileName(std::string const &path) const;
 	GetRequest();//=delete
 public:

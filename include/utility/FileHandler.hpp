@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "define.hpp"
+// #include "define.hpp"
+#include "unistd.h"// for access mode and access / read in cpp
 
 class FileHandler
 {
@@ -12,5 +13,6 @@ private:
 public:
 	static std::string	read(std::string const &path);
 	static std::string	read(int fd);
-	static bool			isDir(std::string const &path);
+	static bool			checkIfDirectory(std::string const &path);
+	static void			assertAccess(std::string const &path, int mode);
 };

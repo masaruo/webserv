@@ -2,6 +2,7 @@
 #include "string.hpp"
 #include "HttpExceptionWithConfig.hpp"
 #include "HttpRedirection.hpp"
+#include "FileHandler.hpp"
 #include <sstream>
 #include <unistd.h>// for access
 
@@ -71,14 +72,34 @@ config::Config::LocationConfig	ARequest::setServerConfigLocation(void)
 	return (loc);
 }
 
-std::string	ARequest::setLocalPath(void)
-{
-	HttpUri const		uri = getLine().getUri();
-	std::string const	path = uri.getPath();
-	std::string const	root = config_.getRoot(path);
-	std::string localAbsPath = root + path;
-	return (localAbsPath);
-}
+// std::string	ARequest::setLocalPath(void)
+// {
+// 	HttpUri const		&uri = getLine().getUri();
+// 	std::string const	&path = uri.getPath();
+// 	std::string const	&root = config_.getRoot(path);
+// 	std::string localAbsPath = root + path;
+// 	assertLocalPath(localAbsPath);
+// 	return (localAbsPath);
+// }
+
+// void	ARequest::assertLocalPath(std::string const &localPath)
+// {
+// 	//todo bool const	isRedirection;
+
+// 	bool const	checkIfDirectory = FileHandler::checkIfDirectory(localPath);
+// 	if (!checkIfDirectory)
+// 		return ;
+
+// 	//todo bool const	isAutoIndex = ;
+// 	if (isAutoIndex)
+// 	{
+// 		//todo throw autoindex
+// 	}
+// 	else
+// 	{
+
+// 	}
+// }
 
 void	ARequest::assertRedirection(void) const
 {

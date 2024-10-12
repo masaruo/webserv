@@ -9,7 +9,6 @@
 #include "HttpHeader.hpp"
 #include "PutRequest.hpp"
 #include "define.hpp"
-// #include "ConnectionHandler.hpp"
 #include "IO.class.hpp"
 #include "HttpException.hpp"
 #include <sstream>

@@ -31,35 +31,53 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 	return (*this);
 }
 
-static bool	is_dir(std::string const &path)
+std::string	GetRequest::setLocalPath(void) const
 {
-	struct stat	buf;
+	std::string			finalPath;
+	HttpUri const		&uri = getLine().getUri();
+	std::string const	&path = uri.getPath();
+	std::string const	&root = getConfig().getRoot(path);
+	std::string const	&pathWithRoot = root + path;
+	bool const			isDir = FileHandler::checkIfDirectory(pathWithRoot);
 
-	int res = stat(path.c_str(), &buf);
-	if (res == ft::err)
-		return (false);
-
-	if (S_ISDIR(buf.st_mode))
-		return (true);
+	if (isDir)
+	{
+		assertAutoIndex(path);
+		std::string const &indexFileName = getIndexFileName(path);
+		finalPath = pathWithRoot + "/" + indexFileName;
+	}
 	else
-		return (false);
+	{
+		finalPath = pathWithRoot;
+	}
+	FileHandler::assertAccess(finalPath, R_OK);
+	return (finalPath);
 }
 
-//! todo auto indexを探すだけでなく、ないときにINDEXからサイトを取ってくる？
-bool	GetRequest::isAutoIndex(std::string const &path) const
+void	GetRequest::assertAutoIndex(std::string const &path) const
 {
-	bool const	isdir = is_dir(path);
-	config::Config::LocationConfig	const &loc = getConfigLocation();
+	config::Config::LocationConfig	const &loc = getConfig().getConfigLocation(path);
+	if (loc.directive_.hasKey(config::Config::AUTOINDEX))
+	{
+		if (loc.directive_.getFirstValue(config::Config::AUTOINDEX) == "on")
+		{
+			//todo throw autoindex exception
+		}
+	}
+}
+
+std::string	GetRequest::getIndexFileName(std::string const &path) const
+{
+	config::Config::LocationConfig	const &loc = getConfig().getConfigLocation(path);
 	if (loc.directive_.hasKey(config::Config::INDEX))
 	{
 		std::string const &index_directive = loc.directive_.getFirstValue(config::Config::INDEX);
-		if (index_directive.empty())
-			return (true);
-		else
-			return (false);
+		return (index_directive);
 	}
 	else
-		return (true);
+	{
+		return ("");
+	}
 }
 
 Response	GetRequest::generateResponse(void) const
@@ -73,7 +91,7 @@ Response	GetRequest::generateResponse(void) const
 		Response	r(cgi.generateResponse());
 		return (r);
 	}
-	else if (isAutoIndex(path))
+	else if (checkIfAutoIndex(path))
 	{
 		AutoIndexRequest ai(getLine(), getHeader(), getConfig());
 		Response	r(ai.generateResponse());

@@ -9,6 +9,16 @@ class Response;
 
 class ARequest
 {
+public:
+	// enum	RequestType//?
+	// {
+	// 	GET,
+	// 	POST,
+	// 	DELETE,
+	// 	PUT,
+	// 	CGI,
+	// 	// AUTOINDEX,
+	// };
 private:
 	RequestLine						requestLine_;
 	HttpHeader						header_;
@@ -16,12 +26,14 @@ private:
 	config::Config					config_;
 	config::Config::LocationConfig	configLocation_;//? delete
 	std::string						localPath_;
-	// bool							isDirectory_;
-	ARequest();//=delete:
+	// RequestType						requestType_;//?
+
+	// helper function
 	config::Config::LocationConfig	setServerConfigLocation(void);
-	std::string						setLocalPath(void);
+	virtual std::string				setLocalPath(void) const = 0;
 	void							assertRedirection(void) const;
 	void							assertAllowedMethod(void) const;
+	ARequest();//=delete:
 protected:
 	std::string						getLocalPath(void) const;
 	void							assertFileExist(std::string const &filePath) const;

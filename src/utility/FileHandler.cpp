@@ -1,7 +1,7 @@
 #include "FileHandler.hpp"
 #include "HttpException.hpp"
+#include "define.hpp"
 #include <fstream>
-#include <unistd.h>// read
 #include <sys/stat.h>// stat
 
 std::string FileHandler::read(std::string const &path)
@@ -25,7 +25,7 @@ std::string FileHandler::read(std::string const &path)
 
 std::string	FileHandler::read(int fd)
 {
-	const std::size_t BUFFSIZE = 4096;
+	const std::size_t BUFFSIZE = 4096;//! move to define.hpp
 	std::string buf(BUFFSIZE, '\0');
 	std::string	result;
 
@@ -48,7 +48,7 @@ std::string	FileHandler::read(int fd)
 	return (result);
 }
 
-bool	FileHandler::isDir(std::string const &path)
+bool	FileHandler::checkIfDirectory(std::string const &path)
 {
 	struct stat	buf;
 
@@ -59,4 +59,10 @@ bool	FileHandler::isDir(std::string const &path)
 		return (true);
 	else
 		return (false);
+}
+
+void	FileHandler::assertAccess(std::string const &path, int mode)
+{
+	if (::access(path.c_str(), mode) == ft::err)
+		throw (HttpException(HttpCode::NOT_FOUND));
 }

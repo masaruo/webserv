@@ -5,7 +5,8 @@
 class DeleteRequest : public ARequest
 {
 private:
-	void	removeFile(void) const;
+	std::string	setLocalPath(void) const;
+	void		removeFile(void) const;
 	DeleteRequest();//=delete
 public:
 	explicit DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);

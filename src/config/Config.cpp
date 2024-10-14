@@ -119,6 +119,11 @@ std::string	Config::getRoot(std::string const &path) const
 		return (root_);
 }
 
+Config::ErrorPageMap	Config::getErrorPageMap(void) const
+{
+	return (error_pages_);
+}
+
 std::string	Config::getErrorPage(HttpCode::StatusCode error_code) const
 {
 	std::map<HttpCode::StatusCode, std::string>::size_type	findCount;

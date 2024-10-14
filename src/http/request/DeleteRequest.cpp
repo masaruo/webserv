@@ -1,6 +1,6 @@
 #include "DeleteRequest.hpp"
 #include "Response.hpp"
-#include "HttpExceptionWithConfig.hpp"
+#include "HttpException.hpp"
 #include "UriNormalizer.hpp"
 #include "FileHandler.hpp"
 #include "string.hpp"
@@ -65,7 +65,7 @@ void	DeleteRequest::removeFile(std::string const &path) const
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
 	if (std::remove(path.c_str()) == ft::err)
-		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
 
 void	DeleteRequest::generateResponseData(void)

@@ -1,7 +1,7 @@
 #include "ARequest.hpp"
 #include "string.hpp"
-#include "HttpExceptionWithConfig.hpp"
-#include "HttpRedirection.hpp"
+#include "HttpException.hpp"
+#include "RedirectionException.hpp"
 #include "FileHandler.hpp"
 #include "Response.hpp"
 #include <sstream>
@@ -79,7 +79,7 @@ void	ARequest::assertRedirection(void) const
 	std::string const				&codeStr = loc.directive_.getFirstValue(config::Config::REDIRECT_TO);
 	HttpCode::StatusCode	const	statuscode = HttpCode::getStatusCode(codeStr);
 	std::string const				&redirectPath = loc.directive_.getLastValue(config::Config::REDIRECT_TO);
-	throw (HttpRedirection(statuscode, redirectPath));
+	throw (RedirectionException(statuscode, redirectPath));
 }
 
 void	ARequest::assertAllowedMethod(void) const
@@ -89,7 +89,7 @@ void	ARequest::assertAllowedMethod(void) const
 	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
 	if (!loc.directive_.hasValue(config::Config::ALLOWED_METHOD, method))
 	{
-		throw (HttpExceptionWithConfig(HttpCode::METHOD_NOT_ALLOWED, getConfig()));
+		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
 	}
 }
 

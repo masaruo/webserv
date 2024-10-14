@@ -22,8 +22,9 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	HttpHeader	header(requestStream);
 
 	std::string	host_value = header.getFirstValue("host");
-
 	config::Config	config = config_factory.getConfig(host_value);
+
+	HttpException::loadErrorPageMap(config);
 
 	HttpUri &uri = requestLine.getUriReference();
 	uri.updateWithHostHeader(host_value);

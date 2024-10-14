@@ -1,32 +1,23 @@
-#include "AutoIndexRequest.hpp"
-#include "dirent.h"
+#include "AutoIndexException.hpp"
 #include "Response.hpp"
-#include "HttpException.hpp"
+#include "string.hpp"
+#include <dirent.h>//opendir, readdir, closedir
 
-AutoIndexRequest::AutoIndexRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
-:ARequest(line, header, config)
+AutoIndexException::AutoIndexException(HttpCode::StatusCode statuscode, std::string const &path)
+:AResponseException(statuscode, path)
 {
 	return ;
 }
 
-AutoIndexRequest::~AutoIndexRequest()
+AutoIndexException::~AutoIndexException()
 {
 	return ;
 }
 
-AutoIndexRequest::AutoIndexRequest(AutoIndexRequest const &rhs)
-:ARequest(rhs)
+AutoIndexException::AutoIndexException(AutoIndexException const &rhs)
+:AResponseException(rhs)
 {
 	return ;
-}
-
-AutoIndexRequest &AutoIndexRequest::operator=(AutoIndexRequest const &rhs)
-{
-	if (this != &rhs)
-	{
-		ARequest::operator = (rhs);
-	}
-	return (*this);
 }
 
 static ft::str_vec	getFileNames(std::string const &path)
@@ -48,10 +39,10 @@ static ft::str_vec	getFileNames(std::string const &path)
 	return (files);
 }
 
-Response	AutoIndexRequest::generateResponse(void) const
+Response	AutoIndexException::generateResponse(void) const
 {
-	std::string const	path = getLocalPath();
-	ft::str_vec const	fileNamesVec = getFileNames(path);
+	std::string const	&path = getPath();
+	ft::str_vec const	&fileNamesVec = getFileNames(path);
 	ft::str_vec::const_iterator	iter = fileNamesVec.begin();
 	ft::str_vec::const_iterator	end = fileNamesVec.end();
 	std::string			fileNameStr = "";

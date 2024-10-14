@@ -64,19 +64,19 @@ void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
 		sender.send(res.to_string());
 		std::cerr << "Good Request" << std::endl;//todo
 	}
-	catch(HttpException const &e)
-	{
-		std::cerr << e.what() << std::endl;//todo
-		Response res = e.generateResponse();
-		io::IO sender(fd_);
-		sender.send(res.to_string());
-	}
 	catch(AResponseException const &request)
 	{
 		Response r = request.generateResponse();
 		io::IO sender(fd_);
 		sender.send(r.to_string());
 		std::cerr << "Auto index or redirect " << std::endl;//todo
+	}
+	catch(HttpException const &e)
+	{
+		std::cerr << e.what() << std::endl;//todo
+		Response res = e.generateResponse();
+		io::IO sender(fd_);
+		sender.send(res.to_string());
 	}
 	catch(std::runtime_error const &e)
 	{

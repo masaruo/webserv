@@ -6,6 +6,7 @@ server {
     root /webserv/www/html;
     client_max_body_size 10000000;
 
+    error_page 405 /405.html;
     error_page 404 /404.html;
     error_page 500 /50x.html;
     error_page 502 /50x.html;

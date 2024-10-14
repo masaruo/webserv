@@ -9,6 +9,7 @@ HttpException::ErrorPageMap	HttpException::errorPageMap_;
 std::string					HttpException::root_ = "";
 bool						HttpException::isInitialized_ = false;
 std::string					HttpException::default_error_page_ = "/error.html";
+std::string					HttpException::initial_error_page_ = "/webserv/www/error.html";
 
 //! HttpException
 HttpException::HttpException(HttpCode::StatusCode error_code)
@@ -49,7 +50,10 @@ HttpBody	HttpException::generateBody(void) const
 
 	if (it == end)
 	{
-		errorPath = root_ + default_error_page_;
+		if (isInitialized_)
+			errorPath = root_ + default_error_page_;
+		else
+			errorPath = initial_error_page_;
 	}
 	else
 	{

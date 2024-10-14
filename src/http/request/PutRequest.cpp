@@ -34,13 +34,6 @@ PutRequest &PutRequest::operator=(PutRequest const &rhs)
 	return (*this);
 }
 
-static void	assertFileWithNoControlChar(std::string const &data)
-{
-	ft::string	ftdata(data);
-	if (ftdata.has(ft::string::CTL_EX_NUL_HTAB_CR_LF))
-		throw (HttpException(HttpCode::BAD_REQUEST));
-}
-
 void	PutRequest::uploadFile(std::string const &absPath) const
 {
 	if (absPath.empty())

@@ -116,28 +116,14 @@ static void	assertHeaderName(std::string const &name)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
-static void	assertHeaderValueLine(std::string const &line)
-{
-	ft::string	ftline(line);
-	bool		is_invalid = false;
-
-	if (ftline.empty())
-		is_invalid = true;
-	if (!ftline.has_only(ft::string::FIELD_VALUE))
-		is_invalid = true;
-
-	if (is_invalid)
-		throw (HttpException(HttpCode::BAD_REQUEST));
-}
-
-static void	assetHeaderValue(std::string const &a_value)
+static void	assertHeaderValue(std::string const &a_value)
 {
 	ft::string	ftvalue(a_value);
 	bool		is_invalid = false;
 
 	if (ftvalue.empty())
 		is_invalid = true;
-	if (!ftvalue.has_only(ft::string::VCHAR + ft::string::OBS_TEXT))
+	if (!ftvalue.has_only(ft::string::VCHAR + ft::string::WS))
 		is_invalid = true;
 
 	if (is_invalid)
@@ -188,9 +174,10 @@ void	HttpHeader::addValue(std::string const &line)
 
 	key = line.substr(0, loc);
 	assertDupHeaderName(key);
+	assertHeaderName(key);
 
 	values = line.substr(loc + 1);
-	assertHeaderValueLine(values);
+	assertHeaderValue(values);
 
 	ft::string::string_vector					split_by_comma = values.split(",");
 	ft::string::string_vector_const_iterator	iter = split_by_comma.begin();
@@ -224,6 +211,8 @@ void	HttpHeader::addValue(std::string const &key, std::string const &value)
 	ftkey.to_lower();
 
 	assertDupHeaderName(ftkey);
+	assertHeaderName(ftkey);
+	assertHeaderValue(value);
 	if (data().size() > ft::MAX_HEADERS_NUM)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	vm::VecMap<std::string, std::string>::addValue(ftkey, ftvalue);

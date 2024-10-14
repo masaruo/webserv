@@ -10,7 +10,7 @@ private:
 	std::string	checkBodyLen(std::string const &body);
 public:
 	HttpBody();
-	HttpBody(std::istringstream &iss, HttpHeader const &header);
+	// HttpBody(std::istringstream &iss, HttpHeader const &header);
 	HttpBody(std::string const &str);
 	~HttpBody();
 	HttpBody(HttpBody const &rhs);

@@ -10,6 +10,7 @@ namespace ft
 	// constants
 	int const			eof = 0;
 	int const			err = -1;
+	int			const	MAX_SOCKET_NUM = 1000;
 	std::size_t const	MAX_BODY_SIZE = 600000;
 	std::size_t const	MAX_FIELD_LEN = 4000;
 	std::size_t const	MAX_HEADERS_NUM = 100;

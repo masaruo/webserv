@@ -349,7 +349,7 @@ void	ft::string::to_lower(void)
 	{
 		int	c = static_cast<int>(*it);
 		if (isupper(c))
-			*it = tolower(c);
+			*it = static_cast<char>(tolower(c));
 		it++;
 	}
 }
@@ -362,7 +362,7 @@ void	ft::string::to_upper(void)
 	{
 		int	c = static_cast<int>(*it);
 		if (islower(c))
-			*it = toupper(c);
+			*it = static_cast<char>(toupper(c));
 		it++;
 	}
 }

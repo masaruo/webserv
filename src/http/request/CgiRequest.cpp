@@ -111,7 +111,6 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &
 	std::string const 						&path = getLine().getUri().getPath();
 	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
 	std::string	chdir_target = loc.directive_.getFirstValue(config::Config::CGI_ROOT);
-	chdir_target += getLine().getUri().getPathInfo().directory_;
 	if (chdir(chdir_target.c_str()) == ft::err)
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
@@ -224,7 +223,8 @@ std::string	CgiRequest::setLocalPath(void) const
 	HttpUri const		&uri = getLine().getUri();
 	std::string const	&path = UriNormalizer::decodeDots(uri.getPath());
 	std::string const	&root = getConfig().getRoot(path);
-	std::string const	&pathWithRoot = root + path;
+	std::string const	&file = UriNormalizer::decodeDots(uri.getPathInfo().fileName_);
+	std::string const	&pathWithRoot = root + "/" + file;
 
 	if (!FileHandler::checkPathExist(pathWithRoot))
 		throw (HttpException(HttpCode::NOT_FOUND));

@@ -52,7 +52,7 @@ Config::Config(int flag)//!this is MOCK!
 	LocationConfig cgier;
 	cgier.pathType_ = CGI_PATH;
 	cgier.directive_ = cgi;
-	location_.insert(std::make_pair("/py", cgier));
+	location_.insert(std::make_pair("/cgi-bin", cgier));
 
 	DirectiveMap	re;
 	re.addValue(ALLOWED_METHOD, "GET");
@@ -139,34 +139,38 @@ std::string	Config::getErrorPage(HttpCode::StatusCode error_code) const
 
 Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 {
-	// LocationConfigMap::const_iterator	it = location_.begin();
-	// LocationConfigMap::const_iterator	end = location_.end();
-	// std::string							bestMatch = "";
+	LocationConfigMap::const_iterator	it = location_.begin();
+	LocationConfigMap::const_iterator	end = location_.end();
+	std::string							bestMatch = "";
 
-	// while (it != end)
-	// {
-	// 	if (path.compare(0, it->first.length(), it->first) == 0)
-	// 	{
-	// 		if (it->first.length() > bestMatch.length())
-	// 			bestMatch = it->first;
-	// 	}
-	// 	it++;
-	// }
+	while (it != end)
+	{
+		if (path.compare(0, it->first.length(), it->first) == 0)
+		{
+			if (it->first.length() > bestMatch.length())
+				bestMatch = it->first;
+		}
+		it++;
+	}
 
-	// if (bestMatch.empty())
-	// {
-	// 	return location_.at("/");
-	// }
-
-	LocationConfig	loc;
-	ft::string const	ftpath(path);
-
-	if (ftpath.end_with_str(".py"))
-		loc = location_.at("/py");
-	else if (location_.find(path) == location_.end())
-		loc = location_.at("/");
+	if (bestMatch.empty())
+	{
+		return (location_.at("/"));
+	}
 	else
-		loc = location_.at(path);
-	return (loc);
+	{
+		return (location_.at(bestMatch));
+	}
+
+	// LocationConfig	loc;
+	// ft::string const	ftpath(path);
+
+	// if (ftpath.end_with_str(".py"))
+	// 	loc = location_.at("/py");
+	// else if (location_.find(path) == location_.end())
+	// 	loc = location_.at("/");
+	// else
+	// 	loc = location_.at(path);
+	// return (loc);
 }
 }// end of namespace config

@@ -22,8 +22,8 @@ INC			:=	-I./include \
 				-I./include/http/response \
 				-I./include/http/utility \
 				-I./include/socket \
-				-I./include/utility \
-				-I./utility/include
+				-I./include/utility
+
 SRC			:=	$(wildcard src/*.cpp) \
 				$(wildcard src/*/*.cpp) \
 				$(wildcard src/*/*/*.cpp)

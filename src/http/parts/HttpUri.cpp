@@ -318,7 +318,6 @@ void	HttpUri::assertFinalData(void) const
 {
 	ft::string	const	&host(host_);
 	ft::string const	&path(path_);
-	ft::string			cgi(pathInfo_.directory_);
 
 	if (host.empty() || !host.has_only(ft::string::URI_UNRESERVED + ft::string::SUBDELIMS))
 		throw (HttpException(HttpCode::BAD_REQUEST));
@@ -329,18 +328,17 @@ void	HttpUri::assertFinalData(void) const
 	if (path.empty() || !path.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
-	if (cgi.empty())
+	if (!isCgi_)
 		return ;
 
-	if (!cgi.has_only(ft::string::PCHAR + "/"))
+	ft::string const &dir(pathInfo_.directory_);
+	ft::string const &file(pathInfo_.fileName_);
+	ft::string const &pathinfo(pathInfo_.cgiPathInfo_);
+	if (!dir.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
-		
-	cgi = pathInfo_.fileName_;
-	if (!cgi.has_only(ft::string::PCHAR + "/"))
+	if (!file.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
-
-	cgi = pathInfo_.cgiPathInfo_;
-	if (cgi.empty() || !cgi.has_only(ft::string::PCHAR + "/"))
+	if (!pathinfo.empty() && !pathinfo.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 

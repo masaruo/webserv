@@ -44,12 +44,11 @@ static void	assertFileWithNoControlChar(std::string const &data)
 void	PutRequest::uploadFile(std::string const &absPath) const
 {
 	HttpUri const		&uri = getLine().getUri();
-	std::string const	&fileName = uri.getQueryValue("filename");
+	std::string const	&fileName = uri.getPathInfo().fileName_;
 	std::string			uploadPath = absPath;
 
 	if (uploadPath.empty() || fileName.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
-	uploadPath.append("/" + fileName);
 
 	std::ofstream	ofs(uploadPath.c_str() , std::ios_base::trunc | std::ios_base::binary);//chuncked?
 	if (!ofs)
@@ -63,25 +62,13 @@ void	PutRequest::uploadFile(std::string const &absPath) const
 	}
 }
 
-static std::string getParentPath(std::string const &path, std::string const &root)
-{
-	ft::string						ftPath(path);
-	ftPath.trim('/');
-	ft::string::string_vector const	&splitBySlah = ftPath.split("/");
-
-	if (splitBySlah.empty() || splitBySlah.size() == 1)
-		return (root);
-
-	std::string const &concat = root + ft::reverse_split(splitBySlah, '/');
-	return (concat);
-}
-
 std::string	PutRequest::setLocalPath(void) const
 {
 	HttpUri const		&uri = getLine().getUri();
-	std::string const	&path = UriNormalizer::decodeDots(uri.getPath());
-	std::string const	&root = getConfig().getRoot(path);
-	std::string const	&pathWithRoot = root + path;
+	std::string const	&dir = UriNormalizer::decodeDots(uri.getPathInfo().directory_);
+	std::string const	&file = UriNormalizer::decodeDots(uri.getPathInfo().fileName_);
+	std::string const	&root = getConfig().getRoot(dir);
+	std::string const	&pathWithRoot = root + dir + "/" + file;
 
 	if (FileHandler::checkPathExist(pathWithRoot))
 	{
@@ -94,12 +81,12 @@ std::string	PutRequest::setLocalPath(void) const
 	}
 	else
 	{
-		std::string const &parentPath = getParentPath(path, root);
+		std::string const &parentPath = root + uri.getPathInfo().directory_;
 		if (!FileHandler::checkPathExist(parentPath))
 			throw (HttpException(HttpCode::NOT_FOUND));
 		if (!FileHandler::checkIfDirectory(parentPath))
 			throw (HttpException(HttpCode::CONFLICT));
-		if (access(parentPath.c_str(), W_OK) != ft::err)
+		if (access(parentPath.c_str(), W_OK) == ft::err)
 			throw (HttpException(HttpCode::FORBIDDEN));
 	}
 	return (pathWithRoot);

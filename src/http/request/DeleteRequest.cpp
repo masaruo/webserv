@@ -33,18 +33,6 @@ DeleteRequest &DeleteRequest::operator=(DeleteRequest const &rhs)
 	return (*this);
 }
 
-static std::string getParentPath(std::string const &path, std::string const &root)
-{
-	ft::string const 				&ftPath(path);
-	ft::string::string_vector const	&splitBySlah = ftPath.split("/");
-
-	if (splitBySlah.empty() || splitBySlah.size() == 1)
-		return (root);
-
-	std::string const &concat = root + ft::reverse_split(splitBySlah, '/');
-	return (concat);
-}
-
 std::string	DeleteRequest::setLocalPath(void) const
 {
 	HttpUri const		&uri = getLine().getUri();
@@ -59,7 +47,7 @@ std::string	DeleteRequest::setLocalPath(void) const
 		if (!FileHandler::checkIfFile(pathWithRoot))
 			throw (HttpException(HttpCode::NOT_FOUND));
 
-		std::string const &parentPath = getParentPath(path, root);
+		std::string const &parentPath = root + uri.getPathInfo().directory_;
 		if (access(parentPath.c_str(), W_OK) == ft::err)
 			throw (HttpException(HttpCode::FORBIDDEN));
 	}

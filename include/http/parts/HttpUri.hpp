@@ -6,31 +6,27 @@
 class HttpUri
 {
 public:
-	struct Cgi_s
+	struct PathInfo
 	{
-		bool		isCgi_;
-		bool		hasPathInfo_;
-		std::string	pathBeforeScript_;
-		std::string	scriptName_;
-		std::string	ext_;
-		std::string	pathInfo_;
-		Cgi_s();
+		std::string	directory_;
+		std::string	fileName_;
+		std::string	cgiPathInfo_;
 	};
 
-	struct Query_s
+	struct Query
 	{
-		bool		hasQuery_;
 		ft::str_map	QueryMap_;
-		Query_s();
 	};
-	
+
 private://! add parent_? which is just one / up of path?
 	std::string	rawUri_;
 	std::string	host_;
 	std::size_t	port_;
 	std::string	path_;
-	Query_s		query_;
-	Cgi_s		cgi_;
+	bool		isCgi_;
+	bool		hasQuery_;
+	Query		query_;
+	PathInfo	pathInfo_;
 
 	void		parseAbsoluteFormUri(void);
 	void		parseOriginFormUri(std::string const &host);
@@ -38,7 +34,8 @@ private://! add parent_? which is just one / up of path?
 	std::string	extractHost(std::string const &uri_after_scheme);
 	std::string	extractQuery(std::string const &uri_after_host);
 	std::string	extractPort(std::string const &path_wo_query);
-	std::string	extractPathAndCgi(std::string const &path);
+	std::string	extractPathInfo(std::string const &path);
+	std::string	extractCgiInfo(std::string const &path);
 	void		parseQueryWithDecodePercent(std::string const &query);
 	void		formatEachComponentsExQuery(void);
 	void		assertFinalData(void) const;
@@ -57,10 +54,11 @@ public:
 	std::size_t	getPort(void) const;
 	std::string	getPortStr(void) const;
 	std::string	getPath(void) const;
-	Query_s		getQuery(void) const;
+	Query		getQuery(void) const;
 	ft::str_map	getQueryMap(void) const;
 	std::string	getQueryValue(std::string const &key) const;
 	std::string	getRawQueryString(void) const;
-	Cgi_s		getCgi(void) const;
+	PathInfo	getPathInfo(void) const;
 	bool		IsCgi(void) const;
+	bool		hasQuery(void) const;
 };

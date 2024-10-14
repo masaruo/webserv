@@ -111,7 +111,7 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &
 	std::string const 						&path = getLine().getUri().getPath();
 	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
 	std::string	chdir_target = loc.directive_.getFirstValue(config::Config::CGI_ROOT);
-	chdir_target += getLine().getUri().getCgi().pathBeforeScript_;
+	chdir_target += getLine().getUri().getPathInfo().directory_;
 	if (chdir(chdir_target.c_str()) == ft::err)
 	{
 		std::exit(INTERNAL_SERVER_ERROR);

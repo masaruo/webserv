@@ -5,31 +5,15 @@
 #include "HttpRedirection.hpp"
 #include <sstream>
 
-HttpUri::Cgi_s::Cgi_s()
-:isCgi_(false)
-,hasPathInfo_(false)
-,pathBeforeScript_()
-,scriptName_()
-,ext_()
-,pathInfo_()
-{
-	return ;
-}
-
-HttpUri::Query_s::Query_s()
-:hasQuery_(false)
-,QueryMap_()
-{
-	return ;
-}
-
 HttpUri::HttpUri()
 :rawUri_()
 ,host_()
 ,port_(80)
 ,path_()
+,isCgi_()
+,hasQuery_()
 ,query_()
-,cgi_()
+,pathInfo_()
 {
 	return ;
 }
@@ -44,8 +28,10 @@ HttpUri::HttpUri(HttpUri const &rhs)
 ,host_(rhs.host_)
 ,port_(rhs.port_)
 ,path_(rhs.path_)
+,isCgi_(rhs.isCgi_)
+,hasQuery_(rhs.hasQuery_)
 ,query_(rhs.query_)
-,cgi_(rhs.cgi_)
+,pathInfo_(rhs.pathInfo_)
 {
 	return ;
 }
@@ -58,8 +44,10 @@ HttpUri &HttpUri::operator=(HttpUri const &rhs)
 		host_ = rhs.host_;
 		port_ = rhs.port_;
 		path_ = rhs.path_;
+		isCgi_ = rhs.isCgi_;
+		hasQuery_ = rhs.hasQuery_;
 		query_ = rhs.query_;
-		cgi_ = rhs.cgi_;
+		pathInfo_ = rhs.pathInfo_;
 	}
 	return (*this);
 }
@@ -133,13 +121,13 @@ std::string	HttpUri::extractQuery(std::string const &after_host)
 	{
 		pathWoutQuery = after_host;
 		query = "";
-		query_.hasQuery_ = false;
+		hasQuery_ = false;
 	}
 	else
 	{
 		pathWoutQuery = after_host.substr(0, queryStartPos);
 		query = after_host.substr(queryStartPos + 1);
-		query_.hasQuery_ = true;
+		hasQuery_ = true;
 		parseQueryWithDecodePercent(query);
 	}
 	return (pathWoutQuery);
@@ -172,15 +160,8 @@ std::string	HttpUri::extractPort(std::string const &host)
 	return (hostWoutPort);
 }
 
-std::string	HttpUri::extractPathAndCgi(std::string const &pathWoutQuery)
+std::string	HttpUri::extractCgiInfo(std::string const &pathWoutQuery)
 {
-	std::string::size_type	scriptEndPos = pathWoutQuery.find(".py");//! ONLY PYTHON
-	if (scriptEndPos == std::string::npos)
-	{
-		cgi_.isCgi_ = false;
-		return (pathWoutQuery);
-	}
-
 	ft::string									ftpath(pathWoutQuery);
 	ft::string::string_vector					split_by_slash = ftpath.split("/");
 	ft::string::string_vector::const_iterator	iter = split_by_slash.begin();
@@ -192,7 +173,7 @@ std::string	HttpUri::extractPathAndCgi(std::string const &pathWoutQuery)
 
 	while (iter != end)
 	{
-		std::string::size_type	hasScript = iter->str().find(".py");
+		std::string::size_type	hasScript = iter->str().find(".py");//! only python
 		if (hasScript == std::string::npos)
 		{
 			if (isPathInfo)
@@ -213,16 +194,51 @@ std::string	HttpUri::extractPathAndCgi(std::string const &pathWoutQuery)
 		}
 	}
 
-	Cgi_s	cgi;
-	cgi.isCgi_ = true;
-	cgi.hasPathInfo_ = isPathInfo;
-	cgi.pathBeforeScript_ = ft::reverse_split(pathBeforeScriptVec, '/');
-	cgi.scriptName_ = scriptName;
-	cgi.ext_ = "py";
-	cgi.pathInfo_ = ft::reverse_split(pathInfoVec, '/');
+	PathInfo	cgi;
+	cgi.directory_ = ft::reverse_split(pathBeforeScriptVec, '/');
+	cgi.fileName_ = scriptName;
+	cgi.cgiPathInfo_ = ft::reverse_split(pathInfoVec, '/');
 
-	cgi_ = cgi;
-	return (cgi.pathBeforeScript_ + "/" + cgi.scriptName_);
+	pathInfo_ = cgi;
+	return (cgi.directory_ + "/" + cgi.fileName_);
+}
+
+std::string	HttpUri::extractPathInfo(std::string const &pathWithoutQuery)
+{
+	std::string const		&path(pathWithoutQuery);
+	std::string 			fullPath = "";
+	std::string				dir = "";
+	std::string				file = "";
+
+	std::string::size_type	findPos = path.find(".py");//! only python for cgi
+	// if CGI -> pass to extractCgiInfo()
+	if (findPos != std::string::npos)
+	{
+		isCgi_ = true;
+		fullPath = extractCgiInfo(path);
+	}
+	else
+	{
+		findPos = path.find_last_of('/');
+		if (findPos == std::string::npos)
+		{
+			fullPath = path;
+			dir = path;
+			file = "";
+		}
+		else
+		{
+			fullPath = path;
+			dir = path.substr(0, findPos);
+			file = path.substr(findPos + 1);
+		}
+	}
+	PathInfo	info;
+	info.directory_ = dir;
+	info.fileName_ = file;
+	info.cgiPathInfo_ = "";
+	pathInfo_ = info;
+	return (fullPath);
 }
 
 // 3
@@ -230,7 +246,7 @@ void	HttpUri::parseUriAndExtractPath(std::string const &after_scheme)
 {
 	std::string const	afterHost = extractHost(after_scheme);
 	std::string const	pathStartWoQuery = extractQuery(afterHost);
-	std::string const	path = extractPathAndCgi(pathStartWoQuery);
+	std::string const	path = extractPathInfo(pathStartWoQuery);
 	
 	path_ = path;
 }
@@ -286,23 +302,23 @@ void	HttpUri::formatEachComponentsExQuery(void)
 	// authority_ = UriNormalizer::decodePercent(authority_);
 	host_ = UriNormalizer::decodePercent(host_);
 	path_ = UriNormalizer::decodePercent(path_);
-	cgi_.pathBeforeScript_ = UriNormalizer::decodePercent(cgi_.pathBeforeScript_);
-	cgi_.scriptName_ = UriNormalizer::decodePercent(cgi_.scriptName_);
-	cgi_.pathInfo_ = UriNormalizer::decodePercent(cgi_.pathInfo_);
+	pathInfo_.directory_ = UriNormalizer::decodePercent(pathInfo_.directory_);
+	pathInfo_.fileName_ = UriNormalizer::decodePercent(pathInfo_.fileName_);
+	pathInfo_.cgiPathInfo_ = UriNormalizer::decodePercent(pathInfo_.cgiPathInfo_);
 
 	// expand dots
 	host_ = UriNormalizer::decodeDots(host_);
 	path_ = UriNormalizer::decodeDots(path_);
-	cgi_.pathBeforeScript_ = UriNormalizer::decodeDots(cgi_.pathBeforeScript_);
-	cgi_.scriptName_ = UriNormalizer::decodeDots(cgi_.scriptName_);
-	cgi_.pathInfo_ = UriNormalizer::decodeDots(cgi_.pathInfo_);
+	pathInfo_.directory_ = UriNormalizer::decodeDots(pathInfo_.directory_);
+	pathInfo_.fileName_ = UriNormalizer::decodeDots(pathInfo_.fileName_);
+	pathInfo_.cgiPathInfo_ = UriNormalizer::decodeDots(pathInfo_.cgiPathInfo_);
 }
 
 void	HttpUri::assertFinalData(void) const
 {
 	ft::string	const	&host(host_);
 	ft::string const	&path(path_);
-	ft::string			cgi(cgi_.pathBeforeScript_);
+	ft::string			cgi(pathInfo_.directory_);
 
 	if (host.empty() || !host.has_only(ft::string::URI_UNRESERVED + ft::string::SUBDELIMS))
 		throw (HttpException(HttpCode::BAD_REQUEST));
@@ -319,11 +335,11 @@ void	HttpUri::assertFinalData(void) const
 	if (!cgi.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
 		
-	cgi = cgi_.scriptName_;
+	cgi = pathInfo_.fileName_;
 	if (!cgi.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
-	cgi = cgi_.pathInfo_;
+	cgi = pathInfo_.cgiPathInfo_;
 	if (cgi.empty() || !cgi.has_only(ft::string::PCHAR + "/"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
@@ -348,7 +364,7 @@ std::string	HttpUri::getPath(void) const
 	return (path_);
 }
 
-HttpUri::Query_s	HttpUri::getQuery(void) const
+HttpUri::Query	HttpUri::getQuery(void) const
 {
 	return (query_);
 }
@@ -384,12 +400,17 @@ std::string	HttpUri::getRawQueryString(void) const
 	return(oss.str());
 }
 
-HttpUri::Cgi_s	HttpUri::getCgi(void) const
+HttpUri::PathInfo	HttpUri::getPathInfo(void) const
 {
-	return (cgi_);
+	return (pathInfo_);
 }
 
 bool	HttpUri::IsCgi(void) const
 {
-	return (cgi_.isCgi_);
+	return (isCgi_);
+}
+
+bool	HttpUri::hasQuery(void) const
+{
+	return (hasQuery_);
 }

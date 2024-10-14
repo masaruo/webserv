@@ -13,11 +13,10 @@
 #include "ClientSocket.class.hpp"
 #include "define.hpp"
 #include "Fcntl.class.hpp"
-// #include "ConnectionHandler.hpp"
 #include "RequestFactory.hpp"
 #include "Response.hpp"
 #include "HttpException.hpp"
-#include "HttpExceptionWithConfig.hpp"
+#include "AResponseException.hpp"
 #include "IO.class.hpp"
 #include <unistd.h>
 
@@ -61,29 +60,23 @@ void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
 	{
 		ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(fd_, config_factory));
 		Response res = request_->generateResponse();
-		// ConnectionHandler::sendData(fd_, res.to_string());
 		io::IO sender(fd_);
 		sender.send(res.to_string());
 		std::cerr << "Good Request" << std::endl;//todo
 	}
-	catch(HttpExceptionWithConfig const &e)
-	{
-		Response res = e.generateResponse();
-		io::IO sender(fd_);
-		sender.send(res.to_string());
-		// ConnectionHandler::sendData(fd_, res.to_string());
-	}
 	catch(HttpException const &e)
 	{
 		std::cerr << e.what() << std::endl;//todo
 		Response res = e.generateResponse();
 		io::IO sender(fd_);
 		sender.send(res.to_string());
-		// ConnectionHandler::sendData(fd_, res.to_string());
 	}
-	catch(HttpException const &e)
+	catch(AResponseException const &request)
 	{
-		std::cerr << e.what() << std::endl;//todo
+		Response r = request.generateResponse();
+		io::IO sender(fd_);
+		sender.send(r.to_string());
+		std::cerr << "Auto index or redirect " << std::endl;//todo
 	}
 	catch(std::runtime_error const &e)
 	{

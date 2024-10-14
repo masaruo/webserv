@@ -61,6 +61,7 @@ public:
 	std::size_t		getPort(void) const;
 	std::string		getServerName(void) const;
 	std::string		getRoot(std::string const &path = "") const;
+	ErrorPageMap	getErrorPageMap(void) const;
 	std::string		getErrorPage(HttpCode::StatusCode error_code) const;
 	std::string		getOtherDirective(DirectiveType type) const;
 	LocationConfig	getConfigLocation(std::string const &path) const;

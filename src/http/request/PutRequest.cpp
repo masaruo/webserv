@@ -1,6 +1,6 @@
 #include "PutRequest.hpp"
 #include "Response.hpp"
-#include "HttpExceptionWithConfig.hpp"
+#include "HttpException.hpp"
 #include "string.hpp"
 #include "FileHandler.hpp"
 #include "UriNormalizer.hpp"
@@ -49,12 +49,12 @@ void	PutRequest::uploadFile(std::string const &absPath) const
 	std::ofstream	ofs(absPath.c_str() , std::ios_base::trunc | std::ios_base::binary);//chuncked?
 	if (!ofs)
 	{
-		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 	ofs.write(getBody().to_string().c_str(), getBody().getSize());
 	if (!ofs)
 	{
-		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 }
 

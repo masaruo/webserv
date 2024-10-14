@@ -2,7 +2,7 @@
 #include "HttpException.hpp"
 #include "string.hpp"
 #include "UriNormalizer.hpp"
-#include "HttpRedirection.hpp"
+// #include "HttpRedirectionException.hpp"
 #include <sstream>
 
 HttpUri::HttpUri()

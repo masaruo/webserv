@@ -65,7 +65,8 @@ void	PutRequest::uploadFile(std::string const &absPath) const
 
 static std::string getParentPath(std::string const &path, std::string const &root)
 {
-	ft::string const 				&ftPath(path);
+	ft::string						ftPath(path);
+	ftPath.trim('/');
 	ft::string::string_vector const	&splitBySlah = ftPath.split("/");
 
 	if (splitBySlah.empty() || splitBySlah.size() == 1)
@@ -94,8 +95,8 @@ std::string	PutRequest::setLocalPath(void) const
 	else
 	{
 		std::string const &parentPath = getParentPath(path, root);
-		if (FileHandler::checkPathExist(parentPath))
-			throw (HttpException(HttpCode::CONFLICT));
+		if (!FileHandler::checkPathExist(parentPath))
+			throw (HttpException(HttpCode::NOT_FOUND));
 		if (!FileHandler::checkIfDirectory(parentPath))
 			throw (HttpException(HttpCode::CONFLICT));
 		if (access(parentPath.c_str(), W_OK) != ft::err)

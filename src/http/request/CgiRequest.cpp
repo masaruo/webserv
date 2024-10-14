@@ -23,6 +23,7 @@ CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
 {
+	generateResponseData();
 	return ;
 }
 

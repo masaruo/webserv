@@ -37,7 +37,7 @@ Config::Config(int flag)//!this is MOCK!
 	upload.addValue(ALLOWED_METHOD, "DELETE");
 	upload.addValue(ALLOWED_METHOD, "GET");
 	upload.addValue(AUTOINDEX, "on");
-	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploads");
+	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploadstore");//? have to create folder?
 	LocationConfig	uploader;
 	uploader.pathType_ = UPLOAD_PATH;
 	uploader.directive_ = upload;

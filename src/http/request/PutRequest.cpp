@@ -43,14 +43,10 @@ static void	assertFileWithNoControlChar(std::string const &data)
 
 void	PutRequest::uploadFile(std::string const &absPath) const
 {
-	HttpUri const		&uri = getLine().getUri();
-	std::string const	&fileName = uri.getPathInfo().fileName_;
-	std::string			uploadPath = absPath;
-
-	if (uploadPath.empty() || fileName.empty())
+	if (absPath.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
-	std::ofstream	ofs(uploadPath.c_str() , std::ios_base::trunc | std::ios_base::binary);//chuncked?
+	std::ofstream	ofs(absPath.c_str() , std::ios_base::trunc | std::ios_base::binary);//chuncked?
 	if (!ofs)
 	{
 		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));

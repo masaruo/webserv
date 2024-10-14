@@ -36,9 +36,10 @@ DeleteRequest &DeleteRequest::operator=(DeleteRequest const &rhs)
 std::string	DeleteRequest::setLocalPath(void) const
 {
 	HttpUri const		&uri = getLine().getUri();
-	std::string const	&path = UriNormalizer::decodeDots(uri.getPath());
-	std::string const	&root = getConfig().getRoot(path);
-	std::string const	&pathWithRoot = root + path;
+	std::string const	&dir = UriNormalizer::decodeDots(uri.getPathInfo().directory_);
+	std::string const	&file = UriNormalizer::decodeDots(uri.getPathInfo().fileName_);
+	std::string const	&root = getConfig().getRoot(dir);
+	std::string const	&pathWithRoot = root + dir + "/" + file;
 
 	if (FileHandler::checkPathExist(pathWithRoot))
 	{
@@ -60,15 +61,10 @@ std::string	DeleteRequest::setLocalPath(void) const
 
 void	DeleteRequest::removeFile(std::string const &path) const
 {
-	HttpUri const		&uri = getLine().getUri();
-	std::string const	&fileName = uri.getQueryValue("filename");
-	std::string			deletePath = path;
-
-	if (deletePath.empty() || fileName.empty())
+	if (path.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
-	deletePath.append("/" + fileName);
 
-	if (std::remove(deletePath.c_str()) == ft::err)
+	if (std::remove(path.c_str()) == ft::err)
 		throw (HttpExceptionWithConfig(HttpCode::INTERNAL_SERVER_ERROR, getConfig()));
 }
 

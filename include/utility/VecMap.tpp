@@ -114,8 +114,7 @@ typename VecMap<K, V>::valueVec_t	VecMap<K, V>::at(K const &key) const
 {
 	assertHasKey(key);
 	const_iterator iter = data_.find(key);
-	if (iter != data_.end())
-		return (iter->second);
+	return (iter->second);
 }
 
 template<typename K, typename V>

@@ -7,8 +7,8 @@ class FileHandler
 private:
 	FileHandler(){};
 	~FileHandler(){};
-	FileHandler(FileHandler const &rhs);
-	FileHandler &operator=(FileHandler const &rhs){ (void) rhs; };
+	FileHandler(FileHandler const &rhs);//=delete
+	FileHandler &operator=(FileHandler const &rhs);//=delete
 public:
 	static int const	INVALID_PATH = -1;
 	static int const	ISDIR = 1;

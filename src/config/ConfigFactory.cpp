@@ -3,6 +3,7 @@
 config::ConfigFactory::ConfigFactory(std::string const &config_path)
 {
 	//todo codes
+	(void) config_path;
 	return ;
 }
 

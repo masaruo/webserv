@@ -39,6 +39,7 @@ public:
 		PathType		pathType_;
 		DirectiveMap	directive_;
 	};
+
 	typedef std::map<std::string, LocationConfig>	LocationConfigMap;
 
 private:

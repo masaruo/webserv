@@ -45,8 +45,9 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 			bodyStr = input.recv("chunked");//* chunkの読み取り
 		else
 			bodyStr = input.recv(header.getContentLen());
-		std::istringstream	bodyStream(bodyStr);
-		HttpBody body(bodyStream, header);
+		// std::istringstream	bodyStream(bodyStr);
+		// HttpBody body(bodyStream, header);
+		HttpBody	body(bodyStr);
 		if (method == "POST")
 		{
 			return (new PostRequest(requestLine, header, body, config));

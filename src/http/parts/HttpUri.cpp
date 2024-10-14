@@ -166,36 +166,67 @@ std::string	HttpUri::extractCgiInfo(std::string const &pathWoutQuery)
 	ft::string::string_vector					split_by_slash = ftpath.split("/");
 	ft::string::string_vector::const_iterator	iter = split_by_slash.begin();
 	ft::string::string_vector::const_iterator	end = split_by_slash.end();
-	ft::string::string_vector					pathBeforeScriptVec;
+	ft::string::string_vector					dirScriptVec;
 	std::string									scriptName;
 	ft::string::string_vector					pathInfoVec;
-	bool										isPathInfo = false;
+	bool										isDir = true;
 
-	while (iter != end)
+	while (true)
 	{
-		std::string::size_type	hasScript = iter->str().find(".py");//! only python
-		if (hasScript == std::string::npos)
+		std::string::size_type	posCgiBin = iter->str().find("cgi-bin");
+		if (isDir)
 		{
-			if (isPathInfo)
-			{
-				pathInfoVec.push_back(*iter);
-			}
-			else
-			{
-				pathBeforeScriptVec.push_back(*iter);
-			}
-			iter++;
+			dirScriptVec.push_back(*iter);
 		}
 		else
 		{
-			scriptName = *iter;
-			isPathInfo = true;
-			iter++;
+			pathInfoVec.push_back(*iter);
 		}
+		if (posCgiBin != std::string::npos)
+		{
+			isDir = false;
+			iter++;
+			scriptName = *iter;
+		}
+		if (iter + 1 == end)
+			break ;
+		iter++;
 	}
+	// while (iter != end)
+	// {
+	// 	std::string::size_type	hasScript = iter->str().find("cgi-bin");//! change to cgi-bin
+	// 	if (hasScript == std::string::npos)
+	// 	{
+
+	// 	}
+	// 	else
+	// 	{
+
+	// 	}
+	// 	iter++;
+		// std::string::size_type	hasScript = iter->str().find(".py");//! only python
+		// if (hasScript == std::string::npos)
+		// {
+		// 	if (isPathInfo)
+		// 	{
+		// 		pathInfoVec.push_back(*iter);
+		// 	}
+		// 	else
+		// 	{
+		// 		pathBeforeScriptVec.push_back(*iter);
+		// 	}
+		// 	iter++;
+		// }
+		// else
+		// {
+		// 	scriptName = *iter;
+		// 	isPathInfo = true;
+		// 	iter++;
+		// }
+	
 
 	PathInfo	cgi;
-	cgi.directory_ = ft::reverse_split(pathBeforeScriptVec, '/');
+	cgi.directory_ = ft::reverse_split(dirScriptVec, '/');
 	cgi.fileName_ = scriptName;
 	cgi.cgiPathInfo_ = ft::reverse_split(pathInfoVec, '/');
 
@@ -210,7 +241,7 @@ std::string	HttpUri::extractPathInfo(std::string const &pathWithoutQuery)
 	std::string				dir = "";
 	std::string				file = "";
 
-	std::string::size_type	findPos = path.find(".py");//! only python for cgi
+	std::string::size_type	findPos = path.find("cgi-bin");
 	// if CGI -> pass to extractCgiInfo()
 	if (findPos != std::string::npos)
 	{
@@ -232,12 +263,9 @@ std::string	HttpUri::extractPathInfo(std::string const &pathWithoutQuery)
 			dir = path.substr(0, findPos);
 			file = path.substr(findPos + 1);
 		}
+		pathInfo_.directory_ = dir;
+		pathInfo_.fileName_ = file;
 	}
-	PathInfo	info;
-	info.directory_ = dir;
-	info.fileName_ = file;
-	info.cgiPathInfo_ = "";
-	pathInfo_ = info;
 	return (fullPath);
 }
 

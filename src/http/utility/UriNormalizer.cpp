@@ -72,11 +72,11 @@ std::string	UriNormalizer::decodePercent(std::string const &raw)
 	{
 		if (*iter == '%')
 		{
-			if (std::distance(iter, end) < UriNormalizer::PERCENT_ENCODE_LEN)//%後の文字列が２つないとき
+			if (static_cast<std::size_t>(std::distance(iter, end)) < UriNormalizer::PERCENT_ENCODE_LEN)//%後の文字列が２つないとき
 			{
 				throw (HttpException(HttpCode::BAD_REQUEST));
 			}
-			percentStr = raw.substr(std::distance(begin, iter), UriNormalizer::PERCENT_ENCODE_LEN);
+			percentStr = raw.substr(static_cast<std::size_t>(std::distance(begin, iter)), UriNormalizer::PERCENT_ENCODE_LEN);
 			std::istringstream iss(percentStr.substr(1));
 			int value;
 			iss >> std::hex >> value;

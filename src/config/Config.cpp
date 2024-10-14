@@ -15,6 +15,7 @@ Config::Config(int flag)//!this is MOCK!
 	root_ = "/webserv/www/html";
 	others_.addValue(MAX_BODY_SIZE, "60000000");
 	error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
+	error_pages_.insert(std::make_pair(HttpCode::METHOD_NOT_ALLOWED, "/405.html"));
 	error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
 	error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
 	error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
@@ -24,8 +25,8 @@ Config::Config(int flag)//!this is MOCK!
 	DirectiveMap	slash;
 	slash.addValue(INDEX, "index.html");
 	slash.addValue(ALLOWED_METHOD, "GET");
-	slash.addValue(ALLOWED_METHOD, "POST");
-	slash.addValue(ALLOWED_METHOD, "DELETE");
+	// slash.addValue(ALLOWED_METHOD, "POST");
+	// slash.addValue(ALLOWED_METHOD, "DELETE");
 	slash.addValue(AUTOINDEX, "on");
 	LocationConfig	root;
 	root.pathType_ = ROOT_PATH;

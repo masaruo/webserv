@@ -12,5 +12,5 @@ public:
 	~GetRequest();
 	GetRequest(GetRequest const &rhs);
 	GetRequest	&operator=(GetRequest const &rhs);
-	Response	generateResponse(void) const;
+	void		generateResponseData(void);
 };

@@ -3,12 +3,14 @@
 #include "HttpExceptionWithConfig.hpp"
 #include "string.hpp"
 #include "FileHandler.hpp"
+#include "UriNormalizer.hpp"
 #include <fstream>
 #include <cstdio>// for fdopen
 
 PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
 {
+	generateResponseData();
 	return ;
 }
 
@@ -39,11 +41,11 @@ static void	assertFileWithNoControlChar(std::string const &data)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
-void	PutRequest::uploadFile(void) const
+void	PutRequest::uploadFile(std::string const &absPath) const
 {
-	HttpUri const	uri = getLine().getUri();
-	std::string const	fileName = uri.getQueryValue("filename");
-	std::string			uploadPath = getLocalPath();
+	HttpUri const		&uri = getLine().getUri();
+	std::string const	&fileName = uri.getQueryValue("filename");
+	std::string			uploadPath = absPath;
 
 	if (uploadPath.empty() || fileName.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
@@ -61,38 +63,59 @@ void	PutRequest::uploadFile(void) const
 	}
 }
 
+static std::string getParentPath(std::string const &path, std::string const &root)
+{
+	ft::string const 				&ftPath(path);
+	ft::string::string_vector const	&splitBySlah = ftPath.split("/");
+
+	if (splitBySlah.empty() || splitBySlah.size() == 1)
+		return (root);
+
+	std::string const &concat = root + ft::reverse_split(splitBySlah, '/');
+	return (concat);
+}
+
 std::string	PutRequest::setLocalPath(void) const
 {
-	std::string			finalPath;
 	HttpUri const		&uri = getLine().getUri();
-	std::string const	&path = uri.getPath();
+	std::string const	&path = UriNormalizer::decodeDots(uri.getPath());
 	std::string const	&root = getConfig().getRoot(path);
 	std::string const	&pathWithRoot = root + path;
-	bool const			isDir = FileHandler::checkIfDirectory(pathWithRoot);
 
-	if (isDir)
+	if (FileHandler::checkPathExist(pathWithRoot))
 	{
-		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
+		if (FileHandler::checkIfDirectory(pathWithRoot))
+			throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
+		if (!FileHandler::checkIfFile(pathWithRoot))
+			throw (HttpException(HttpCode::CONFLICT));
+		if (access(pathWithRoot.c_str(), W_OK) == ft::err)
+			throw (HttpException(HttpCode::FORBIDDEN));
 	}
 	else
 	{
-		bool const	isFileExist = access(pathWithRoot.c_str(), F_OK);//todo
-		bool const	isFileR_OK = access(pathWithRoot.c_str(), W_OK);//todo
-		finalPath = pathWithRoot;
+		std::string const &parentPath = getParentPath(path, root);
+		if (FileHandler::checkPathExist(parentPath))
+			throw (HttpException(HttpCode::CONFLICT));
+		if (!FileHandler::checkIfDirectory(parentPath))
+			throw (HttpException(HttpCode::CONFLICT));
+		if (access(parentPath.c_str(), W_OK) != ft::err)
+			throw (HttpException(HttpCode::FORBIDDEN));
 	}
-	FileHandler::assertAccess(finalPath, R_OK);
-	return (finalPath);
+	return (pathWithRoot);
 }
 
-Response	PutRequest::generateResponse(void) const
+void	PutRequest::generateResponseData(void)
 {
-	uploadFile();
+	std::string const &abspath = setLocalPath();
+	uploadFile(abspath);
+
+	HttpStatus	status(HttpCode::OK);
 
 	HttpHeader	header;
 	header.addValue(HttpHeader::CONTENT_LENGTH, "0");
 
-	HttpStatus	status(HttpCode::OK);
-
-	Response	response(status, header);
-	return (response);
+	setResponseStatus(status);
+	setResponseHeader(header);
+	setResponseHasBody(false);
+	return ;
 }

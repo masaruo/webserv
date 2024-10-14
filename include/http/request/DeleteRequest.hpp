@@ -6,7 +6,7 @@ class DeleteRequest : public ARequest
 {
 private:
 	std::string	setLocalPath(void) const;
-	void		removeFile(void) const;
+	void		removeFile(std::string const &abspath) const;
 	DeleteRequest();//=delete
 public:
 	explicit DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
@@ -14,5 +14,5 @@ public:
 	DeleteRequest &operator=(DeleteRequest const &rsh);
 	~DeleteRequest();
 
-	Response	generateResponse(void) const;
+	void	generateResponseData(void);
 };

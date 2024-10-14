@@ -24,7 +24,7 @@ public:
 		Query_s();
 	};
 	
-private:
+private://! add parent_? which is just one / up of path?
 	std::string	rawUri_;
 	std::string	host_;
 	std::size_t	port_;

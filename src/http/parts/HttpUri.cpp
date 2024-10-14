@@ -216,10 +216,10 @@ std::string	HttpUri::extractPathAndCgi(std::string const &pathWoutQuery)
 	Cgi_s	cgi;
 	cgi.isCgi_ = true;
 	cgi.hasPathInfo_ = isPathInfo;
-	cgi.pathBeforeScript_ = ft::concatSplitVector(pathBeforeScriptVec, '/');
+	cgi.pathBeforeScript_ = ft::reverse_split(pathBeforeScriptVec, '/');
 	cgi.scriptName_ = scriptName;
 	cgi.ext_ = "py";
-	cgi.pathInfo_ = ft::concatSplitVector(pathInfoVec, '/');
+	cgi.pathInfo_ = ft::reverse_split(pathInfoVec, '/');
 
 	cgi_ = cgi;
 	return (cgi.pathBeforeScript_ + "/" + cgi.scriptName_);

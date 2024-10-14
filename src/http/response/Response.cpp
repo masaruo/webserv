@@ -77,7 +77,6 @@ std::string	Response::to_string(void) const
 	std::stringstream	ss;
 
 	ss << status_.to_string();
-	// header_.addValue(HttpHeader::DATE, Date::time());
 	ss << header_.to_string();
 	ss << ft::string::CR +ft::string::LF;
 	if (has_body_)

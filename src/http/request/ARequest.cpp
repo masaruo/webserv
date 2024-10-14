@@ -3,6 +3,7 @@
 #include "HttpExceptionWithConfig.hpp"
 #include "HttpRedirection.hpp"
 #include "FileHandler.hpp"
+#include "Response.hpp"
 #include <sstream>
 #include <unistd.h>// for access
 
@@ -11,8 +12,7 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 ,header_(header)
 ,body_()
 ,config_(config)
-,configLocation_(setServerConfigLocation())
-,localPath_(setLocalPath())
+,response_()
 {
 	assertAllowedMethod();
 	assertRedirection();
@@ -24,8 +24,7 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody c
 ,header_(header)
 ,body_(body)
 ,config_(config)
-,configLocation_(setServerConfigLocation())
-,localPath_(setLocalPath())
+,response_()
 {
 	assertAllowedMethod();
 	assertRedirection();
@@ -37,8 +36,7 @@ ARequest::ARequest(ARequest const &rhs)
 ,header_(rhs.header_)
 ,body_(rhs.body_)
 ,config_(rhs.config_)
-,configLocation_(rhs.configLocation_)
-,localPath_(rhs.localPath_)
+,response_(rhs.response_)
 {
 	return ;
 }
@@ -56,14 +54,13 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 		header_ = rhs.header_;
 		body_ = rhs.body_;
 		config_ = rhs.config_;
-		configLocation_ = rhs.configLocation_;
-		localPath_ = rhs.localPath_;
+		response_ = rhs.response_;
 	}
 	return (*this);
 }
 
 // setters
-config::Config::LocationConfig	ARequest::setServerConfigLocation(void)
+config::Config::LocationConfig	ARequest::setServerConfigLocation(void)//? detelte
 {
 	config::Config::LocationConfig loc;
 	std::string const	&path = getLine().getUri().getPath();
@@ -71,35 +68,6 @@ config::Config::LocationConfig	ARequest::setServerConfigLocation(void)
 	//todo if host == empty? possible? or if loc is empty?
 	return (loc);
 }
-
-// std::string	ARequest::setLocalPath(void)
-// {
-// 	HttpUri const		&uri = getLine().getUri();
-// 	std::string const	&path = uri.getPath();
-// 	std::string const	&root = config_.getRoot(path);
-// 	std::string localAbsPath = root + path;
-// 	assertLocalPath(localAbsPath);
-// 	return (localAbsPath);
-// }
-
-// void	ARequest::assertLocalPath(std::string const &localPath)
-// {
-// 	//todo bool const	isRedirection;
-
-// 	bool const	checkIfDirectory = FileHandler::checkIfDirectory(localPath);
-// 	if (!checkIfDirectory)
-// 		return ;
-
-// 	//todo bool const	isAutoIndex = ;
-// 	if (isAutoIndex)
-// 	{
-// 		//todo throw autoindex
-// 	}
-// 	else
-// 	{
-
-// 	}
-// }
 
 void	ARequest::assertRedirection(void) const
 {
@@ -116,21 +84,56 @@ void	ARequest::assertRedirection(void) const
 
 void	ARequest::assertAllowedMethod(void) const
 {
-	std::string const	&method = requestLine_.getMethod();
-
-	if (!configLocation_.directive_.hasValue(config::Config::ALLOWED_METHOD, method))
+	std::string const						&method = requestLine_.getMethod();
+	std::string const						&path = getLine().getUri().getPath();
+	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
+	if (!loc.directive_.hasValue(config::Config::ALLOWED_METHOD, method))
 	{
 		throw (HttpExceptionWithConfig(HttpCode::METHOD_NOT_ALLOWED, getConfig()));
 	}
 }
 
-void	ARequest::assertFileExist(std::string const &file_path) const
+void	ARequest::setResponseStatus(HttpStatus const &response_status)
 {
-	if (access(file_path.c_str(), W_OK) == ft::err)
-		throw (HttpExceptionWithConfig(HttpCode::NOT_FOUND, getConfig()));
+	response_.status_ = response_status;
+}
+
+void	ARequest::setResponseHeader(HttpHeader const &response_header)
+{
+	response_.header_ = response_header;
+}
+
+void	ARequest::setResponseBody(HttpBody const &response_body)
+{
+	response_.body_ = response_body;
+}
+
+void	ARequest::setResponseHasBody(bool	hasBody)
+{
+	response_.has_body_ = hasBody;
 }
 
 // getters
+HttpStatus	ARequest::getResponseStatus(void) const
+{
+	return (response_.status_);
+}
+
+HttpHeader	ARequest::getResponseHeader(void) const
+{
+	return (response_.header_);
+}
+
+HttpBody	ARequest::getResponseBody(void) const
+{
+	return (response_.body_);
+}
+
+bool	ARequest::getResponseHasBody(void) const
+{
+	return (response_.has_body_);
+}
+
 RequestLine	ARequest::getLine(void) const
 {
 	return (requestLine_);
@@ -151,12 +154,16 @@ config::Config	ARequest::getConfig(void) const
 	return (config_);
 }
 
-config::Config::LocationConfig	ARequest::getConfigLocation(void) const
+Response	ARequest::generateResponse(void) const
 {
-	return (configLocation_);
-}
-
-std::string	ARequest::getLocalPath(void) const
-{
-	return (localPath_);
+	if (getResponseHasBody())
+	{
+		Response r(getResponseStatus(), getResponseHeader(), getResponseBody());
+		return (r);
+	}
+	else
+	{
+		Response r(getResponseStatus(), getResponseHeader());
+		return (r);
+	}
 }

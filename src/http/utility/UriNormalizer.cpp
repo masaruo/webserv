@@ -1,12 +1,9 @@
 #include "UriNormalizer.hpp"
 #include "string.hpp"
 #include "HttpException.hpp"
-// #include "define.hpp"
 #include <algorithm>
-#include <sstream>
 
 std::size_t const	UriNormalizer::PERCENT_ENCODE_LEN = 3;
-static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim);
 
 std::string	UriNormalizer::uniformSlash(std::string const &raw)
 {
@@ -25,18 +22,18 @@ std::string	UriNormalizer::decodeDots(std::string const &raw)
 
 	ft::string									ftraw(raw);
 	ft::string::string_vector					split_by_slash = ftraw.split("/");
-	ft::string::string_vector_iterator			str = split_by_slash.begin();
+	ft::string::string_vector_iterator			iter = split_by_slash.begin();
 	ft::string::string_vector_const_iterator	end = split_by_slash.end();
 	ft::string::string_vector					normalized;
 
-	while (str != end)
+	while (iter != end)
 	{
-		if ((*str == "." && str->size() == 1) || str->empty())
+		if ((*iter == "." && iter->size() == 1) || iter->empty())
 		{
-			str++;
+			iter++;
 			continue ;
 		}
-		else if (*str == ".." && str->size() == 2)
+		else if (*iter == ".." && iter->size() == 2)
 		{
 			if (!normalized.empty())
 				normalized.pop_back();
@@ -45,11 +42,18 @@ std::string	UriNormalizer::decodeDots(std::string const &raw)
 		}
 		else
 		{
-			normalized.push_back(*str);
+			normalized.push_back(*iter);
 		}
-		str++;
+		iter++;
 	}
-	std::string	res = concatStringVector(raw, normalized, '/');
+	std::string	res = ft::reverse_split(normalized, '/');
+
+	if (ftraw.start_with('/') && ftraw.size() != 1)
+		res.insert(0, 1, '/');
+	if (ftraw.end_with('/') && ftraw.size() != 1)
+		res.push_back('/');
+	if (res.empty())
+		res.push_back('/');
 	return (res);
 }
 
@@ -89,24 +93,4 @@ std::string	UriNormalizer::decodePercent(std::string const &raw)
 		}
 	}
 	return (decorded);
-}
-
-static std::string	concatStringVector(std::string const &raw, ft::string::string_vector const &string_vec, char delim)
-{
-	ft::string::string_vector_const_iterator	iter = string_vec.begin();
-	ft::string::string_vector_const_iterator	end = string_vec.end();
-	std::stringstream	ss;
-	ft::string	ftraw(raw);
-
-	if (ftraw.start_with('/'))
-		ss << "/";
-
-	while (iter != end)
-	{
-		ss << iter->str();
-		if (iter + 1 != end || ftraw.end_with('/'))
-			ss << delim;
-		iter++;
-	}
-	return (ss.str());
 }

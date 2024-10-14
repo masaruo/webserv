@@ -78,6 +78,8 @@ void	HttpCode::initialize() {
 		StatusCodeMap_[NOT_EXTENDED] = "Not Extended";
 		StatusCodeMap_[NETWORK_AUTHENTICATION_REQUIRED] = "Network Authentication Required";
 
+		// webserv custome error
+		StatusCodeMap_[INVALID_IN_WEBSERV] = "Custome Error";
 		is_initialized_ = true;
 	}
 }

@@ -115,6 +115,6 @@ public:
 	string_vector	split(std::string const &to_split) const;
 };
 
-std::string		concatSplitVector(ft::string::string_vector const &str_vec, char delim);
-std::string		removeConsecutiveDelim(std::string const &str, char delim);
+std::string			reverse_split(ft::string::string_vector const &str_vec, char delim);
+std::string			removeConsecutiveDelim(std::string const &str, char delim);
 } //end of namespace ft

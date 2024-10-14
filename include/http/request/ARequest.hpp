@@ -9,32 +9,55 @@ class Response;
 
 class ARequest
 {
+public:
+	struct	ResponseData
+	{
+		HttpStatus	status_;
+		HttpHeader	header_;
+		HttpBody	body_;
+		bool		has_body_;
+		ResponseData():has_body_(false){};
+	};
 private:
 	RequestLine						requestLine_;
 	HttpHeader						header_;
 	HttpBody						body_;
 	config::Config					config_;
-	config::Config::LocationConfig	configLocation_;//? delete
-	std::string						localPath_;
-	// bool							isDirectory_;
-	ARequest();//=delete:
+	ResponseData					response_;
+
+	// helper function
 	config::Config::LocationConfig	setServerConfigLocation(void);
-	std::string						setLocalPath(void);
+	virtual std::string				setLocalPath(void) const = 0;//! pure virtual
 	void							assertRedirection(void) const;
 	void							assertAllowedMethod(void) const;
+	ARequest();//=delete:
 protected:
-	std::string						getLocalPath(void) const;
 	void							assertFileExist(std::string const &filePath) const;
+	//response structure setter / getter
+	void							setResponseStatus(HttpStatus const &response_status);
+	void							setResponseHeader(HttpHeader const &response_header);
+	void							setResponseBody(HttpBody const &response_body);
+	void							setResponseHasBody(bool hasBody);
 public:
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);
 	virtual ~ARequest();
 	ARequest(ARequest const &rhs);
 	ARequest &operator=(ARequest const &rhs);
+
 	RequestLine 					getLine(void) const;
 	HttpHeader 						getHeader(void) const;
 	HttpBody						getBody(void) const;
 	config::Config					getConfig(void) const;
-	config::Config::LocationConfig	getConfigLocation(void) const;
-	virtual	Response				generateResponse(void) const = 0;
+
+	config::Config::LocationConfig	getConfigLocation(void) const;//? delete
+
+	//getter for response
+	HttpStatus						getResponseStatus(void) const;
+	HttpHeader						getResponseHeader(void) const;
+	HttpBody						getResponseBody(void) const;
+	bool							getResponseHasBody(void) const;
+
+	virtual void					generateResponseData(void) = 0;//! pure virtual
+	Response						generateResponse(void) const;
 };

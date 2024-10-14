@@ -1,7 +1,7 @@
 #include "CgiRequest.hpp"
-#include "Response.hpp"
 #include "HttpException.hpp"
 #include "FileHandler.hpp"
+#include "UriNormalizer.hpp"
 #include <unistd.h>// execve & chdir
 #include <cstdlib>// std::exit
 #include <cstring>// std::strcpy
@@ -16,12 +16,14 @@ int const	CgiRequest::INTERNAL_SERVER_ERROR = 50;
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
 :ARequest(line, header, config)
 {
+	generateResponseData();
 	return ;
 }
 
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
 {
+	generateResponseData();
 	return ;
 }
 
@@ -81,8 +83,7 @@ static char	**generateArgv(std::string const &uri)
 	return (argv);
 }
 
-#include <iostream>
-void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2]) const
+void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &abspath) const
 {
 	if (close(pipe_in[WRITE_FD]) == ft::err)
 		std::exit(INTERNAL_SERVER_ERROR);
@@ -100,22 +101,24 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2]) const
 	char	**argv = NULL;
 	try
 	{
-		argv = generateArgv(getLocalPath());
+		argv = generateArgv(abspath);
 	}
 	catch(std::bad_alloc const &e)
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
-	std::string	chdir_target = getConfigLocation().directive_.getFirstValue(config::Config::CGI_ROOT);
-	chdir_target += getLine().getUri().getCgi().pathBeforeScript_;
+	std::string const 						&path = getLine().getUri().getPath();
+	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
+	std::string	chdir_target = loc.directive_.getFirstValue(config::Config::CGI_ROOT);
+	chdir_target += getLine().getUri().getPathInfo().directory_;
 	if (chdir(chdir_target.c_str()) == ft::err)
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
 	//generate ENV with chdir dir
-	Env env(getLine(), getHeader(), getBody(), getLocalPath());
+	Env env(getLine(), getHeader(), getBody(), abspath);
 
 	execve(argv[0], argv, env.c_env());
 	std::exit(INTERNAL_SERVER_ERROR);
@@ -184,7 +187,7 @@ std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_p
 	return (result);
 }
 
-std::string	CgiRequest::execute(void) const
+std::string	CgiRequest::execute(std::string const &abspath) const
 {
 	int			pipe_in[2];
 	int			pipe_out[2];
@@ -206,7 +209,7 @@ std::string	CgiRequest::execute(void) const
 	}
 	else if (child_pid == CHILD_PID)
 	{
-		exec_child(pipe_in, pipe_out);
+		exec_child(pipe_in, pipe_out, abspath);
 	}
 	else
 	{
@@ -215,9 +218,27 @@ std::string	CgiRequest::execute(void) const
 	return (bodyStr);
 }
 
-Response	CgiRequest::generateResponse(void) const
+std::string	CgiRequest::setLocalPath(void) const
 {
-	std::string const	resBody = execute();
+	std::string			finalPath;
+	HttpUri const		&uri = getLine().getUri();
+	std::string const	&path = UriNormalizer::decodeDots(uri.getPath());
+	std::string const	&root = getConfig().getRoot(path);
+	std::string const	&pathWithRoot = root + path;
+
+	if (!FileHandler::checkPathExist(pathWithRoot))
+		throw (HttpException(HttpCode::NOT_FOUND));
+	if (!FileHandler::checkIfFile(pathWithRoot))
+		throw (HttpException(HttpCode::CONFLICT));
+	if (access(pathWithRoot.c_str(), X_OK) == ft::err)
+		throw (HttpException(HttpCode::FORBIDDEN));
+	return (pathWithRoot);
+}
+
+void	CgiRequest::generateResponseData(void)
+{
+	std::string const	abspath = setLocalPath();
+	std::string const	resBody = execute(abspath);
 
 	if (resBody.empty())
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
@@ -230,6 +251,9 @@ Response	CgiRequest::generateResponse(void) const
 	header.addValue(HttpHeader::CONTENT_TYPE, "text/html");
 	header.addValue(HttpHeader::CONTENT_LENGTH, body.getSizeStr());
 
-	Response	r(status, header, body);
-	return (r);
+	setResponseStatus(status);
+	setResponseHeader(header);
+	setResponseBody(body);
+	setResponseHasBody(true);
+	return ;
 }

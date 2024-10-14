@@ -1,13 +1,16 @@
 #include "GetRequest.hpp"
 #include "Response.hpp"
 #include "CgiRequest.hpp"
-#include "AutoIndexRequest.hpp"
+// #include "AutoIndexRequest.hpp"
+#include "autoIndexException.hpp"
 #include "FileHandler.hpp"
+#include "UriNormalizer.hpp"
 #include <sys/stat.h>
 
 GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
 :ARequest(line, header, config)
 {
+	generateResponseData();
 	return ;
 }
 
@@ -31,38 +34,64 @@ GetRequest &GetRequest::operator=(GetRequest const &rhs)
 	return (*this);
 }
 
-static bool	is_dir(std::string const &path)
+std::string	GetRequest::setLocalPath(void) const
 {
-	struct stat	buf;
+	std::string			finalPath;
+	HttpUri const		&uri = getLine().getUri();
+	std::string const	&path = UriNormalizer::decodeDots(uri.getPath());
+	std::string const	&root = getConfig().getRoot(path);
+	std::string const	&pathWithRoot = root + path;
 
-	int res = stat(path.c_str(), &buf);
-	if (res == ft::err)
-		return (false);
+	if (!FileHandler::checkPathExist(pathWithRoot))
+		throw (HttpException(HttpCode::NOT_FOUND));
 
-	if (S_ISDIR(buf.st_mode))
-		return (true);
-	else
-		return (false);
+	finalPath = pathWithRoot;
+	if (FileHandler::checkIfDirectory(pathWithRoot))
+	{
+		assertAutoIndex(path, pathWithRoot);
+		std::string const &indexFileName = getIndexFileName(path);
+		finalPath = pathWithRoot + indexFileName;
+	}
+	if (!FileHandler::checkPathExist(finalPath))
+		throw (HttpException(HttpCode::NOT_FOUND));
+	if (!FileHandler::checkIfFile(finalPath))
+		throw (HttpException(HttpCode::CONFLICT));
+	if (access(finalPath.c_str(), R_OK) == ft::err)
+		throw (HttpException(HttpCode::FORBIDDEN));
+	return (finalPath);
 }
 
-//! todo auto indexを探すだけでなく、ないときにINDEXからサイトを取ってくる？
-bool	GetRequest::isAutoIndex(std::string const &path) const
+void	GetRequest::assertAutoIndex(std::string const &path, std::string const &pathWithRoot) const
 {
-	bool const	isdir = is_dir(path);
-	config::Config::LocationConfig	const &loc = getConfigLocation();
+	config::Config::LocationConfig	const &loc = getConfig().getConfigLocation(path);
+
+	if (loc.directive_.hasKey(config::Config::INDEX))
+		return ;
+
+	if (loc.directive_.hasKey(config::Config::AUTOINDEX))
+	{
+		if (loc.directive_.getFirstValue(config::Config::AUTOINDEX) == "on")
+		{
+			throw (AutoIndexException(HttpCode::OK, pathWithRoot));
+		}
+	}
+}
+
+std::string	GetRequest::getIndexFileName(std::string const &path) const
+{
+	config::Config::LocationConfig	const &loc = getConfig().getConfigLocation(path);
 	if (loc.directive_.hasKey(config::Config::INDEX))
 	{
 		std::string const &index_directive = loc.directive_.getFirstValue(config::Config::INDEX);
-		if (index_directive.empty())
-			return (true);
-		else
-			return (false);
+		return (index_directive);
 	}
 	else
-		return (true);
+	{
+		return ("");
+	}
 }
 
-Response	GetRequest::generateResponse(void) const
+void	GetRequest::generateResponseData(void)
 {
 	HttpUri const		uri = getLine().getUri();
 	std::string const	path = uri.getPath();
@@ -70,21 +99,17 @@ Response	GetRequest::generateResponse(void) const
 	if (uri.IsCgi())
 	{
 		CgiRequest	cgi(getLine(), getHeader(), getConfig());
-		Response	r(cgi.generateResponse());
-		return (r);
-	}
-	else if (isAutoIndex(path))
-	{
-		AutoIndexRequest ai(getLine(), getHeader(), getConfig());
-		Response	r(ai.generateResponse());
-		return (r);
+		setResponseStatus(cgi.getResponseStatus());
+		setResponseHeader(cgi.getResponseHeader());
+		setResponseBody(cgi.getResponseBody());
+		setResponseHasBody(cgi.getResponseHasBody());
+		return;
 	}
 	else
 	{
-		std::string	const	&path = uri.getPath();
-		std::string const	&absPath = getLocalPath() + getConfigLocation().directive_.getFirstValue(config::Config::INDEX);
+		std::string const &abspath = setLocalPath();
 
-		HttpBody	body(FileHandler::read(absPath));//todo IOclass
+		HttpBody body(FileHandler::read(abspath));
 
 		HttpHeader	header;
 		header.addValue(HttpHeader::CONTENT_TYPE, "text/html");
@@ -92,7 +117,10 @@ Response	GetRequest::generateResponse(void) const
 
 		HttpStatus	status(HttpCode::OK);
 
-		Response	r(status, header, body);
-		return (r);
+		setResponseStatus(status);
+		setResponseHeader(header);
+		setResponseBody(body);
+		setResponseHasBody(true);
+		return ;
 	}
 }

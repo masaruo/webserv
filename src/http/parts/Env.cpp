@@ -42,39 +42,10 @@ void	Env::addEnvItem(std::string const &key, std::string const &value)
 	env_.insert(std::pair<std::string, std::string>(key, value));
 }
 
-// void	Env::generateEnv(RequestLine const &line, HttpHeader const &header, std::string const &local_path)
-// {
-// 	HttpUri const	uri = line.getUri();
-// 	std::string const	pathInfo = uri.getCgi().pathInfo_;
-// 	std::string const	pathTranslated = local_path + "/" + pathInfo;
-// 	std::string const	scriptName = uri.getPath();
-// 	std::string			contentType = "";
-// 	if (header.hasKey("content-type"))
-// 		contentType = header.getFirstValue("content-type");
-
-// 	addEnvItem("auth_type", "");
-// 	addEnvItem("content_length", "0");
-// 	addEnvItem("content_type", contentType);
-// 	addEnvItem("gateway_interface", "CGI/1.1");
-// 	addEnvItem("path_info", pathInfo);
-// 	addEnvItem("path_translated", pathTranslated);
-// 	addEnvItem("query_string", uri.getRawQueryString());
-// 	addEnvItem("remote_addr", "");//!Must todo
-// 	addEnvItem("remote_host", "");
-// 	addEnvItem("remote_ident", "");
-// 	addEnvItem("remote_user", "");
-// 	addEnvItem("request_method", line.getMethod());
-// 	addEnvItem("script_name", scriptName);
-// 	addEnvItem("server_name", uri.getHost());
-// 	addEnvItem("server_port", uri.getPortStr());
-// 	addEnvItem("server_protocol", "HTTP/1.1");
-// 	addEnvItem("server_software", "webserv");
-// }
-
 void	Env::addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body, std::string const &local_path)
 {
 	HttpUri	const	uri = line.getUri();
-	std::string const	pathInfo = uri.getCgi().pathInfo_;
+	std::string const	pathInfo = uri.getPathInfo().cgiPathInfo_;
 	std::string const	pathTranslated = local_path + "/" + pathInfo;
 	std::string const	scriptName = uri.getPath();
 	std::string			contentType = "";

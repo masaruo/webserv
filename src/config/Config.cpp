@@ -37,7 +37,7 @@ Config::Config(int flag)//!this is MOCK!
 	upload.addValue(ALLOWED_METHOD, "DELETE");
 	upload.addValue(ALLOWED_METHOD, "GET");
 	upload.addValue(AUTOINDEX, "on");
-	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploads");
+	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploadstore");//? have to create folder?
 	LocationConfig	uploader;
 	uploader.pathType_ = UPLOAD_PATH;
 	uploader.directive_ = upload;
@@ -133,6 +133,25 @@ std::string	Config::getErrorPage(HttpCode::StatusCode error_code) const
 
 Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 {
+	// LocationConfigMap::const_iterator	it = location_.begin();
+	// LocationConfigMap::const_iterator	end = location_.end();
+	// std::string							bestMatch = "";
+
+	// while (it != end)
+	// {
+	// 	if (path.compare(0, it->first.length(), it->first) == 0)
+	// 	{
+	// 		if (it->first.length() > bestMatch.length())
+	// 			bestMatch = it->first;
+	// 	}
+	// 	it++;
+	// }
+
+	// if (bestMatch.empty())
+	// {
+	// 	return location_.at("/");
+	// }
+
 	LocationConfig	loc;
 	ft::string const	ftpath(path);
 

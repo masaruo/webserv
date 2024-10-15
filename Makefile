@@ -12,17 +12,10 @@
 
 TARGET		:=	webserv
 CXX			:=	c++
-CXXFLAGS	:=	-Wall -Wextra -Werror -Wconversion -std=c++98 -MMD -MP
+CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
 LDFLAGS		:=	
-INC			:=	-I./include \
-				-I./include/config \
-				-I./include/http/exception \
-				-I./include/http/parts \
-				-I./include/http/request \
-				-I./include/http/response \
-				-I./include/http/utility \
-				-I./include/socket \
-				-I./include/utility
+INCDIRS		:=	$(shell find include -type d)
+INC			:=	$(addprefix -I, $(INCDIRS))
 
 SRC			:=	$(wildcard src/*.cpp) \
 				$(wildcard src/*/*.cpp) \

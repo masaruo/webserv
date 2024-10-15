@@ -6,13 +6,13 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/07/26 16:39:33 by mogawa           ###   ########.fr        #
+#    Updated: 2024/10/15 17:46:11 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 TARGET		:=	webserv
-CXX			:=	c++
-CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
+CXX			:= c++
+CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP 
 LDFLAGS		:=	
 INCDIRS		:=	$(shell find include -type d)
 INC			:=	$(addprefix -I, $(INCDIRS))
@@ -28,9 +28,10 @@ DEP			:=	$(OBJ:.o=.d)
 
 ifdef WITH_ASAN
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
-CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined,leak
+CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined,leak -fno-limit-debug-info
 LDFLAGS		:=	-fsanitize=address,undefined,leak
 endif
+
 
 $(info OBJ=$(OBJ))
 

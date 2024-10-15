@@ -3,13 +3,6 @@
 #include "cstring"
 #include "HttpException.hpp"
 
-// Env::Env(RequestLine const &line, HttpHeader const &header, std::string const &local_path)
-// :env_(getEnviron())
-// {
-// 	generateEnv(line, header, local_path);
-// 	return ;
-// }
-
 Env::Env(RequestLine const &line, HttpHeader const &header, HttpBody const &body, std::string const &local_path)
 :env_(getEnviron())
 {

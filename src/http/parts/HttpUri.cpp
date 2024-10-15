@@ -192,38 +192,6 @@ std::string	HttpUri::extractCgiInfo(std::string const &pathWoutQuery)
 			break ;
 		iter++;
 	}
-	// while (iter != end)
-	// {
-	// 	std::string::size_type	hasScript = iter->str().find("cgi-bin");//! change to cgi-bin
-	// 	if (hasScript == std::string::npos)
-	// 	{
-
-	// 	}
-	// 	else
-	// 	{
-
-	// 	}
-	// 	iter++;
-		// std::string::size_type	hasScript = iter->str().find(".py");//! only python
-		// if (hasScript == std::string::npos)
-		// {
-		// 	if (isPathInfo)
-		// 	{
-		// 		pathInfoVec.push_back(*iter);
-		// 	}
-		// 	else
-		// 	{
-		// 		pathBeforeScriptVec.push_back(*iter);
-		// 	}
-		// 	iter++;
-		// }
-		// else
-		// {
-		// 	scriptName = *iter;
-		// 	isPathInfo = true;
-		// 	iter++;
-		// }
-	
 
 	PathInfo	cgi;
 	cgi.directory_ = ft::reverse_split(dirScriptVec, '/');

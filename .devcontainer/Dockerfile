@@ -19,6 +19,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y \
+    nginx \
     net-tools \
     iproute2 \
     dnsutils \
@@ -46,6 +47,7 @@ RUN apt-get update && apt-get upgrade -y && \
     lsof \
     vim \
     valgrind \
+    man-db \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

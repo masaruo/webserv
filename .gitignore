@@ -14,5 +14,6 @@ obj/*
 !.pretty_printer.py
 !config/*
 !cgi-bin/*
+!nginx/webserv.conf
 !www/*
 asset/*

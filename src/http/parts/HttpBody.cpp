@@ -20,12 +20,6 @@ HttpBody::HttpBody()
 	return ;
 }
 
-// HttpBody::HttpBody(std::istringstream &iss, HttpHeader const &header)
-// :data_(checkBodyLen(iss.str()))
-// {
-// 	return ;
-// }
-
 HttpBody::HttpBody(std::string const &str)
 :data_(checkBodyLen(str))
 {

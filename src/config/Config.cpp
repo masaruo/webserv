@@ -195,7 +195,6 @@ void	config::Config::setConfig(Parser& parse)
 			&& !isServerName(parse) \
 			&& !isRoot(parse) \
 			&& !isMaxBodySize(parse) \
-			&& !isTimeout(parse) \
 			&& !isErrorPage(parse))
 			throw std::runtime_error("invalid config3");
     }

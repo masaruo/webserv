@@ -85,7 +85,7 @@ void	ARequest::assertRedirection(void) const
 void	ARequest::assertAllowedMethod(void) const
 {
 	std::string const				&method = requestLine_.getMethod();
-	std::string	const				&path = getLine().getUri().getPathInfo().directory_;
+	std::string	const				&path = getLine().getUri().getPath();
 	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
 	if (!loc.directive_.hasValue(config::Config::ALLOWED_METHOD, method))
 	{

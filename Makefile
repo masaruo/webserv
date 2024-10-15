@@ -33,8 +33,6 @@ LDFLAGS		:=	-fsanitize=address,undefined,leak
 endif
 
 
-$(info OBJ=$(OBJ))
-
 all: $(TARGET)
 
 $(OBJDIR)/%.o: %.cpp
@@ -59,3 +57,5 @@ re: fclean
 -include $(DEP)
 
 .PHONY: clean fclean re
+
+# $(info OBJ=$(OBJ))

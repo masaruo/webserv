@@ -38,6 +38,8 @@ RUN apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+COPY ../nginx/gdbinit /root/.config/gdb/gdbinit
+
 WORKDIR /webserv
 
 # Keep the container running

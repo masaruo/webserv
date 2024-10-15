@@ -1,9 +1,20 @@
-#include "ConfigFactory.hpp"
+#include "../../include/config/ConfigFactory.hpp"
 
 config::ConfigFactory::ConfigFactory(std::string const &config_path)
 {
-	//todo codes
-	return ;
+	// config_pathから読み取ってConfigに入れる
+	std::ifstream ifs(config_path);
+	std::istreambuf_iterator<char> it(ifs);
+    std::istreambuf_iterator<char> last;
+    std::string str(it, last);
+
+	Parser parse(str);
+	// while (parse.get_token() != "\0")
+	// {
+		Config config(parse);
+		configs_.push_back(config);
+	// }
+	configs_[0].getServerName();
 }
 
 config::ConfigFactory::ConfigFactory(int flag)//todo delete mock only
@@ -57,4 +68,9 @@ config::Config	config::ConfigFactory::getConfig(std::string const &server_name) 
 		iter++;
 	}
 	return (configs_.front());
+}
+
+int main()
+{
+	config::ConfigFactory("simple.conf");
 }

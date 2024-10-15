@@ -4,7 +4,10 @@
 #include <set>
 #include <vector>
 #include <stdexcept>
-#include "HttpCode.hpp"
+#include "../http/common/HttpCode.hpp"
+#include "Server.hpp"
+
+class Parser;
 
 namespace config
 {
@@ -30,10 +33,28 @@ private:
 	std::map<std::string, location_s>		locations_;
 	location_s	getLocation(std::string const &path) const;
 	Config();//=delete
+
+	// setter
+	void	setConfig(Parser& parse);
+	void	setServerName(std::string name);
+	void	setPort(size_t port);
+	void	setRoot(std::string root);
+	void	setMaxBodySize(size_t size);
+	void	setErrorPage(HttpCode::code_e code, std::string page);
+	void	setKeepAliveTimeout(size_t time);
+
+	// bool
+	bool	isPort(Parser& parse);
+	bool	isServerName(Parser& parse);
+	bool	isRoot(Parser& parse);
+	bool	isMaxBodySize(Parser& parse);
+	bool	isTimeout(Parser& parse);
+	bool	isErrorPage(Parser& parse);
 public:
 	// consturctor and destructor
 	Config(int flag);//todo delete mock only = mogawa to delete
 	Config(std::string const &block);//todo = add default path
+	Config(Parser& parse);
 	Config(Config const &rhs);
 	Config &operator=(Config const &rhs);
 	~Config();

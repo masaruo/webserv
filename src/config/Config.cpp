@@ -1,8 +1,8 @@
-#include "../../include/config/Config.hpp"
-#include "../../include/http/common/HttpStatus.hpp"
+// #include "../../include/config/Config.hpp"
+// #include "../../include/http/common/HttpStatus.hpp"
 #include <iostream>
-// #include "Config.hpp"
-// #include "HttpException.hpp"
+#include "Config.hpp"
+#include "HttpException.hpp"
 #include "string.hpp"
 
 namespace config
@@ -185,21 +185,22 @@ config::Config::Config(Parser& parse)
 void	config::Config::setConfig(Parser& parse)
 {
 	if (parse.consume_token() != "server")
-        throw std::runtime_error("invalid config");
+        throw std::runtime_error("invalid config1");
     if (parse.consume_token() != "{")
-        throw std::runtime_error("invalid config");
+        throw std::runtime_error("invalid config2");
     while (parse.get_token() != "}" && parse.get_token() != "\0")
     {
+		// std::cout << parse.get_token() << std::endl;
 		if (!isPort(parse) \
 			&& !isServerName(parse) \
 			&& !isRoot(parse) \
 			&& !isMaxBodySize(parse) \
 			&& !isTimeout(parse) \
 			&& !isErrorPage(parse))
-			throw std::runtime_error("invalid config");
+			throw std::runtime_error("invalid config3");
     }
     if (parse.consume_token() != "}")
-        throw std::runtime_error("invalid config");
+        throw std::runtime_error("invalid config4");
 }
 
 void	config::Config::setServerName(std::string name)
@@ -217,19 +218,20 @@ void	config::Config::setRoot(std::string root)
 	root_ = root;
 }
 
-void	config::Config::setMaxBodySize(size_t size)
+void	config::Config::setMaxBodySize(std::string size)
 {
-	max_body_size_ = size;
+	others_.addValue(MAX_BODY_SIZE, size);
+	// max_body_size_ = size;
 }
 
-void	config::Config::setErrorPage(HttpCode::code_e code, std::string page)
+void	config::Config::setErrorPage(HttpCode::StatusCode code, std::string page)
 {
 	error_pages_.insert(std::make_pair(code, page));
 }
 
 void	config::Config::setKeepAliveTimeout(size_t time)
 {
-	keep_alive_timeout_ = time;
+	// keep_alive_timeout_ = time;
 }
 
 bool	config::Config::isPort(Parser& parse)
@@ -263,8 +265,9 @@ bool	config::Config::isRoot(Parser& parse)
     if (parse.get_token() != "root")
         return false;
     parse.consume_token();
-	if (!isnums(parse.get_token()))
-		return false;
+	// std::cout << parse.get_token() << std::endl;
+	// if (!isnums(parse.get_token()))
+	// 	return false;
     setRoot(parse.consume_token());
     if (parse.consume_token() != ";")
         return false;
@@ -278,10 +281,8 @@ bool	config::Config::isMaxBodySize(Parser& parse)
     parse.consume_token();
 	if (!isnums(parse.get_token()))
 		return false;
-    std::stringstream ss;
-	size_t size;
-    ss << parse.consume_token();
-    ss >> size;
+	std::string size;
+    size = parse.consume_token();
 	setMaxBodySize(size);
     if (parse.consume_token() != ";")
         return false;
@@ -317,7 +318,7 @@ bool	config::Config::isErrorPage(Parser& parse)
     ss << parse.consume_token();
     ss >> code;
     std::string error_page = parse.consume_token();
-    setErrorPage(HttpCode::code_e(code), error_page);
+    setErrorPage(HttpCode::StatusCode(code), error_page);
     if (parse.consume_token() != ";")
         return false;
     return true;

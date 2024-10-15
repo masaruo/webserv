@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include <stdexcept>
-#include "../http/common/HttpCode.hpp"
+#include "HttpCode.hpp"
 #include "Server.hpp"
 
 class Parser;
@@ -65,8 +65,8 @@ private:
 	void	setServerName(std::string name);
 	void	setPort(size_t port);
 	void	setRoot(std::string root);
-	void	setMaxBodySize(size_t size);
-	void	setErrorPage(HttpCode::code_e code, std::string page);
+	void	setMaxBodySize(std::string size);
+	void	setErrorPage(HttpCode::StatusCode code, std::string page);
 	void	setKeepAliveTimeout(size_t time);
 
 	// bool

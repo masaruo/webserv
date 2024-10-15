@@ -1,4 +1,4 @@
-#include "../../include/config/ConfigFactory.hpp"
+#include "ConfigFactory.hpp"
 
 config::ConfigFactory::ConfigFactory(std::string const &config_path)
 {
@@ -9,14 +9,15 @@ config::ConfigFactory::ConfigFactory(std::string const &config_path)
     std::string str(it, last);
 
 	Parser parse(str);
-	// while (parse.get_token() != "\0")
-	// {
+	while (parse.get_token() != "\0")
+	{
 		Config config(parse);
 		configs_.push_back(config);
-	// }
-	configs_[0].getServerName();
+	}
+	// std::cout << configs_[0].getServerName() << std::endl;
+	// std::cout << configs_[1].getServerName() << std::endl;
 	//todo codes
-	(void) config_path;
+	// (void) config_path;
 	return ;
 }
 

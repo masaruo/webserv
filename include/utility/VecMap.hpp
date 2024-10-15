@@ -64,12 +64,6 @@ public:
 		:std::runtime_error(msg){ return; }
 	};
 
-	class VecMapHttpException : public HttpException
-	{
-	public:
-		explicit VecMapHttpException(std::string const &msg)
-		:HttpException(msg){ return; }
-	};
 };
 
 }// end of namespace ft

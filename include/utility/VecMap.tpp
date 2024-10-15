@@ -163,7 +163,7 @@ std::size_t	VecMap<K, V>::getIdxOfValue(K const &key, V const &value) const
 	valueVec_t const					&vec = getValueVector(key);
 	typename valueVec_t::const_iterator	iter = std::find(vec.begin(), vec.end(), value);
 	if (iter != vec.end())
-		return (std::distance(vec.begin(), iter) + 1);
+		return (static_cast<std::size_t>(std::distance(vec.begin(), iter) + 1));
 	else
 		return (0);
 

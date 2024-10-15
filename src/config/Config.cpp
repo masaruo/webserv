@@ -229,11 +229,6 @@ void	config::Config::setErrorPage(HttpCode::StatusCode code, std::string page)
 	error_pages_.insert(std::make_pair(code, page));
 }
 
-void	config::Config::setKeepAliveTimeout(size_t time)
-{
-	// keep_alive_timeout_ = time;
-}
-
 bool	config::Config::isPort(Parser& parse)
 {
     if (parse.get_token() != "listen")

@@ -67,7 +67,6 @@ private:
 	void	setRoot(std::string root);
 	void	setMaxBodySize(std::string size);
 	void	setErrorPage(HttpCode::StatusCode code, std::string page);
-	void	setKeepAliveTimeout(size_t time);
 
 	// bool
 	bool	isPort(Parser& parse);

@@ -1,175 +1,180 @@
 #include "../../include/config/Config.hpp"
 #include "../../include/http/common/HttpStatus.hpp"
 #include <iostream>
+// #include "Config.hpp"
+// #include "HttpException.hpp"
+#include "string.hpp"
 
-config::Config::Config(int flag)//!this is MOCK!
+namespace config
 {
-	if (flag == 1)
-	{
-		server_name_ = "_";
-		port_ = 8888;
-		root_ = "/webserv/www/html";
-		max_body_size_ = 10000000;
-		error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
-		error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
 
-//location /
-		location_s tmp;
-		tmp.index_ = "index.html";
-		tmp.allowed_methods_.insert("GET");
-		tmp.allowed_methods_.insert("POST");
-		tmp.allowed_methods_.insert("DELETE");
-		tmp.is_autoindex_ = true;
-		tmp.is_cgi_ = false;
-		tmp.cgi_root_ = "";
-		tmp.cgi_upload_path_ = "";
-		locations_.insert(std::make_pair("/", tmp));
+Config::Config(int flag)//!this is MOCK!
+{
+	(void) flag;
 
-//location uploads
-		tmp.allowed_methods_.insert("PUT");
-		tmp.is_autoindex_ = false;
-		tmp.is_cgi_ = false;
-		tmp.cgi_root_ = "";
-		tmp.cgi_upload_path_ = "/webserv/www/save";
-		locations_.insert(std::make_pair("/uploads", tmp));
+	// main directives
+	port_ = 80;
+	server_name_ = "_";
+	root_ = "/webserv/www/html";
+	others_.addValue(MAX_BODY_SIZE, "60000000");
+	error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
+	error_pages_.insert(std::make_pair(HttpCode::METHOD_NOT_ALLOWED, "/405.html"));
+	error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
+	error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
+	error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
+	error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
 
-//location cgi
-		tmp.allowed_methods_.insert("");
-		tmp.is_autoindex_ = false;
-		tmp.is_cgi_ = true;
-		tmp.cgi_root_ = "/webserv/cgi-bin";
-		tmp.cgi_upload_path_ = "";
-		locations_.insert(std::make_pair(".py", tmp));
-	}
-	else
-	{
-		server_name_ = "example.com";
-		port_ = 7777;
-		root_ = "/webserv/www/example";
-		max_body_size_ = 5000000;
-		error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
-		error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
-		error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
+	// locations
+	DirectiveMap	slash;
+	slash.addValue(INDEX, "index.html");
+	slash.addValue(ALLOWED_METHOD, "GET");
+	// slash.addValue(ALLOWED_METHOD, "POST");
+	// slash.addValue(ALLOWED_METHOD, "DELETE");
+	slash.addValue(AUTOINDEX, "on");
+	LocationConfig	root;
+	root.pathType_ = ROOT_PATH;
+	root.directive_ = slash;
+	location_.insert(std::make_pair("/", root));
 
-//location /
-		location_s tmp;
-		tmp.index_ = "index.html";
-		tmp.allowed_methods_.insert("GET");
-		tmp.is_autoindex_ = true;
-		tmp.is_cgi_ = false;
-		tmp.cgi_root_ = "";
-		tmp.cgi_upload_path_ = "";
-		locations_.insert(std::make_pair("/", tmp));
-	}
+	DirectiveMap	upload;
+	upload.addValue(ALLOWED_METHOD, "PUT");
+	upload.addValue(ALLOWED_METHOD, "DELETE");
+	upload.addValue(ALLOWED_METHOD, "GET");
+	upload.addValue(AUTOINDEX, "on");
+	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploadstore");//? have to create folder?
+	LocationConfig	uploader;
+	uploader.pathType_ = UPLOAD_PATH;
+	uploader.directive_ = upload;
+	location_.insert(std::make_pair("/uploads", uploader));
+
+	DirectiveMap	cgi;
+	cgi.addValue(ALLOWED_METHOD, "GET");
+	cgi.addValue(ALLOWED_METHOD, "POST");
+	cgi.addValue(AUTOINDEX, "off");
+	cgi.addValue(CGI_ROOT, "/webserv/cgi-bin");
+	LocationConfig cgier;
+	cgier.pathType_ = CGI_PATH;
+	cgier.directive_ = cgi;
+	location_.insert(std::make_pair("/cgi-bin", cgier));
+
+	DirectiveMap	re;
+	re.addValue(ALLOWED_METHOD, "GET");
+	re.addValue(ALLOWED_METHOD, "PUT");
+	re.addValue(ALLOWED_METHOD, "POST");
+	re.addValue(ALLOWED_METHOD, "DELETE");
+	re.addValue(REDIRECT_TO, "301");
+	re.addValue(REDIRECT_TO, "http://example.com");
+	LocationConfig redir;
+	redir.pathType_ = REDIRECTION_PATH;
+	redir.directive_ = re;
+	location_.insert(std::make_pair("/redirect", redir));
 }
 
-config::Config::~Config()
+Config::~Config()
 {
 	return ;
 }
 
-config::Config::Config(Config const &rhs)
-:server_name_(rhs.server_name_)
-,port_(rhs.port_)
+Config::Config(Config const &rhs)
+:port_(rhs.port_)
+,server_name_(rhs.server_name_)
 ,root_(rhs.root_)
-,max_body_size_(rhs.max_body_size_)
 ,error_pages_(rhs.error_pages_)
-,locations_(rhs.locations_)
+,others_(rhs.others_)
+,location_(rhs.location_)
 {
 	return ;
 }
 
-config::Config &config::Config::operator=(Config const &rhs)
+Config &Config::operator=(Config const &rhs)
 {
 	if (this != &rhs)
 	{
-		server_name_ = rhs.server_name_;
 		port_ = rhs.port_;
+		server_name_ = rhs.server_name_;
 		root_ = rhs.root_;
-		max_body_size_ = rhs.max_body_size_;
 		error_pages_ = rhs.error_pages_;
-		locations_ = rhs.locations_;
+		others_ = rhs.others_;
+		location_ = rhs.location_;
 	}
 	return (*this);
 }
 
-//todo getter
-std::string	config::Config::getServerName(void) const
-{
-	return (server_name_);
-}
-
-std::size_t	config::Config::getPort(void) const
+//getter
+std::size_t	Config::getPort(void) const
 {
 	return (port_);
 }
 
-std::string	config::Config::getRoot(void) const
+std::string	Config::getServerName(void) const
 {
-	return (root_);
+	return (server_name_);
 }
 
-std::size_t	config::Config::getMaxBodySize(void) const
+std::string	Config::getRoot(std::string const &path) const
 {
-	return (max_body_size_);
+	LocationConfig const &loc = getConfigLocation(path);
+
+	if (loc.pathType_ == CGI_PATH)
+		return (loc.directive_.getFirstValue(CGI_ROOT));
+	else if (loc.pathType_ == UPLOAD_PATH)
+		return (loc.directive_.getFirstValue(UPLOAD_ROOT));
+	else
+		return (root_);
 }
 
-std::string	config::Config::getErrorPage(HttpCode::code_e error_code) const
+Config::ErrorPageMap	Config::getErrorPageMap(void) const
 {
+	return (error_pages_);
+}
+
+std::string	Config::getErrorPage(HttpCode::StatusCode error_code) const
+{
+	std::map<HttpCode::StatusCode, std::string>::size_type	findCount;
+	findCount = error_pages_.count(error_code);
+
+	if (findCount == 0)
+		return ("");
+
 	std::string const	error_path = error_pages_.at(error_code);
 	return (error_path);
 }
 
-std::size_t	config::Config::getKeepAliveTimeout(void) const
+Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 {
-	return (keep_alive_timeout_);
-}
+	LocationConfigMap::const_iterator	it = location_.begin();
+	LocationConfigMap::const_iterator	end = location_.end();
+	std::string							bestMatch = "";
 
-config::Config::location_s	config::Config::getLocation(std::string const &path) const
-{
-	if (locations_.find(path) == locations_.end())
-		throw (HttpStatus::HttpStatusException(HttpCode::NOT_FOUND));
-	location_s loc = locations_.at(path);
-	return (loc);
-}
+	while (it != end)
+	{
+		if (path.compare(0, it->first.length(), it->first) == 0)
+		{
+			if (it->first.length() > bestMatch.length())
+				bestMatch = it->first;
+		}
+		it++;
+	}
 
-std::string	config::Config::getIndex(std::string const &path) const
-{
-	return (getLocation(path).index_);
-}
-
-bool	config::Config::isAllowedMethod(std::string const &path, std::string const &method) const
-{
-	location_s	loc = getLocation(path);
-	if (loc.allowed_methods_.find(method) == loc.allowed_methods_.end())
-		return (false);
+	if (bestMatch.empty())
+	{
+		return (location_.at("/"));
+	}
 	else
-		return (true);
-}
+	{
+		return (location_.at(bestMatch));
+	}
 
-bool	config::Config::isAutoIndex(std::string const &path) const
-{
-	return (getLocation(path).is_autoindex_);
-}
+	// LocationConfig	loc;
+	// ft::string const	ftpath(path);
 
-bool	config::Config::isCgi(std::string const &path) const
-{
-	return (getLocation(path).is_cgi_);
-}
-
-std::string	config::Config::getCgiRoot(std::string const &path) const
-{
-	return (getLocation(path).cgi_root_);
-}
-
-std::string	config::Config::getCgiUploadPath(std::string const &path) const
-{
-	return (getLocation(path).cgi_upload_path_);
+	// if (ftpath.end_with_str(".py"))
+	// 	loc = location_.at("/py");
+	// else if (location_.find(path) == location_.end())
+	// 	loc = location_.at("/");
+	// else
+	// 	loc = location_.at(path);
+	// return (loc);
 }
 
 config::Config::Config(Parser& parse)
@@ -317,3 +322,4 @@ bool	config::Config::isErrorPage(Parser& parse)
         return false;
     return true;
 }
+}// end of namespace config

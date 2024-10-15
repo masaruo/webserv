@@ -13,6 +13,8 @@
 #include "SocketHolder.class.hpp"
 #include "ClientSocket.class.hpp"
 #include "ListenSocket.class.hpp"
+#include "define.hpp"
+#include "HttpException.hpp"
 
 SocketHolder::SocketHolder()
 {
@@ -27,6 +29,8 @@ SocketHolder::~SocketHolder()
 
 void	SocketHolder::addSocket(ASocket *socket)
 {
+	if (vec_sockets_.size() > ft::MAX_SOCKET_NUM)
+		throw (HttpException(HttpCode::SERVICE_UNAVAILABLE));
 	vec_sockets_.push_back(socket);
 }
 
@@ -53,14 +57,9 @@ void	SocketHolder::markSocketDelete(ASocket *socket)
 	socket->markSocketDelete();
 }
 
-static void	clearVecSocket__(SocketHolder::iterator iter)
-{
-	delete *iter;
-}
-
 int	SocketHolder::getSize() const
 {
-	return (vec_sockets_.size());
+	return (static_cast<int>(vec_sockets_.size()));
 }
 
 void	SocketHolder::deleteSocketHolder(void)
@@ -93,10 +92,4 @@ void	SocketHolder::deleteMarkedSocket(void)
 		else
 			it++;
 	}
-}
-
-SocketHolder::SocketHolderException::SocketHolderException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
 }

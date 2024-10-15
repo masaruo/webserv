@@ -4,28 +4,60 @@
 #include "HttpBody.hpp"
 #include "RequestFactory.hpp"
 #include "Config.hpp"
-#include "HttpStatus.hpp"
-#include <stdexcept>
 
-class AResponse;
+class Response;
 
 class ARequest
 {
+public:
+	struct	ResponseData
+	{
+		HttpStatus	status_;
+		HttpHeader	header_;
+		HttpBody	body_;
+		bool		has_body_;
+		ResponseData():has_body_(false){};
+	};
 private:
-	RequestLine		line_;
-	HttpHeader		header_;
-	HttpBody		body_;
-	config::Config	config_;
+	RequestLine						requestLine_;
+	HttpHeader						header_;
+	HttpBody						body_;
+	config::Config					config_;
+	ResponseData					response_;
+
+	// helper function
+	config::Config::LocationConfig	setServerConfigLocation(void);
+	virtual std::string				setLocalPath(void) const = 0;//! pure virtual
+	void							assertRedirection(void) const;
+	void							assertAllowedMethod(void) const;
 	ARequest();//=delete:
+protected:
+	void							assertFileExist(std::string const &filePath) const;
+	//response structure setter / getter
+	void							setResponseStatus(HttpStatus const &response_status);
+	void							setResponseHeader(HttpHeader const &response_header);
+	void							setResponseBody(HttpBody const &response_body);
+	void							setResponseHasBody(bool hasBody);
 public:
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
 	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);
 	virtual ~ARequest();
 	ARequest(ARequest const &rhs);
 	ARequest &operator=(ARequest const &rhs);
-	RequestLine 		getLine(void) const;
-	HttpHeader 			getHeader(void) const;
-	HttpBody			getBody(void) const;
-	config::Config		getConfig(void) const;
-	virtual	AResponse	*createResponse(void) const = 0;
+
+	RequestLine 					getLine(void) const;
+	HttpHeader 						getHeader(void) const;
+	HttpBody						getBody(void) const;
+	config::Config					getConfig(void) const;
+
+	config::Config::LocationConfig	getConfigLocation(void) const;//? delete
+
+	//getter for response
+	HttpStatus						getResponseStatus(void) const;
+	HttpHeader						getResponseHeader(void) const;
+	HttpBody						getResponseBody(void) const;
+	bool							getResponseHasBody(void) const;
+
+	virtual void					generateResponseData(void) = 0;//! pure virtual
+	Response						generateResponse(void) const;
 };

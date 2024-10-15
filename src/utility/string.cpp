@@ -18,15 +18,40 @@ std::string const	ft::string::DIGIT = "0123456789";
 std::string const	ft::string::LOALPHA = "abcdefghijklmnopqrstuvwxyz";
 std::string const	ft::string::UPALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 std::string const	ft::string::ALPHA = LOALPHA + UPALPHA;
+std::string const	ft::string::ALNUM = ft::string::ALPHA + ft::string::DIGIT;
 std::string const	ft::string::SP = " ";
 std::string const	ft::string::HTAB = "\t";
-std::string const	ft::string::VT = "\v";
-std::string const	ft::string::FF = "\f";
+std::string const	ft::string::WS = ft::string::SP + ft::string::HTAB;
 std::string const	ft::string::CR = "\r";
 std::string const	ft::string::LF = "\n";
-std::string const	ft::string::WHITESPACE = SP + HTAB + VT + FF + CR;
 std::string const	ft::string::CRLF = CR + LF;
-
+std::string const	ft::string::CTL_EX_NUL_HTAB_CR_LF =
+	"\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0E\x0F"
+	"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x7F";
+std::string const	ft::string::NUL = "\x00";
+std::string const	ft::string::CTL =	ft::string::NUL + ft::string::CTL_EX_NUL_HTAB_CR_LF + \
+										 ft::string::HTAB + ft::string::CRLF;
+std::string const	ft::string::DQUOTE = "\"";
+std::string const	ft::string::HEXDIG = ft::string::DIGIT + "ABCDEF";
+std::string const	ft::string::VCHAR = ft::string::ALNUM + "!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~";
+std::string const	ft::string::CHAR = ft::string::VCHAR + ft::string::CTL_EX_NUL_HTAB_CR_LF + "\x7f";
+std::string const	ft::string::TOKEN = ft::string::ALNUM + "!#$%&'*+-.^_`|~";
+std::string const	ft::string::OBS_TEXT = 
+	"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F"
+	"\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F"
+	"\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF"
+	"\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF"
+	"\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF"
+	"\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF"
+	"\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF"
+	"\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF";
+std::string const	ft::string::FIELD_VALUE = ft::string::VCHAR + ft::string::WS + ft::string::OBS_TEXT;
+std::string const	ft::string::SUBDELIMS = "!$&'()*+,;=";
+std::string const	ft::string::URI_RESERVED = ":/?#[]@!$&'()*+,;=";
+std::string const	ft::string::URI_UNRESERVED = ft::string::ALNUM + "-._~";
+std::string const	ft::string::QUERY = ft::string::URI_UNRESERVED + "/?:@!$'()*+,;=";
+std::string const	ft::string::PCHAR = ft::string::URI_UNRESERVED + ft::string::SUBDELIMS + ":@";
+std::string const	ft::string::SCHEME = ft::string::ALNUM + "+-,";
 //constructor / destructor
 ft::string::string()
 :base_()
@@ -178,9 +203,21 @@ bool	ft::string::has_only(std::string const &to_search, size_type start, size_ty
 		return (false);
 }
 
+bool	ft::string::has(std::string const &to_search, size_type start, size_type end) const
+{
+	if (end == std::string::npos)
+		end = base_.size();
+
+	size_type const pos = base_.find(to_search);
+	if (pos == std::string::npos || pos > end || pos < start)
+		return (false);
+	else
+		return (true);
+}
+
 bool	ft::string::start_with(std::string const &to_search) const
 {
-	if (base_.empty())
+	if (base_.empty() || to_search.empty())
 		return (false);
 	size_type pos = base_.find_first_of(to_search);
 	if (pos == 0)
@@ -200,23 +237,45 @@ bool	ft::string::start_with(char const to_search) const
 		return (false);
 }
 
-bool	ft::string::end_with(std::string const &to_search) const
+bool	ft::string::start_with_str(std::string const &to_search) const
 {
-	if (base_.empty())
+	if (base_.empty() || to_search.empty())
 		return (false);
-	size_type pos = base_.find_last_of(to_search);
-	if (pos + 1 == base_.size())
+	size_type pos = base_.find(to_search);
+	if (pos == 0)
 		return (true);
 	else
 		return (false);
+}
+
+bool	ft::string::end_with(std::string const &to_search) const
+{
+	if (base_.empty() || to_search.empty())
+		return (false);
+	size_type pos = base_.find_last_not_of(to_search);
+	if (pos == base_.size() - 1)
+		return (false);
+	else
+		return (true);
 }
 
 bool	ft::string::end_with(char const to_search) const
 {
 	if (base_.empty())
 		return (false);
-	size_type pos = base_.find_last_of(to_search);
-	if (pos + 1 == base_.size())
+	size_type pos = base_.find_last_not_of(to_search);
+	if (pos == base_.size() - 1)
+		return (false);
+	else
+		return (true);
+}
+
+bool	ft::string::end_with_str(std::string const &to_search) const
+{
+	if (base_.empty() || to_search.empty())
+		return (false);
+	size_type pos = base_.rfind(to_search);
+	if (pos + to_search.size() == base_.size())
 		return (true);
 	else
 		return (false);
@@ -274,7 +333,7 @@ void	ft::string::trim(ft::string const &target)
 		this->pop_back();
 }
 
-void	ft::string::trim(char const &target)
+void	ft::string::trim(char target)
 {
 	while (start_with(target))
 		this->pop();
@@ -290,7 +349,7 @@ void	ft::string::to_lower(void)
 	{
 		int	c = static_cast<int>(*it);
 		if (isupper(c))
-			*it = tolower(c);
+			*it = static_cast<char>(tolower(c));
 		it++;
 	}
 }
@@ -303,23 +362,9 @@ void	ft::string::to_upper(void)
 	{
 		int	c = static_cast<int>(*it);
 		if (islower(c))
-			*it = toupper(c);
+			*it = static_cast<char>(toupper(c));
 		it++;
 	}
-}
-
-ft::bytes_vec	ft::string::to_binary(void) const
-{
-	const_iterator	iter = base_.begin();
-	const_iterator	end = base_.end();
-	ft::bytes_vec	binary;
-
-	while (iter != end)
-	{
-		binary.push_back(static_cast<u_int8_t>(*iter));
-		iter++;
-	}
-	return (binary);
 }
 
 ft::string::string_vector	ft::string::split(std::string const &delims) const
@@ -333,7 +378,6 @@ ft::string::string_vector	ft::string::split(std::string const &delims) const
 		cp_end = base_.find_first_of(delims, cp_end);
 		if (cp_end == std::string::npos)
 		{
-			// split_v.push_back(base_);
 			break ;
 		}
 		else
@@ -346,4 +390,32 @@ ft::string::string_vector	ft::string::split(std::string const &delims) const
 	if (cp_begin < base_.size())
 		split_v.push_back(base_.substr(cp_begin, base_.size() - cp_begin));
 	return (split_v);
+}
+
+std::string	ft::reverse_split(ft::string::string_vector const &str_vec, char delim)
+{
+	ft::string::string_vector::const_iterator	iter = str_vec.begin();
+	ft::string::string_vector::const_iterator	end = str_vec.end();
+	std::string	concatinated = "";
+
+	while (iter != end)
+	{
+		concatinated += iter->str();
+		if (iter + 1 != end)
+			concatinated += delim;
+		iter++;
+	}
+	return (concatinated);
+}
+
+std::string	ft::removeConsecutiveDelim(std::string const &str, char delim)
+{
+	if (str.empty())
+		return ("");
+
+	ft::string	ftstr(str);
+	std::string	delimStr(1, delim);
+	ft::string::string_vector	strVec = ftstr.split(delimStr);
+	std::string	concat = reverse_split(strVec, delim);
+	return (concat);
 }

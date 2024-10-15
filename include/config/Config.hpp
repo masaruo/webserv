@@ -8,30 +8,56 @@
 #include "Server.hpp"
 
 class Parser;
+#include "VecMap.hpp"
+#include "HttpCode.hpp"
 
 namespace config
 {
 class Config
 {
 public:
-	struct location_s
+	enum	PathType
 	{
-		std::string				index_;
-		std::set<std::string>	allowed_methods_;
-		bool					is_autoindex_;
-		bool					is_cgi_;
-		std::string				cgi_root_;
-		std::string				cgi_upload_path_;
+		ROOT_PATH,
+		STATIC_PATH,
+		UPLOAD_PATH,
+		CGI_PATH,
+		REDIRECTION_PATH,
 	};
+
+	enum	DirectiveType
+	{
+		// LISTEN,
+		// SERVER_NAME,
+		// ERROR_PAGE,
+		LOCATION,
+		INDEX,
+		ALLOWED_METHOD,
+		AUTOINDEX,
+		UPLOAD_ROOT,
+		CGI_ROOT,
+		REDIRECT_TO,
+		MAX_BODY_SIZE,
+	};
+
+	typedef vm::VecMap<DirectiveType, std::string>	DirectiveMap;
+	typedef std::map<HttpCode::StatusCode, std::string>	ErrorPageMap;
+
+	struct LocationConfig
+	{
+		PathType		pathType_;
+		DirectiveMap	directive_;
+	};
+
+	typedef std::map<std::string, LocationConfig>	LocationConfigMap;
+
 private:
-	std::string								server_name_;
-	std::size_t								port_;
-	std::string								root_;
-	std::size_t								max_body_size_;
-	std::map<HttpCode::code_e, std::string>	error_pages_;
-	std::size_t								keep_alive_timeout_;
-	std::map<std::string, location_s>		locations_;
-	location_s	getLocation(std::string const &path) const;
+	std::size_t			port_;
+	std::string			server_name_;
+	std::string			root_;
+	ErrorPageMap		error_pages_;
+	DirectiveMap		others_;
+	LocationConfigMap	location_;
 	Config();//=delete
 
 	// setter
@@ -60,19 +86,12 @@ public:
 	~Config();
 
 	// getter for attributes (ex location)
-	std::string	getServerName(void) const;
-	std::size_t	getPort(void) const;
-	std::string	getRoot(void) const;
-	std::size_t	getMaxBodySize(void) const;
-	std::string	getErrorPage(HttpCode::code_e error_code) const;
-	std::size_t	getKeepAliveTimeout(void) const;
-
-	// getter for location directives
-	std::string	getIndex(std::string const &path) const;
-	bool		isAllowedMethod(std::string const &path, std::string const &method) const;
-	bool		isAutoIndex(std::string const &path) const;
-	bool		isCgi(std::string const &path) const;
-	std::string	getCgiRoot(std::string const &path) const;
-	std::string	getCgiUploadPath(std::string const &path) const;
+	std::size_t		getPort(void) const;
+	std::string		getServerName(void) const;
+	std::string		getRoot(std::string const &path = "") const;
+	ErrorPageMap	getErrorPageMap(void) const;
+	std::string		getErrorPage(HttpCode::StatusCode error_code) const;
+	std::string		getOtherDirective(DirectiveType type) const;
+	LocationConfig	getConfigLocation(std::string const &path) const;
 };
 }

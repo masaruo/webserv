@@ -15,6 +15,9 @@ config::ConfigFactory::ConfigFactory(std::string const &config_path)
 		configs_.push_back(config);
 	// }
 	configs_[0].getServerName();
+	//todo codes
+	(void) config_path;
+	return ;
 }
 
 config::ConfigFactory::ConfigFactory(int flag)//todo delete mock only

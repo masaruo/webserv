@@ -22,7 +22,7 @@ class ClientSocket : public ASocket
 private:
 	ft::unique_ptr<ARequest>	request_;
 	std::time_t					last_activity_;
-	std::size_t					timeout_;
+	std::time_t					timeout_;
 
 	int	acceptHandler(int listen_fd);
 	std::time_t	get_time(void) const;

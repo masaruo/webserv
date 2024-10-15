@@ -1,18 +1,18 @@
 #pragma once
 #include "ARequest.hpp"
-#include "HttpBody.hpp"
 
-class AResponse;
+class Response;
 
 class PutRequest : public ARequest
 {
 private:
-	void	saveBody(void) const;
+	std::string	setLocalPath(void) const;
+	void		uploadFile(std::string const &abspath) const;
 	PutRequest();//=delete
 public:
 	explicit PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);
 	explicit PutRequest(PutRequest const &rhs);
 	PutRequest &operator=(PutRequest const &rhs);
 	~PutRequest();
-	AResponse	*createResponse(void) const;
+	void	generateResponseData(void);
 };

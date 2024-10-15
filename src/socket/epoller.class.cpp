@@ -17,7 +17,6 @@
 #include "define.hpp"
 #include <sys/epoll.h>
 #include <unistd.h>
-// #include <iostream>
 
 Epoller::Epoller(int size, int timeout, std::string const &config_path)
 :epfd_(epoll_create(size))
@@ -61,7 +60,7 @@ void	Epoller::epollAdd(ASocket *socket)
 	{
 		throw (EpollerException("epoll add failed at 49."));
 	}
-	SocketHolder_.addSocket(socket);
+	SocketHolder_.addSocket(socket);//todo try catch
 	return ;
 }
 
@@ -128,7 +127,6 @@ void	Epoller::epollLoop(void)
 			else if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
 			{
 				epollClose(socket);
-				throw (EpollerException("epoll with HUP or ERR error at 118."));
 			}
 			else
 			{

@@ -3,6 +3,7 @@ obj/*
 !*/
 !*.cpp
 !*.hpp
+!*.tpp
 !*.cc
 !*.h
 !*.a
@@ -11,3 +12,10 @@ obj/*
 !.devcontainer/*
 !.gdbinit
 !.pretty_printer.py
+!config/*
+!cgi-bin/*
+!nginx/webserv.conf
+!www/*
+asset/*
+googletest
+

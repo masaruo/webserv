@@ -3,42 +3,25 @@
 #include <map>
 #include <vector>
 #include <sstream>
-#include <stdint.h> // uint8_t
+#include <stdexcept>
 
 namespace ft
 {
-	int const	eof = 0;
-	int const	err = -1;
+	// constants
+	int const			eof = 0;
+	int const			err = -1;
+	int			const	MAX_SOCKET_NUM = 1000;
+	std::size_t const	MAX_BODY_SIZE = 600000;
+	std::size_t const	MAX_FIELD_LEN = 4000;
+	std::size_t const	MAX_HEADERS_NUM = 100;
+	std::size_t const	URI_MAX_LEN = 8000;
+	std::size_t const	READ_BUF_SIZE = 4000;
 
-	typedef enum 
-	{
-		GET,
-		POST,
-		DELETE,
-		ERROR
-	}	http_method_t;
-
-//! str_vec
-	typedef std::vector<std::string>	str_vec;
-	typedef str_vec::iterator			str_vec_iter;
-	typedef str_vec::const_iterator		str_vec_const_iter;
-	typedef str_vec::size_type			str_vec_size_type;
-	typedef str_vec::difference_type	str_vec_diff_type;
-
-//! str_map
+	// typedef
+	typedef std::vector<std::string>			str_vec;
 	typedef std::map<std::string, std::string>	str_map;
-	typedef str_map::iterator					str_map_iter;
-	typedef str_map::const_iterator				str_map_const_iter;
-	typedef str_map::size_type					str_map_size_type;
-	typedef str_map::difference_type			str_map_diff_type;
 
-//! vec_for_bin_data
-	typedef std::vector<uint8_t>		bytes_vec;
-	typedef bytes_vec::iterator			bytes_vec_iter;
-	typedef bytes_vec::const_iterator	bytes_vec_const_iter;
-	typedef bytes_vec::size_type		bytes_vec_size_type;
-	typedef bytes_vec::difference_type	bytes_vec_diff_type;
-
+	// communal functions
 	template <typename T>
 	T stonum(std::string const &str)
 	{
@@ -47,7 +30,7 @@ namespace ft
 		ss >> num;
 		if (ss.fail() || !ss.eof())
 		{
-			//todo error?
+			throw (std::invalid_argument("Conversion error in stonum (define.hpp at line 51)."));
 		}
 		return (num);
 	}
@@ -57,11 +40,10 @@ namespace ft
 	{
 		std::stringstream	numStr;
 		numStr << num;
-		if (numStr.failbit)
+		if (numStr.fail())
 		{
-			//todo error?
+			throw (std::invalid_argument("Conversion error in to_string (define.hpp at line 63)."));
 		}
 		return (numStr.str());
 	}
-
-}
+}// end of namespace ft

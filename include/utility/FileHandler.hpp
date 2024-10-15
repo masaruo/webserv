@@ -1,18 +1,23 @@
 #pragma once
 #include <string>
-#include "define.hpp"
+#include "unistd.h"// for access mode and access / read in cpp
 
-class FileReader
+class FileHandler
 {
 private:
-	FileReader(){};
-	~FileReader(){};
-	FileReader(FileReader const &rhs);
-	FileReader &operator=(FileReader const &rhs){ (void) rhs; };
+	FileHandler(){};
+	~FileHandler(){};
+	FileHandler(FileHandler const &rhs);//=delete
+	FileHandler &operator=(FileHandler const &rhs);//=delete
 public:
-	static std::string		readTextFile(std::string const &path);
-	// static std::string	readFdFile(int fd);
-	static ft::bytes_vec	readFdFile(int fd);
-
-	//todo error
+	static int const	INVALID_PATH = -1;
+	static int const	ISDIR = 1;
+	static int const	ISFILE = 2;
+	static int const	FILE_EXIST = 3;
+	static std::string	read(std::string const &path);
+	static std::string	read(int fd);
+	static bool			checkPathExist(std::string const &path);
+	static bool			checkIfDirectory(std::string const &path);
+	static bool			checkIfFile(std::string const &path);
+	static void			assertAccess(std::string const &path, int mode);
 };

@@ -1,11 +1,11 @@
 #include "PostRequest.hpp"
-// #include "PostResponse.hpp"
-#include "CgiResponse.hpp"
-#include <fstream>
+#include "CgiRequest.hpp"
+#include "CgiRequest.hpp"
 
 PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)
 {
+	generateResponseData();
 	return ;
 }
 
@@ -29,8 +29,21 @@ PostRequest &PostRequest::operator=(PostRequest const &rhs)
 	return (*this); 
 }
 
-AResponse	*PostRequest::createResponse(void) const
+std::string	PostRequest::setLocalPath(void) const
 {
-	ft::unique_ptr<ARequest>tmp(new PostRequest(*this));
-	return (new CgiResponse(tmp));
+	std::string	dummy = "";
+	return (dummy);
+}
+
+void	PostRequest::generateResponseData(void)
+{
+	std::string const dummy = setLocalPath();
+	(void) dummy;
+
+	CgiRequest	cgi(getLine(), getHeader(), getBody(), getConfig());
+	setResponseStatus(cgi.getResponseStatus());
+	setResponseHeader(cgi.getResponseHeader());
+	setResponseBody(cgi.getResponseBody());
+	setResponseHasBody(cgi.getResponseHasBody());
+	return;
 }

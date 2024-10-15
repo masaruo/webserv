@@ -1,11 +1,9 @@
 #include "PutRequest.hpp"
-#include "Response.hpp"
 #include "HttpException.hpp"
 #include "string.hpp"
 #include "FileHandler.hpp"
 #include "UriNormalizer.hpp"
 #include <fstream>
-// #include <cstdio>// for fdopen
 
 PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
 :ARequest(line, header, body, config)

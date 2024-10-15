@@ -1,5 +1,4 @@
 #include "DeleteRequest.hpp"
-#include "Response.hpp"
 #include "HttpException.hpp"
 #include "UriNormalizer.hpp"
 #include "FileHandler.hpp"

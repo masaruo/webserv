@@ -1,8 +1,6 @@
 #include "GetRequest.hpp"
-#include "Response.hpp"
 #include "CgiRequest.hpp"
-// #include "AutoIndexRequest.hpp"
-#include "autoIndexException.hpp"
+#include "AutoIndexException.hpp"
 #include "FileHandler.hpp"
 #include "UriNormalizer.hpp"
 #include <sys/stat.h>

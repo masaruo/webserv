@@ -1,14 +1,11 @@
 #include "RequestFactory.hpp"
-#include "ARequest.hpp"
+#include "define.hpp"
+#include "HttpHeader.hpp"
 #include "GetRequest.hpp"
 #include "PostRequest.hpp"
 #include "DeleteRequest.hpp"
-#include "CgiRequest.hpp"
-#include "string.hpp"
 #include "RequestLine.hpp"
-#include "HttpHeader.hpp"
 #include "PutRequest.hpp"
-#include "define.hpp"
 #include "IO.class.hpp"
 #include "HttpException.hpp"
 #include <sstream>
@@ -45,8 +42,6 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 			bodyStr = input.recv("chunked");//* chunkの読み取り
 		else
 			bodyStr = input.recv(header.getContentLen());
-		// std::istringstream	bodyStream(bodyStr);
-		// HttpBody body(bodyStream, header);
 		HttpBody	body(bodyStr);
 		if (method == "POST")
 		{

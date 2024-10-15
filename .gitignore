@@ -17,3 +17,5 @@ obj/*
 !nginx/webserv.conf
 !www/*
 asset/*
+googletest
+

@@ -1,6 +1,6 @@
 #pragma once
 #include "ARequest.hpp"
-#include "env.hpp"
+#include "Env.hpp"
 
 class CgiRequest : public ARequest
 {

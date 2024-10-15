@@ -1,6 +1,5 @@
 #include "HttpStatus.hpp"
 #include <sstream>
-#include "Response.hpp"
 
 HttpStatus::HttpStatus()
 :code_(HttpCode::INVALID_IN_WEBSERV)

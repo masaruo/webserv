@@ -73,7 +73,6 @@ private:
 	bool	isServerName(Parser& parse);
 	bool	isRoot(Parser& parse);
 	bool	isMaxBodySize(Parser& parse);
-	bool	isTimeout(Parser& parse);
 	bool	isErrorPage(Parser& parse);
 public:
 	// consturctor and destructor

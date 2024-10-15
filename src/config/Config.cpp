@@ -284,23 +284,6 @@ bool	config::Config::isMaxBodySize(Parser& parse)
     return true;
 }
 
-bool	config::Config::isTimeout(Parser& parse)
-{
-    if (parse.get_token() != "keep_alive_timeout")
-        return false;
-    parse.consume_token();
-	if (!isnums(parse.get_token()))
-		return false;
-    std::stringstream ss;
-	size_t time;
-    ss << parse.consume_token();
-    ss >> time;
-	setKeepAliveTimeout(time);
-    if (parse.consume_token() != ";")
-        return false;
-    return true;
-}
-
 bool	config::Config::isErrorPage(Parser& parse)
 {
     if (parse.get_token() != "error_page")

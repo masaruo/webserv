@@ -38,7 +38,7 @@ Config::Config(int flag)//!this is MOCK!
 	upload.addValue(ALLOWED_METHOD, "DELETE");
 	upload.addValue(ALLOWED_METHOD, "GET");
 	upload.addValue(AUTOINDEX, "on");
-	upload.addValue(UPLOAD_ROOT, "./www/uploadstore");//? have to create folder?
+	upload.addValue(UPLOAD_ROOT, "www/uploadstore");//? have to create folder?
 	LocationConfig	uploader;
 	uploader.pathType_ = UPLOAD_PATH;
 	uploader.directive_ = upload;
@@ -48,7 +48,7 @@ Config::Config(int flag)//!this is MOCK!
 	cgi.addValue(ALLOWED_METHOD, "GET");
 	cgi.addValue(ALLOWED_METHOD, "POST");
 	cgi.addValue(AUTOINDEX, "off");
-	cgi.addValue(CGI_ROOT, "./cgi-bin");
+	cgi.addValue(CGI_ROOT, "cgi-bin");
 	LocationConfig cgier;
 	cgier.pathType_ = CGI_PATH;
 	cgier.directive_ = cgi;
@@ -64,7 +64,7 @@ Config::Config(int flag)//!this is MOCK!
 	LocationConfig redir;
 	redir.pathType_ = REDIRECTION_PATH;
 	redir.directive_ = re;
-	location_.insert(std::make_pair("/redirect", redir));
+	location_.insert(std::make_pair("redirect", redir));
 }
 
 Config::~Config()

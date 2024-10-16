@@ -1,26 +1,3 @@
-// {
-// 	"name": "webserv container",
-// 	"build": {
-// 	  "dockerfile": "../docker/Dockerfile",
-// 	  "context": "../docker"
-// 	},
-// 	"customizations": {
-// 	  "vscode": {
-// 		"extensions": [
-// 			"ms-vscode.cpptools",
-// 			"ms-vscode.cmake-tools",
-// 			"twxs.cmake",
-// 			"ms-azuretools.vscode-docker",
-// 			"llvm-vs-code-extensions.vscode-clangd",
-// 			"xaver.clang-format"
-// 		]
-// 	  }
-// 	},
-// 	"mounts": [
-// 	  "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
-// 	],
-// 	"remoteUser": "root"
-//   }
 {
 	"name": "C++ Dev Container",
 	"dockerComposeFile": "docker-compose.yml",
@@ -29,8 +6,14 @@
 	"customizations": {
 	  "vscode": {
 		"extensions": [
-		  "ms-vscode.cpptools"
-		]
+		  "ms-vscode.cpptools-extension-pack",
+		  "ms-ceintl.vscode-language-pack-ja",
+		  "vscodevim.vim",
+		  "ms-python.python",
+		  "ms-python.debugpy",
+		  "kube.42header"
+		],
+		"settings": {"C_Cpp.clang_format_style": "file"}
 	  }
 	},
 	"remoteUser": "root"

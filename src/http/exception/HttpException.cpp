@@ -9,7 +9,7 @@ HttpException::ErrorPageMap	HttpException::errorPageMap_;
 std::string					HttpException::root_ = "";
 bool						HttpException::isInitialized_ = false;
 std::string					HttpException::default_error_page_ = "/error.html";
-std::string					HttpException::initial_error_page_ = "/webserv/www/error.html";
+std::string					HttpException::initial_error_page_ = "./www/error.html";
 
 //! HttpException
 HttpException::HttpException(HttpCode::StatusCode error_code)

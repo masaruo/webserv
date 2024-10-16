@@ -98,15 +98,6 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
-	char	**argv = NULL;
-	try
-	{
-		argv = generateArgv(abspath);
-	}
-	catch(std::bad_alloc const &e)
-	{
-		std::exit(INTERNAL_SERVER_ERROR);
-	}
 
 	std::string const 						&path = getLine().getUri().getPath();
 	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
@@ -118,6 +109,18 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &
 
 	//generate ENV with chdir dir
 	Env env(getLine(), getHeader(), getBody(), abspath);
+
+	std::string const &file = getLine().getUri().getPathInfo().fileName_;
+
+	char	**argv = NULL;
+	try
+	{
+		argv = generateArgv(file);
+	}
+	catch(std::bad_alloc const &e)
+	{
+		std::exit(INTERNAL_SERVER_ERROR);
+	}
 
 	execve(argv[0], argv, env.c_env());
 	std::exit(INTERNAL_SERVER_ERROR);

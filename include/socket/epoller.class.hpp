@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:23:52 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/26 16:43:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/16 01:14:50 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ private:
 	Epoller(Epoller const &rhs);//=delete
 	Epoller &operator=(Epoller const &rhs);//=delete
 public:
-	explicit Epoller(int size = 1, int timeout = -1, std::string const &config_path = "/webserv/config/config.md");//!change path to config
+	explicit Epoller(int size = 1, int timeout = -1, std::string const &config_path = "./config/config.md");//!change path to config
 	explicit Epoller(int size = 1, int timeout = -1, int flag = 1);//!change path to config
 	~Epoller();
 	void	epollAdd(ASocket *socket);

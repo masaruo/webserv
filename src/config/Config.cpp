@@ -12,7 +12,7 @@ Config::Config(int flag)//!this is MOCK!
 	// main directives
 	port_ = 80;
 	server_name_ = "_";
-	root_ = "./www/html";
+	root_ = "www/html";
 	others_.addValue(MAX_BODY_SIZE, "60000000");
 	error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
 	error_pages_.insert(std::make_pair(HttpCode::METHOD_NOT_ALLOWED, "/405.html"));

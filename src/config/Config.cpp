@@ -190,12 +190,12 @@ void	config::Config::setConfig(Parser& parse)
         throw std::runtime_error("invalid config2");
     while (parse.get_token() != "}" && parse.get_token() != "\0")
     {
-		// std::cout << parse.get_token() << std::endl;
 		if (!isPort(parse) \
 			&& !isServerName(parse) \
 			&& !isRoot(parse) \
 			&& !isMaxBodySize(parse) \
-			&& !isErrorPage(parse))
+			&& !isErrorPage(parse) \
+			&& !isLocation(parse))
 			throw std::runtime_error("invalid config3");
     }
     if (parse.consume_token() != "}")
@@ -300,4 +300,136 @@ bool	config::Config::isErrorPage(Parser& parse)
         return false;
     return true;
 }
+
+void	config::Config::setLocation(Parser& parse, LocationConfig& location, std::string location_path)
+{
+    while (parse.get_token() != "}" && parse.get_token() != "\0")
+    {
+		if (!isIndex(parse, location) \
+			&& !isMethod(parse, location) \
+			&& !isAoutIndex(parse, location) \
+			&& !isUploadRoot(parse, location) \
+			&& !isCgiRoot(parse, location) \
+			&& !isRedirect(parse, location))
+			throw std::runtime_error("invalid location3");
+    }
+	location_.insert(std::make_pair(location_path, location));
+}
+
+void	config::Config::setIndex(std::string index, LocationConfig& location)
+{
+	location.directive_.addValue(INDEX, index);
+}
+
+void	config::Config::setMethod(std::string method, LocationConfig& location)
+{
+	location.directive_.addValue(ALLOWED_METHOD, method);
+}
+
+void	config::Config::setAoutIndex(std::string aout_index, LocationConfig& location)
+{
+	location.directive_.addValue(AUTOINDEX, aout_index);
+}
+
+void	config::Config::setUploadRoot(std::string upload_root, LocationConfig& location)
+{
+	location.directive_.addValue(UPLOAD_ROOT, upload_root);
+	location.pathType_ = UPLOAD_PATH;
+}
+
+void	config::Config::setCgiRoot(std::string cgi_root, LocationConfig& location)
+{
+	location.directive_.addValue(CGI_ROOT, cgi_root);
+	location.pathType_ = CGI_PATH;
+}
+
+void	config::Config::setRedirect(std::string redirect, LocationConfig& location)
+{
+	location.directive_.addValue(REDIRECT_TO, redirect);
+	location.pathType_ = REDIRECTION_PATH;
+}
+
+bool	config::Config::isLocation(Parser& parse)
+{
+	if (parse.consume_token() != "location")
+        return false;
+	LocationConfig	location;
+	std::string	location_path = parse.consume_token();
+	location.pathType_ = STATIC_PATH;
+    if (parse.consume_token() != "{")
+        return false;
+	setLocation(parse, location, location_path);
+    if (parse.consume_token() != "}")
+        return false;
+	return true;
+}
+
+bool	config::Config::isIndex(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "index")
+        return false;
+    parse.consume_token();
+    setIndex(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool	config::Config::isMethod(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "allowed_methods")
+        return false;
+    parse.consume_token();
+	while (parse.get_token() != ";" && parse.get_token() != "\0")
+    	setMethod(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isAoutIndex(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "autoindex")
+        return false;
+    parse.consume_token();
+    setAoutIndex(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isUploadRoot(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "upload_store")
+        return false;
+    parse.consume_token();
+    setUploadRoot(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isCgiRoot(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "cgi_root")
+        return false;
+    parse.consume_token();
+    setCgiRoot(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isRedirect(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "return")
+        return false;
+    parse.consume_token();
+    setRedirect(parse.consume_token(), location);
+    setRedirect(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
 }// end of namespace config

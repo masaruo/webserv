@@ -67,6 +67,13 @@ private:
 	void	setRoot(std::string root);
 	void	setMaxBodySize(std::string size);
 	void	setErrorPage(HttpCode::StatusCode code, std::string page);
+	void	setLocation(Parser& parse, LocationConfig& location, std::string location_path);
+	void	setIndex(std::string index, LocationConfig& location);
+	void	setMethod(std::string method, LocationConfig& location);
+	void	setAoutIndex(std::string aout_index, LocationConfig& location);
+	void	setUploadRoot(std::string upload_root, LocationConfig& location);
+	void	setCgiRoot(std::string cgi_root, LocationConfig& location);
+	void	setRedirect(std::string redirect, LocationConfig& location);
 
 	// bool
 	bool	isPort(Parser& parse);
@@ -74,6 +81,13 @@ private:
 	bool	isRoot(Parser& parse);
 	bool	isMaxBodySize(Parser& parse);
 	bool	isErrorPage(Parser& parse);
+	bool	isLocation(Parser& parse);
+	bool	isIndex(Parser& parse, LocationConfig& location);
+	bool	isMethod(Parser& parse, LocationConfig& location);
+	bool	isAoutIndex(Parser& parse, LocationConfig& location);
+	bool	isUploadRoot(Parser& parse, LocationConfig& location);
+	bool	isCgiRoot(Parser& parse, LocationConfig& location);
+	bool	isRedirect(Parser& parse, LocationConfig& location);
 public:
 	// consturctor and destructor
 	Config(int flag);//todo delete mock only = mogawa to delete

@@ -16,8 +16,27 @@ config::ConfigFactory::ConfigFactory(std::string const &config_path)
 	}
 	// std::cout << configs_[0].getServerName() << std::endl;
 	// std::cout << configs_[1].getServerName() << std::endl;
-	//todo codes
-	// (void) config_path;
+	// std::cout << std::endl;
+	// //todo codes
+	// // (void) config_path;
+	// std::cout << configs_[0].getConfigLocation("/").pathType_ << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/").directive_.getFirstValue(Config::INDEX) << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/").directive_.getFirstValue(Config::ALLOWED_METHOD) << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/").directive_.getLastValue(Config::ALLOWED_METHOD) << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/").directive_.getFirstValue(Config::AUTOINDEX) << std::endl;
+	
+	// std::cout << std::endl;
+
+	// std::cout << configs_[0].getConfigLocation("/uploads").pathType_ << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/uploads").directive_.getFirstValue(Config::ALLOWED_METHOD) << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/uploads").directive_.getFirstValue(Config::UPLOAD_ROOT) << std::endl;
+	
+	// std::cout << std::endl;
+	
+	// std::cout << configs_[0].getConfigLocation("/redirect").pathType_ << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/redirect").directive_.getFirstValue(Config::REDIRECT_TO) << std::endl;
+	// std::cout << configs_[0].getConfigLocation("/redirect").directive_.getLastValue(Config::REDIRECT_TO) << std::endl;
+
 	return ;
 }
 
@@ -74,7 +93,7 @@ config::Config	config::ConfigFactory::getConfig(std::string const &server_name) 
 	return (configs_.front());
 }
 
-int main()
-{
-	config::ConfigFactory("simple.conf");
-}
+// int main()
+// {
+// 	config::ConfigFactory("simple.conf");
+// }

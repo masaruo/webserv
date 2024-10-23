@@ -185,9 +185,9 @@ config::Config::Config(Parser& parse)
 void	config::Config::setConfig(Parser& parse)
 {
 	if (parse.consume_token() != "server")
-        throw std::runtime_error("invalid config1");
+        throw std::runtime_error("invalid config");
     if (parse.consume_token() != "{")
-        throw std::runtime_error("invalid config2");
+        throw std::runtime_error("invalid config");
     while (parse.get_token() != "}" && parse.get_token() != "\0")
     {
 		if (!isPort(parse) \
@@ -196,10 +196,10 @@ void	config::Config::setConfig(Parser& parse)
 			&& !isMaxBodySize(parse) \
 			&& !isErrorPage(parse) \
 			&& !isLocation(parse))
-			throw std::runtime_error("invalid config3");
+			throw std::runtime_error("invalid config");
     }
     if (parse.consume_token() != "}")
-        throw std::runtime_error("invalid config4");
+        throw std::runtime_error("invalid config");
 }
 
 void	config::Config::setServerName(std::string name)
@@ -311,7 +311,7 @@ void	config::Config::setLocation(Parser& parse, LocationConfig& location, std::s
 			&& !isUploadRoot(parse, location) \
 			&& !isCgiRoot(parse, location) \
 			&& !isRedirect(parse, location))
-			throw std::runtime_error("invalid location3");
+			throw std::runtime_error("invalid config");
     }
 	location_.insert(std::make_pair(location_path, location));
 }

@@ -10,6 +10,10 @@
 #include "HttpException.hpp"
 #include <sstream>
 
+int const	RequestFactory::HASCHUNK = 1;
+int const	RequestFactory::HASBODY = 2;
+int const	RequestFactory::NOBODY = 0;
+
 ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &config_factory)
 {
 	io::IO	input(fd);
@@ -54,4 +58,35 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	{
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	}
+}
+
+void	RequestFactory::createRequestLineAndHeader(int fd, RequestLine &line, HttpHeader &header)
+{
+	io::IO				input(fd);
+	std::string			raw_request = input.recv();
+	std::istringstream	requestStream(raw_request);
+	RequestLine			tmpline(requestStream);
+	HttpHeader			tmpheader(requestStream);
+
+	std::string	host_value = tmpheader.getFirstValue("host");
+
+	//todo error page
+	// config::Config	config = config_factory.getConfig(host_value);
+	// HttpException::loadErrorPageMap(config);
+
+	HttpUri &uri = tmpline.getUriReference();
+	uri.updateWithHostHeader(host_value);
+
+	line = tmpline;
+	header = tmpheader;
+}
+
+int	RequestFactory::hasBody(HttpHeader const &header)
+{
+	if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
+		return (RequestFactory::HASCHUNK);
+	else if (header.getContentLen() > 0)
+		return (RequestFactory::HASBODY);
+	else 
+		return (RequestFactory::NOBODY);
 }

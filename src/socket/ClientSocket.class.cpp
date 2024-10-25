@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:10:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 14:18:54 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 06:13:46 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #include <unistd.h>
 
 ClientSocket::ClientSocket(int listen_fd)
-:ASocket(ASocket::accepted)
+:ASocket(ASocket::ACCEPTED)
 ,request_()
 ,last_activity_(std::time(NULL))
 ,timeout_(1000)// config

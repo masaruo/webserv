@@ -4,10 +4,12 @@
 #include "epoller.class.hpp"
 #include <string>
 #include <iostream>
+#include <csignal>
 
 int main(void)
 {
-	Epoller					poller(1, 1);//last arg is flag for mock;
+	Epoller	poller(1, 1);//last arg is flag for mock;
+	signal(SIGINT, NULL);//todo sigintの時の終了処理？sigterm?
 	SocketHolder::init(&poller);
 	try
 	{
@@ -21,4 +23,5 @@ int main(void)
 		std::cerr << e.what() << '\n';
 	}
 	return (0);
+	SocketHolder::destructor();
 }

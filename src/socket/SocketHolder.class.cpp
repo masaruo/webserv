@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 05:48:18 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 06:05:03 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	SocketHolder::addSocket(ASocket *socket)
 
 // 	while (it != end)
 // 	{
-// 		if ((*it)->getSocketType() == ASocket::accepted)
+// 		if ((*it)->getSocketType() == ASocket::ACCEPTED)
 // 		{
 // 			ClientSocket *client = dynamic_cast<ClientSocket*>(*it);
 // 			client->check_timeouts();
@@ -80,7 +80,7 @@ void	SocketHolder::deleteMarkedSocket(void)
 
 	while (it != end)
 	{
-		if ((*it)->getSocketType() == ASocket::to_delete)
+		if ((*it)->getSocketType() == ASocket::DELETE)
 		{
 			iterator tmp = it;
 			it++;

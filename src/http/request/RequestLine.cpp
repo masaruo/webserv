@@ -52,6 +52,14 @@ RequestLine::RequestLine(std::istringstream &iss)
 	setVersion(version);
 }
 
+RequestLine::RequestLine()
+:method_()
+,uri_()
+,version_()
+{
+	return ;
+}
+
 RequestLine::~RequestLine()
 {
 	return ;

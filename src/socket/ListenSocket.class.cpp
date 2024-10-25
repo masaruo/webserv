@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 18:45:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 10:49:17 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 06:53:14 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 ListenSocket::ListenSocket(int port)
-:ASocket(ASocket::listening)
+:ASocket(ASocket::LISTEN)
 ,listening_port_(port)
 {
 	setSockaddr();

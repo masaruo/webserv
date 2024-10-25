@@ -9,12 +9,11 @@ class RequestLine
 private:
 	std::string	method_;
 	HttpUri		uri_;
-	// std::string	uri_;
 	std::string	version_;
-	void	setMethod(std::string const &inMethod);
-	void	setVersion(std::string const &inVer);
-	RequestLine();//=delete
+	void		setMethod(std::string const &inMethod);
+	void		setVersion(std::string const &inVer);
 public:
+	RequestLine();
 	explicit RequestLine(std::istringstream &iss);
 	~RequestLine();
 	RequestLine(RequestLine const &rhs);

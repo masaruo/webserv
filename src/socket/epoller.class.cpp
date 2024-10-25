@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 05:46:11 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 08:33:26 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,14 @@
 #include "ASocket.class.hpp"
 #include "ClientSocket.class.hpp"
 #include "define.hpp"
+
+#include "unique_ptr.hpp"
+#include "Response.hpp"
+#include "RequestLine.hpp"
+#include "HttpHeader.hpp"
+#include "HttpBody.hpp"
+#include "RequestFactory.hpp"
+
 #include <sys/epoll.h>
 #include <unistd.h>
 
@@ -107,23 +115,67 @@ void	Epoller::epollLoop(void)
 
 		while (it != end)
 		{
-			uint32_t	ev = it->events;
-			ASocket		*socket = static_cast<ASocket*>(it->data.ptr);
-			if (socket->getSocketType() == ASocket::listening)
+			uint32_t			ev = it->events;
+			ASocket				*socket = static_cast<ASocket*>(it->data.ptr);
+			ASocket::SocType	type = socket->getSocketType();
+			if (type == ASocket::IDLE)
+				continue ;
+			if (ev & EPOLLIN && type == ASocket::LISTEN)
 			{
 				ASocket *new_socket = new ClientSocket(socket->getFd());
+				new_socket->setSocketType(ASocket::RECV);
 				epollAdd(new_socket);
 			}
 			else if (ev & (EPOLLIN | EPOLLOUT))
 			{
+				int fd = socket->getFd();
 				ClientSocket *client;
 				client = dynamic_cast<ClientSocket*>(socket);
 				if (client == NULL)
-				{
 					throw (EpollerException("epoll to get client socket failed at 111."));
+				if (ev & EPOLLIN)
+				{
+					if (type == ASocket::RECV)
+					{
+						RequestLine line;
+						HttpHeader header;
+						RequestFactory::createRequestLineAndHeader(fd, line, header);
+						int flg = RequestFactory::hasBody(header);
+						if (flg == RequestFactory::HASCHUNK)
+							socket->setSocketType(ASocket::RECVCHUNK);
+						else if (flg == RequestFactory::HASBODY)
+							socket->setSocketType(ASocket::RECVBODY);
+						else
+							socket->setSocketType(ASocket::IDLE);
+						// ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(client->getFd(), config_factory_));
+						// Response res = request_->generateResponse();
+					}
+					else if (type == ASocket::RECVBODY)
+					{
+						
+					}
+					else if (type == ASocket::RECVCHUNK)
+					{
+						
+					}
+					else if (type == ASocket::READ)
+					{
+						//todo read
+					}
 				}
-				client->recv_handler(config_factory_);
-				epollClose(socket);
+				else
+				{
+					if (type == ASocket::SEND)
+					{
+						//todo
+					}
+					else if (type == ASocket::WRITE)
+					{
+						//todo
+					}
+				}
+				// client->recv_handler(config_factory_);
+				// epollClose(socket);
 			}
 			else if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
 			{

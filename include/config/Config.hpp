@@ -5,7 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include "HttpCode.hpp"
-#include "Server.hpp"
+#include "Parser.hpp"
 
 class Parser;
 #include "VecMap.hpp"

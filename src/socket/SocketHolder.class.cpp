@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 14:00:05 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 05:48:18 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,13 @@
 #include "define.hpp"
 #include "HttpException.hpp"
 
-SocketHolder::SocketHolder()
-{
-	return ;
-}
+SocketHolder::vec_socket	SocketHolder::vec_sockets_;
+Epoller						*SocketHolder::poller_ = NULL;
 
-SocketHolder::~SocketHolder()
+void	SocketHolder::init(Epoller *poller)
 {
-	deleteSocketHolder();
-	return ;
+	if (poller_ == NULL)
+		poller_ = poller;
 }
 
 void	SocketHolder::addSocket(ASocket *socket)
@@ -34,35 +32,35 @@ void	SocketHolder::addSocket(ASocket *socket)
 	vec_sockets_.push_back(socket);
 }
 
-void	SocketHolder::checkTimeout(void)
-{
-	if (vec_sockets_.empty())
-		return ;
-	iterator		it = vec_sockets_.begin();
-	const_iterator	end = vec_sockets_.end();
+// void	SocketHolder::checkTimeout(void)
+// {
+// 	if (vec_sockets_.empty())
+// 		return ;
+// 	iterator		it = vec_sockets_.begin();
+// 	const_iterator	end = vec_sockets_.end();
 
-	while (it != end)
-	{
-		if ((*it)->getSocketType() == ASocket::accepted)
-		{
-			ClientSocket *client = dynamic_cast<ClientSocket*>(*it);
-			client->check_timeouts();
-		}
-		it++;
-	}
-}
+// 	while (it != end)
+// 	{
+// 		if ((*it)->getSocketType() == ASocket::accepted)
+// 		{
+// 			ClientSocket *client = dynamic_cast<ClientSocket*>(*it);
+// 			client->check_timeouts();
+// 		}
+// 		it++;
+// 	}
+// }
 
 void	SocketHolder::markSocketDelete(ASocket *socket)
 {
 	socket->markSocketDelete();
 }
 
-int	SocketHolder::getSize() const
+int	SocketHolder::getSize()
 {
 	return (static_cast<int>(vec_sockets_.size()));
 }
 
-void	SocketHolder::deleteSocketHolder(void)
+void	SocketHolder::destructor(void)
 {
 	iterator		it = vec_sockets_.begin();
 	const_iterator	end = vec_sockets_.end();

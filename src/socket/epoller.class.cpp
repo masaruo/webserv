@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 13:43:58 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 05:46:11 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,8 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-Epoller::Epoller(int size, int timeout, std::string const &config_path)
+Epoller::Epoller(int size, std::string const &config_path)
 :epfd_(epoll_create(size))
-,timeout_(timeout)
 ,config_factory_(config_path)
 {
 	if (epfd_ == ft::err)
@@ -30,9 +29,8 @@ Epoller::Epoller(int size, int timeout, std::string const &config_path)
 	return ;
 }
 
-Epoller::Epoller(int size, int timeout, int flag)
+Epoller::Epoller(int size, int flag)
 :epfd_(epoll_create(size))
-,timeout_(timeout)
 ,config_factory_(flag)
 {
 	if (epfd_ == ft::err)
@@ -60,7 +58,8 @@ void	Epoller::epollAdd(ASocket *socket)
 	{
 		throw (EpollerException("epoll add failed at 49."));
 	}
-	SocketHolder_.addSocket(socket);//todo try catch
+	// SocketHolder_.addSocket(socket);//todo try catch
+	SocketHolder::addSocket(socket);
 	return ;
 }
 
@@ -78,17 +77,19 @@ void	Epoller::epollClose(ASocket *socket)
 #include <cerrno>
 int	Epoller::epollWait(void)
 {
-	int	size = SocketHolder_.getSize();
-	res_evlist_.resize(size);
+	int size = SocketHolder::getSize();
+	// int	size = SocketHolder_.getSize();
+	event_list_.resize(size);
 	int	numEvents = 0;
-	numEvents = epoll_wait(epfd_, res_evlist_.data(), size, timeout_);
+	numEvents = epoll_wait(epfd_, event_list_.data(), size, ft::TIMEOUT);
 	if (numEvents == ft::err)
 	{
 		//? if (errno == EINTR)//forbidden
 		throw (EpollerException("epoll wait failed at 79."));
 	}
-	SocketHolder_.checkTimeout();
-	SocketHolder_.deleteMarkedSocket();
+	// SocketHolder_.checkTimeout();
+	// SocketHolder_.deleteMarkedSocket();
+	SocketHolder::deleteMarkedSocket();
 	return (numEvents);
 }
 
@@ -100,8 +101,8 @@ void	Epoller::epollLoop(void)
 		while (numEvents == 0)
 			numEvents = epollWait();
 
-		const_iterator	it = res_evlist_.begin();
-		const_iterator	end = res_evlist_.begin();
+		const_iterator	it = event_list_.begin();
+		const_iterator	end = event_list_.begin();
 		std::advance(end, numEvents);
 
 		while (it != end)
@@ -135,11 +136,12 @@ void	Epoller::epollLoop(void)
 			}
 			it++;
 		}
-		SocketHolder_.deleteMarkedSocket();
+		// SocketHolder_.deleteMarkedSocket();
+		SocketHolder::deleteMarkedSocket();
 	}
 }
 
-//exception
+// exception
 Epoller::EpollerException::EpollerException(std::string const &msg)
 :std::runtime_error(msg)
 {

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:23:52 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/16 01:14:50 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 05:44:55 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,7 @@ public:
 	typedef ev_vec::size_type				size_type;
 private:
 	int const				epfd_;
-	SocketHolder			SocketHolder_;//!what is this?
-	ev_vec					res_evlist_;//!what is this?
-	int						timeout_;
+	ev_vec					event_list_;
 	config::ConfigFactory	config_factory_;
 
 	int					epollWait(void);
@@ -41,8 +39,8 @@ private:
 	Epoller(Epoller const &rhs);//=delete
 	Epoller &operator=(Epoller const &rhs);//=delete
 public:
-	explicit Epoller(int size = 1, int timeout = -1, std::string const &config_path = "./config/config.md");//!change path to config
-	explicit Epoller(int size = 1, int timeout = -1, int flag = 1);//!change path to config
+	explicit Epoller(int size = 1, std::string const &config_path = "./config/config.md");//!change path to config
+	explicit Epoller(int size = 1, int flag = 1);//!change path to config
 	~Epoller();
 	void	epollAdd(ASocket *socket);
 	void	epollClose(ASocket *socket);

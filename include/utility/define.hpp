@@ -16,6 +16,7 @@ namespace ft
 	std::size_t const	MAX_HEADERS_NUM = 100;
 	std::size_t const	URI_MAX_LEN = 8000;
 	std::size_t const	READ_BUF_SIZE = 4000;
+	std::size_t const	TIMEOUT = 20;
 
 	// typedef
 	typedef std::vector<std::string>			str_vec;

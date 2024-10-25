@@ -7,8 +7,8 @@ class ConfigFactory
 {
 private:
 	std::vector<Config>	configs_;
-	ConfigFactory();//=delete
 public:
+	ConfigFactory();//=delete
 	ConfigFactory(std::string const &config_path);//todo = default path
 	ConfigFactory(int flag);//todo delete: mock purpose only
 	ConfigFactory(ConfigFactory const &rhs);

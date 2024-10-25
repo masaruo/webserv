@@ -7,8 +7,8 @@
 
 int main(void)
 {
-	Epoller					poller(1, 1000, 1);//last arg is flag for mock;
-
+	Epoller					poller(1, 1);//last arg is flag for mock;
+	SocketHolder::init(&poller);
 	try
 	{
 		//? how to add listen sockets from configs

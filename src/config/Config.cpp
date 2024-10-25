@@ -1,5 +1,3 @@
-// #include "../../include/config/Config.hpp"
-// #include "../../include/http/common/HttpStatus.hpp"
 #include <iostream>
 #include "Config.hpp"
 #include "HttpException.hpp"

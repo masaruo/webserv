@@ -1,5 +1,6 @@
 #pragma once
 #include "Config.hpp"
+#include <fstream>
 
 namespace config
 {

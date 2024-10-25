@@ -1,4 +1,13 @@
 #pragma once
+#include <string>
+#include <map>
+#include <set>
+#include <vector>
+#include <stdexcept>
+#include "HttpCode.hpp"
+#include "Parser.hpp"
+
+class Parser;
 #include "VecMap.hpp"
 #include "HttpCode.hpp"
 
@@ -50,10 +59,40 @@ private:
 	DirectiveMap		others_;
 	LocationConfigMap	location_;
 	Config();//=delete
+
+	// setter
+	void	setConfig(Parser& parse);
+	void	setServerName(std::string name);
+	void	setPort(size_t port);
+	void	setRoot(std::string root);
+	void	setMaxBodySize(std::string size);
+	void	setErrorPage(HttpCode::StatusCode code, std::string page);
+	void	setLocation(Parser& parse, LocationConfig& location, std::string location_path);
+	void	setIndex(std::string index, LocationConfig& location);
+	void	setMethod(std::string method, LocationConfig& location);
+	void	setAoutIndex(std::string aout_index, LocationConfig& location);
+	void	setUploadRoot(std::string upload_root, LocationConfig& location);
+	void	setCgiRoot(std::string cgi_root, LocationConfig& location);
+	void	setRedirect(std::string redirect, LocationConfig& location);
+
+	// bool
+	bool	isPort(Parser& parse);
+	bool	isServerName(Parser& parse);
+	bool	isRoot(Parser& parse);
+	bool	isMaxBodySize(Parser& parse);
+	bool	isErrorPage(Parser& parse);
+	bool	isLocation(Parser& parse);
+	bool	isIndex(Parser& parse, LocationConfig& location);
+	bool	isMethod(Parser& parse, LocationConfig& location);
+	bool	isAoutIndex(Parser& parse, LocationConfig& location);
+	bool	isUploadRoot(Parser& parse, LocationConfig& location);
+	bool	isCgiRoot(Parser& parse, LocationConfig& location);
+	bool	isRedirect(Parser& parse, LocationConfig& location);
 public:
 	// consturctor and destructor
 	Config(int flag);//todo delete mock only = mogawa to delete
 	Config(std::string const &block);//todo = add default path
+	Config(Parser& parse);
 	Config(Config const &rhs);
 	Config &operator=(Config const &rhs);
 	~Config();

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Config.hpp"
 #include "HttpException.hpp"
 #include "string.hpp"
@@ -173,4 +174,260 @@ Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 	// 	loc = location_.at(path);
 	// return (loc);
 }
+
+config::Config::Config(Parser& parse)
+{
+	Config::setConfig(parse);
+}
+
+void	config::Config::setConfig(Parser& parse)
+{
+	if (parse.consume_token() != "server")
+        throw std::runtime_error("invalid config");
+    if (parse.consume_token() != "{")
+        throw std::runtime_error("invalid config");
+    while (parse.get_token() != "}" && parse.get_token() != "\0")
+    {
+		if (!isPort(parse) \
+			&& !isServerName(parse) \
+			&& !isRoot(parse) \
+			&& !isMaxBodySize(parse) \
+			&& !isErrorPage(parse) \
+			&& !isLocation(parse))
+			throw std::runtime_error("invalid config");
+    }
+    if (parse.consume_token() != "}")
+        throw std::runtime_error("invalid config");
+}
+
+void	config::Config::setServerName(std::string name)
+{
+	server_name_ = name;
+}
+
+void	config::Config::setPort(size_t port)
+{
+	port_ = port;
+}
+
+void	config::Config::setRoot(std::string root)
+{
+	root_ = root;
+}
+
+void	config::Config::setMaxBodySize(std::string size)
+{
+	others_.addValue(MAX_BODY_SIZE, size);
+	// max_body_size_ = size;
+}
+
+void	config::Config::setErrorPage(HttpCode::StatusCode code, std::string page)
+{
+	error_pages_.insert(std::make_pair(code, page));
+}
+
+bool	config::Config::isPort(Parser& parse)
+{
+    if (parse.get_token() != "listen")
+        return false;
+    parse.consume_token();
+    std::stringstream ss;
+	size_t port;
+    ss << parse.consume_token();
+    ss >> port;
+	setPort(port);
+    if (parse.consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool	config::Config::isServerName(Parser& parse)
+{
+    if (parse.get_token() != "server_name")
+        return false;
+    parse.consume_token();
+    setServerName(parse.consume_token());
+    if (parse.consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool	config::Config::isRoot(Parser& parse)
+{
+    if (parse.get_token() != "root")
+        return false;
+    parse.consume_token();
+	// std::cout << parse.get_token() << std::endl;
+	// if (!isnums(parse.get_token()))
+	// 	return false;
+    setRoot(parse.consume_token());
+    if (parse.consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool	config::Config::isMaxBodySize(Parser& parse)
+{
+    if (parse.get_token() != "max_body_size")
+        return false;
+    parse.consume_token();
+	if (!isnums(parse.get_token()))
+		return false;
+	std::string size;
+    size = parse.consume_token();
+	setMaxBodySize(size);
+    if (parse.consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool	config::Config::isErrorPage(Parser& parse)
+{
+    if (parse.get_token() != "error_page")
+        return false;
+    parse.consume_token();
+	if (!isnums(parse.get_token()))
+		return false;
+    std::stringstream ss;
+    int code;
+    ss << parse.consume_token();
+    ss >> code;
+    std::string error_page = parse.consume_token();
+    setErrorPage(HttpCode::StatusCode(code), error_page);
+    if (parse.consume_token() != ";")
+        return false;
+    return true;
+}
+
+void	config::Config::setLocation(Parser& parse, LocationConfig& location, std::string location_path)
+{
+    while (parse.get_token() != "}" && parse.get_token() != "\0")
+    {
+		if (!isIndex(parse, location) \
+			&& !isMethod(parse, location) \
+			&& !isAoutIndex(parse, location) \
+			&& !isUploadRoot(parse, location) \
+			&& !isCgiRoot(parse, location) \
+			&& !isRedirect(parse, location))
+			throw std::runtime_error("invalid config");
+    }
+	location_.insert(std::make_pair(location_path, location));
+}
+
+void	config::Config::setIndex(std::string index, LocationConfig& location)
+{
+	location.directive_.addValue(INDEX, index);
+}
+
+void	config::Config::setMethod(std::string method, LocationConfig& location)
+{
+	location.directive_.addValue(ALLOWED_METHOD, method);
+}
+
+void	config::Config::setAoutIndex(std::string aout_index, LocationConfig& location)
+{
+	location.directive_.addValue(AUTOINDEX, aout_index);
+}
+
+void	config::Config::setUploadRoot(std::string upload_root, LocationConfig& location)
+{
+	location.directive_.addValue(UPLOAD_ROOT, upload_root);
+	location.pathType_ = UPLOAD_PATH;
+}
+
+void	config::Config::setCgiRoot(std::string cgi_root, LocationConfig& location)
+{
+	location.directive_.addValue(CGI_ROOT, cgi_root);
+	location.pathType_ = CGI_PATH;
+}
+
+void	config::Config::setRedirect(std::string redirect, LocationConfig& location)
+{
+	location.directive_.addValue(REDIRECT_TO, redirect);
+	location.pathType_ = REDIRECTION_PATH;
+}
+
+bool	config::Config::isLocation(Parser& parse)
+{
+	if (parse.consume_token() != "location")
+        return false;
+	LocationConfig	location;
+	std::string	location_path = parse.consume_token();
+	location.pathType_ = STATIC_PATH;
+    if (parse.consume_token() != "{")
+        return false;
+	setLocation(parse, location, location_path);
+    if (parse.consume_token() != "}")
+        return false;
+	return true;
+}
+
+bool	config::Config::isIndex(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "index")
+        return false;
+    parse.consume_token();
+    setIndex(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+    return true;
+}
+
+bool	config::Config::isMethod(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "allowed_methods")
+        return false;
+    parse.consume_token();
+	while (parse.get_token() != ";" && parse.get_token() != "\0")
+    	setMethod(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isAoutIndex(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "autoindex")
+        return false;
+    parse.consume_token();
+    setAoutIndex(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isUploadRoot(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "upload_store")
+        return false;
+    parse.consume_token();
+    setUploadRoot(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isCgiRoot(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "cgi_root")
+        return false;
+    parse.consume_token();
+    setCgiRoot(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
+bool	config::Config::isRedirect(Parser& parse, LocationConfig& location)
+{
+    if (parse.get_token() != "return")
+        return false;
+    parse.consume_token();
+    setRedirect(parse.consume_token(), location);
+    setRedirect(parse.consume_token(), location);
+    if (parse.consume_token() != ";")
+        return false;
+	return true;
+}
+
 }// end of namespace config

@@ -107,7 +107,8 @@ void	GetRequest::generateResponseData(void)
 	{
 		std::string const &abspath = setLocalPath();
 
-		HttpBody body(FileHandler::read(abspath));
+		
+		HttpBody body(FileHandler::read(abspath));//! read
 
 		HttpHeader	header;
 		header.addValue(HttpHeader::CONTENT_TYPE, "text/html");

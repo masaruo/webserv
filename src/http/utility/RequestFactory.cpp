@@ -85,8 +85,9 @@ int	RequestFactory::hasBody(HttpHeader const &header)
 {
 	if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
 		return (RequestFactory::HASCHUNK);
-	else if (header.getContentLen() > 0)
+	else if (header.hasKey("content-length") && header.getContentLen() > 0)
 		return (RequestFactory::HASBODY);
 	else 
 		return (RequestFactory::NOBODY);
 }
+

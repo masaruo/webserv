@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 08:33:26 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/27 19:26:44 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@
 #include "HttpHeader.hpp"
 #include "HttpBody.hpp"
 #include "RequestFactory.hpp"
+#include "GetRequest.hpp"
+#include "Response.hpp"
+#include "FileIOSocket.hpp"
 
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -30,9 +33,9 @@ Epoller::Epoller(int size, std::string const &config_path)
 :epfd_(epoll_create(size))
 ,config_factory_(config_path)
 {
-	if (epfd_ == ft::err)
+	if (epfd_ == -1)
 	{
-		throw(EpollerException("epoll class initialization failed at 28."));
+		// throw(EpollerException("epoll class initialization failed at 28."));
 	}
 	return ;
 }
@@ -41,16 +44,16 @@ Epoller::Epoller(int size, int flag)
 :epfd_(epoll_create(size))
 ,config_factory_(flag)
 {
-	if (epfd_ == ft::err)
+	if (epfd_ == -1)
 	{
-		throw(EpollerException("epoll class initialization failed at 28."));
+		// throw(EpollerException("epoll class initialization failed at 28."));
 	}
 	return ;
 }
 
 Epoller::~Epoller()
 {
-	if (epfd_ != ft::err)
+	if (epfd_ != -1)
 		close (epfd_);
 }
 
@@ -62,9 +65,9 @@ void	Epoller::epollAdd(ASocket *socket)
 	ev.data.ptr = socket;
 	int	res = 0;
 	res = epoll_ctl(epfd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
-	if (res == ft::err)
+	if (res == -1)
 	{
-		throw (EpollerException("epoll add failed at 49."));
+		// throw (EpollerException("epoll add failed at 49."));
 	}
 	// SocketHolder_.addSocket(socket);//todo try catch
 	SocketHolder::addSocket(socket);
@@ -75,9 +78,9 @@ void	Epoller::epollClose(ASocket *socket)
 {
 	int res = 0;
 	res = epoll_ctl(epfd_, EPOLL_CTL_DEL, socket->getFd(), NULL);
-	if (res == ft::err)
+	if (res == -1)
 	{
-		throw (EpollerException("epoll close failed at 61."));
+		// throw (EpollerException("epoll close failed at 61."));
 	}
 	socket->markSocketDelete();
 }
@@ -90,10 +93,10 @@ int	Epoller::epollWait(void)
 	event_list_.resize(size);
 	int	numEvents = 0;
 	numEvents = epoll_wait(epfd_, event_list_.data(), size, ft::TIMEOUT);
-	if (numEvents == ft::err)
+	if (numEvents == -1)
 	{
 		//? if (errno == EINTR)//forbidden
-		throw (EpollerException("epoll wait failed at 79."));
+		// throw (EpollerException("epoll wait failed at 79."));
 	}
 	// SocketHolder_.checkTimeout();
 	// SocketHolder_.deleteMarkedSocket();
@@ -120,62 +123,73 @@ void	Epoller::epollLoop(void)
 			ASocket::SocType	type = socket->getSocketType();
 			if (type == ASocket::IDLE)
 				continue ;
-			if (ev & EPOLLIN && type == ASocket::LISTEN)
+			else if (ev & EPOLLIN && type == ASocket::LISTEN)
 			{
 				ASocket *new_socket = new ClientSocket(socket->getFd());
 				new_socket->setSocketType(ASocket::RECV);
 				epollAdd(new_socket);
 			}
-			else if (ev & (EPOLLIN | EPOLLOUT))
+			else if (ev & (EPOLLIN))
 			{
 				int fd = socket->getFd();
 				ClientSocket *client;
 				client = dynamic_cast<ClientSocket*>(socket);
 				if (client == NULL)
-					throw (EpollerException("epoll to get client socket failed at 111."));
-				if (ev & EPOLLIN)
+					std::cout << "138" << std::endl;
+					// throw (EpollerException("epoll to get client socket failed at 111."));
+				if (type == ASocket::RECV)
 				{
-					if (type == ASocket::RECV)
+					RequestLine line;
+					HttpHeader header;
+					RequestFactory::createRequestLineAndHeader(fd, line, header);
+					int flg = RequestFactory::hasBody(header);
+					if (flg == RequestFactory::HASCHUNK)
+						socket->setSocketType(ASocket::RECVCHUNK);
+					else if (flg == RequestFactory::HASBODY)
+						socket->setSocketType(ASocket::RECVBODY);
+					else
+						socket->setSocketType(ASocket::SEND);
+
+					std::string const		&host = header.getFirstValue("host");
+					config::Config const	&config = config_factory_.getConfig(host);
+					std::string const		&method = line.getMethod();
+					if (method == "GET")
 					{
-						RequestLine line;
-						HttpHeader header;
-						RequestFactory::createRequestLineAndHeader(fd, line, header);
-						int flg = RequestFactory::hasBody(header);
-						if (flg == RequestFactory::HASCHUNK)
-							socket->setSocketType(ASocket::RECVCHUNK);
-						else if (flg == RequestFactory::HASBODY)
-							socket->setSocketType(ASocket::RECVBODY);
-						else
-							socket->setSocketType(ASocket::IDLE);
-						// ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(client->getFd(), config_factory_));
-						// Response res = request_->generateResponse();
+						ft::unique_ptr<ARequest>get(new GetRequest(line, header, config));
+						client->request_ = get;
+						// Response res = client->request_->generateResponse();
 					}
-					else if (type == ASocket::RECVBODY)
-					{
-						
-					}
-					else if (type == ASocket::RECVCHUNK)
-					{
-						
-					}
-					else if (type == ASocket::READ)
-					{
-						//todo read
-					}
+					//todo create Request?
+					// ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(client->getFd(), config_factory_));
+					// Response res = request_->generateResponse();
 				}
-				else
+				else if (type == ASocket::RECVBODY)
 				{
-					if (type == ASocket::SEND)
-					{
-						//todo
-					}
-					else if (type == ASocket::WRITE)
-					{
-						//todo
-					}
+					//todo
 				}
-				// client->recv_handler(config_factory_);
-				// epollClose(socket);
+				else if (type == ASocket::RECVCHUNK)
+				{
+					//todo
+				}
+			}
+			else if (ev & (EPOLLOUT))
+			{
+				int fd = socket->getFd();
+				ClientSocket *client;
+				client = dynamic_cast<ClientSocket*>(socket);
+				if (client == NULL)
+					std::cout << "138" << std::endl;
+				if (type == ASocket::SEND)
+				{
+					Response res = client->request_->generateResponse();
+					send(fd, res.to_string().c_str(), res.to_string().size(), 0);
+					epollClose(socket);
+					//todo
+				}
+				else if (type == ASocket::WRITE)
+				{
+					//todo
+				}
 			}
 			else if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
 			{
@@ -184,7 +198,7 @@ void	Epoller::epollLoop(void)
 			else
 			{
 				epollClose(socket);
-				throw (EpollerException("epoll with unknown error at 123."));
+				// throw (EpollerException("epoll with unknown error at 123."));
 			}
 			it++;
 		}
@@ -193,9 +207,10 @@ void	Epoller::epollLoop(void)
 	}
 }
 
+
 // exception
-Epoller::EpollerException::EpollerException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
-}
+// Epoller::EpollerException::EpollerException(std::string const &msg)
+// :std::runtime_error(msg)
+// {
+// 	return ;
+// }

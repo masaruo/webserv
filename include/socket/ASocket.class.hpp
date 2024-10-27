@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 17:36:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 08:25:03 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/26 03:06:29 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ public:
 	}	sockaddr_t;
 private:
 	SocType						type_;
-	ft::unique_ptr<ARequest>	request_;
 protected:
 	int				fd_;//todo const
 	sockaddr_t		addr_;

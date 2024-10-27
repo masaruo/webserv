@@ -6,7 +6,7 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/10/15 17:46:11 by mogawa           ###   ########.fr        #
+#    Updated: 2024/10/27 18:58:22 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,8 +54,11 @@ fclean: clean
 re: fclean
 	$(MAKE) all
 
+docker:
+	docker container exec -it webserv bash
+
 -include $(DEP)
 
-.PHONY: clean fclean re
+.PHONY: clean fclean re docker
 
-# $(info OBJ=$(OBJ))
+# $(info SRC=$(SRC))

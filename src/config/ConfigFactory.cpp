@@ -3,7 +3,7 @@
 config::ConfigFactory::ConfigFactory(std::string const &config_path)
 {
 	// config_pathから読み取ってConfigに入れる
-	std::ifstream ifs(config_path);
+	std::ifstream ifs(config_path.c_str());
 	if (!ifs)
 		throw std::invalid_argument("can not open file.");
 	std::istreambuf_iterator<char> it(ifs);

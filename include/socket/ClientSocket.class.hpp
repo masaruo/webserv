@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:10:22 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 10:08:18 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/25 22:45:39 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 class ClientSocket : public ASocket
 {
 private:
-	ft::unique_ptr<ARequest>	request_;
 	std::time_t					last_activity_;
 	std::time_t					timeout_;
 
@@ -30,6 +29,7 @@ private:
 	ClientSocket(ClientSocket const &rhs);//=delete
 	ClientSocket &operator=(ClientSocket const &rhs);//=delete
 public:
+	ft::unique_ptr<ARequest>	request_;//!
 	explicit ClientSocket(int listen_fd);
 	~ClientSocket();
 	void setSockaddr(void);//? need?

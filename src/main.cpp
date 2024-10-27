@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <csignal>
+#include "FileIOSocket.hpp"
 
 int main(void)
 {

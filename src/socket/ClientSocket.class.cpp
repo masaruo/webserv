@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:10:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 06:13:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 02:01:25 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,37 +53,37 @@ void	ClientSocket::setSockaddr(void)
 	//todo
 }
 
-#include <iostream>
-void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
-{
-	try
-	{
-		ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(fd_, config_factory));
-		Response res = request_->generateResponse();
-		io::IO sender(fd_);
-		sender.send(res.to_string());
-		std::cerr << "Good Request" << std::endl;//todo
-	}
-	catch(AResponseException const &request)
-	{
-		Response r = request.generateResponse();
-		io::IO sender(fd_);
-		sender.send(r.to_string());
-		std::cerr << "Auto index or redirect " << std::endl;//todo
-	}
-	catch(HttpException const &e)
-	{
-		std::cerr << e.what() << std::endl;//todo
-		Response res = e.generateResponse();
-		io::IO sender(fd_);
-		sender.send(res.to_string());
-	}
-	catch(std::runtime_error const &e)
-	{
-		std::cerr << e.what() << std::endl;//todo
-	}	
-	set_time();
-}
+// #include <iostream>
+// void	ClientSocket::recv_handler(config::ConfigFactory const &config_factory)
+// {
+// 	try
+// 	{
+// 		ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(fd_, config_factory));
+// 		Response res = request_->generateResponse();
+// 		io::IO sender(fd_);
+// 		sender.send(res.to_string());
+// 		std::cerr << "Good Request" << std::endl;//todo
+// 	}
+// 	catch(AResponseException const &request)
+// 	{
+// 		Response r = request.generateResponse();
+// 		io::IO sender(fd_);
+// 		sender.send(r.to_string());
+// 		std::cerr << "Auto index or redirect " << std::endl;//todo
+// 	}
+// 	catch(HttpException const &e)
+// 	{
+// 		std::cerr << e.what() << std::endl;//todo
+// 		Response res = e.generateResponse();
+// 		io::IO sender(fd_);
+// 		sender.send(res.to_string());
+// 	}
+// 	catch(std::runtime_error const &e)
+// 	{
+// 		std::cerr << e.what() << std::endl;//todo
+// 	}	
+// 	set_time();
+// }
 
 void	ClientSocket::set_time(void)
 {

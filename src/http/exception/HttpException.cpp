@@ -59,7 +59,7 @@ HttpBody	HttpException::generateBody(void) const
 	{
 		errorPath = root_ + errorPageMap_.at(errorCode_);
 	}
-	std::string contents = FileHandler::read(errorPath);
+	std::string contents = FileHandler::read(errorPath);//todo sstream
 	HttpBody body(contents);
 	return (body);
 }

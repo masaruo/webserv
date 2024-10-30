@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:10:22 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 22:45:39 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 02:28:36 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@
 #include "ARequest.hpp"
 #include "ConfigFactory.hpp"
 #include <ctime>
+
+#include "RequestLine.hpp"
+#include "HttpHeader.hpp"
+#include "HttpBody.hpp"
+#include "Response.hpp"
 
 class ClientSocket : public ASocket
 {
@@ -29,7 +34,14 @@ private:
 	ClientSocket(ClientSocket const &rhs);//=delete
 	ClientSocket &operator=(ClientSocket const &rhs);//=delete
 public:
+	
 	ft::unique_ptr<ARequest>	request_;//!
+	RequestLine					line_;//!
+	HttpHeader					header_;//!
+	HttpBody					body_;//!
+	Response					response_;//!
+	// ft::unique_ptr<Response>	response_;
+
 	explicit ClientSocket(int listen_fd);
 	~ClientSocket();
 	void setSockaddr(void);//? need?

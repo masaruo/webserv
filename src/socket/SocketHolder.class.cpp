@@ -6,11 +6,12 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 06:05:03 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/28 02:39:03 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "SocketHolder.class.hpp"
+#include "epoller.class.hpp"
 #include "ClientSocket.class.hpp"
 #include "ListenSocket.class.hpp"
 #include "define.hpp"
@@ -29,6 +30,7 @@ void	SocketHolder::addSocket(ASocket *socket)
 {
 	if (vec_sockets_.size() > ft::MAX_SOCKET_NUM)
 		throw (HttpException(HttpCode::SERVICE_UNAVAILABLE));
+	poller_->epollAdd(socket);
 	vec_sockets_.push_back(socket);
 }
 

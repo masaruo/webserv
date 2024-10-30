@@ -15,8 +15,10 @@ int main(void)
 	try
 	{
 		//? how to add listen sockets from configs
-		poller.epollAdd(new ListenSocket(7777));
-		poller.epollAdd(new ListenSocket(8888));
+		// poller.epollAdd(new ListenSocket(7777));
+		// poller.epollAdd(new ListenSocket(8888));
+		SocketHolder::addSocket(new ListenSocket(7777));
+		SocketHolder::addSocket(new ListenSocket(8888));
 		poller.epollLoop();
 	}
 	catch(const std::exception& e)

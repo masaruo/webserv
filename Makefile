@@ -6,7 +6,7 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/10/27 18:58:22 by mogawa           ###   ########.fr        #
+#    Updated: 2024/10/29 18:59:10 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,10 +26,10 @@ OBJDIR		:=	obj
 OBJ			:=	$(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 DEP			:=	$(OBJ:.o=.d)
 
-ifdef WITH_ASAN
+ifdef WITH_GDB
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
-CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined,leak -fno-limit-debug-info
-LDFLAGS		:=	-fsanitize=address,undefined,leak
+CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined -fno-limit-debug-info -fno-omit-frame-pointer
+LDFLAGS		:=	-fsanitize=address,undefined
 endif
 
 
@@ -43,7 +43,10 @@ $(TARGET):	$(OBJ)
 	$(CXX) $(LDFLAGS) $^ -o $@
 
 debug: fclean
-	$(MAKE) all WITH_ASAN=1
+	$(MAKE) all WITH_GDB=1
+
+gdb: debug
+	gdb ./$(TARGET)
 
 clean:
 	$(RM) -r $(OBJDIR)
@@ -57,8 +60,11 @@ re: fclean
 docker:
 	docker container exec -it webserv bash
 
+val:
+	valgrind ./$(TARGET)
+
 -include $(DEP)
 
-.PHONY: clean fclean re docker
+.PHONY: clean fclean re docker val
 
 # $(info SRC=$(SRC))

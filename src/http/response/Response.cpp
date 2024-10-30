@@ -3,6 +3,15 @@
 #include "Date.hpp"
 #include <sstream>
 
+Response::Response()
+:status_()
+,header_()
+,body_()
+,has_body_(false)
+{
+	return ;
+}
+
 Response::Response(HttpStatus const &status, HttpHeader const &header)
 :status_(status)
 ,header_(header)

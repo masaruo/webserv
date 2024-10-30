@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/27 19:26:44 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 03:58:57 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,11 @@
 #include "GetRequest.hpp"
 #include "Response.hpp"
 #include "FileIOSocket.hpp"
+#include "DeleteRequest.hpp"
+#include "PostRequest.hpp"
+#include "CgiRequest.hpp"
+#include "PutRequest.hpp"
+#include "IO.class.hpp""
 
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -35,7 +40,7 @@ Epoller::Epoller(int size, std::string const &config_path)
 {
 	if (epfd_ == -1)
 	{
-		// throw(EpollerException("epoll class initialization failed at 28."));
+		// throw(EpollerException("epoll class initialization failed at 28.");
 	}
 	return ;
 }
@@ -70,7 +75,7 @@ void	Epoller::epollAdd(ASocket *socket)
 		// throw (EpollerException("epoll add failed at 49."));
 	}
 	// SocketHolder_.addSocket(socket);//todo try catch
-	SocketHolder::addSocket(socket);
+	// SocketHolder::addSocket(socket);
 	return ;
 }
 
@@ -127,49 +132,91 @@ void	Epoller::epollLoop(void)
 			{
 				ASocket *new_socket = new ClientSocket(socket->getFd());
 				new_socket->setSocketType(ASocket::RECV);
-				epollAdd(new_socket);
+				SocketHolder::addSocket(new_socket);
+				// epollAdd(new_socket);
 			}
 			else if (ev & (EPOLLIN))
 			{
-				int fd = socket->getFd();
 				ClientSocket *client;
 				client = dynamic_cast<ClientSocket*>(socket);
 				if (client == NULL)
-					std::cout << "138" << std::endl;
+					std::cout << "138" << std::endl;//!
 					// throw (EpollerException("epoll to get client socket failed at 111."));
-				if (type == ASocket::RECV)
-				{
-					RequestLine line;
-					HttpHeader header;
-					RequestFactory::createRequestLineAndHeader(fd, line, header);
-					int flg = RequestFactory::hasBody(header);
-					if (flg == RequestFactory::HASCHUNK)
-						socket->setSocketType(ASocket::RECVCHUNK);
-					else if (flg == RequestFactory::HASBODY)
-						socket->setSocketType(ASocket::RECVBODY);
-					else
-						socket->setSocketType(ASocket::SEND);
 
-					std::string const		&host = header.getFirstValue("host");
-					config::Config const	&config = config_factory_.getConfig(host);
-					std::string const		&method = line.getMethod();
-					if (method == "GET")
+				int fd = socket->getFd();
+				try
+				{
+					if (type == ASocket::RECV)
 					{
-						ft::unique_ptr<ARequest>get(new GetRequest(line, header, config));
-						client->request_ = get;
-						// Response res = client->request_->generateResponse();
+						RequestLine line;
+						HttpHeader header;
+						RequestFactory::createRequestLineAndHeader(fd, line, header);
+						client->line_ = line;
+						client->header_ = header;
+						int flg = RequestFactory::hasBody(header);
+						if (flg != RequestFactory::NOBODY)
+							socket->setSocketType(ASocket::RECVBODY);
+						else
+							socket->setSocketType(ASocket::SEND);
+
+						std::string const		&host = header.getFirstValue("host");
+						config::Config const	&config = config_factory_.getConfig(host);
+						std::string const		&method = line.getMethod();
+						if (method == "GET")
+						{
+							ft::unique_ptr<ARequest>get(new GetRequest(line, header, config));
+							client->request_ = get;
+							client->response_ = client->request_->generateResponse();
+							socket->setSocketType(ASocket::SEND);
+						}
+						else if (method == "DELETE")
+						{
+							ft::unique_ptr<ARequest>del(new DeleteRequest(line, header, config));
+							client->request_ = del;
+							client->response_ = client->request_->generateResponse();
+							socket->setSocketType(ASocket::SEND);
+						}
 					}
-					//todo create Request?
-					// ft::unique_ptr<ARequest>request_(RequestFactory::createRequest(client->getFd(), config_factory_));
-					// Response res = request_->generateResponse();
+					else if (type == ASocket::RECVBODY)
+					{
+						io::IO	input(fd);
+						std::string	bodyStr;
+						// RequestLine const &line = client->request_->getLine();
+						// HttpHeader const &header = client->request_->getHeader();
+						HttpHeader header = client->header_;
+						RequestLine line = client->line_;
+						int flg = RequestFactory::hasBody(header);
+						if (flg == RequestFactory::HASBODY)
+						{
+							bodyStr = input.recv(header.getContentLen());
+						}
+						else// chunk
+						{
+							bodyStr = input.recv("chunked");
+						}
+						std::string const	&method = line.getMethod();
+						std::string const	&host = header.getFirstValue("host");
+						config::Config const &config = config_factory_.getConfig(host);
+						if (method == "POST")
+						{
+							ft::unique_ptr<ARequest>post(new PostRequest(line, header, bodyStr, config));
+							client->request_ = post;
+							client->response_ = client->request_->generateResponse();
+							socket->setSocketType(ASocket::SEND);
+						}
+						else if (method == "PUT")
+						{
+							ft::unique_ptr<ARequest>put(new PutRequest(line, header, bodyStr, config));
+							client->request_ = put;
+							client->response_ = client->request_->generateResponse();
+							socket->setSocketType(ASocket::SEND);
+						}
+					}
 				}
-				else if (type == ASocket::RECVBODY)
+				catch (HttpException const &request)
 				{
-					//todo
-				}
-				else if (type == ASocket::RECVCHUNK)
-				{
-					//todo
+					client->response_ = request.generateResponse();
+					socket->setSocketType(ASocket::SEND);
 				}
 			}
 			else if (ev & (EPOLLOUT))
@@ -181,13 +228,10 @@ void	Epoller::epollLoop(void)
 					std::cout << "138" << std::endl;
 				if (type == ASocket::SEND)
 				{
-					Response res = client->request_->generateResponse();
+					// Response res = client->request_->generateResponse();
+					Response res = client->response_;
 					send(fd, res.to_string().c_str(), res.to_string().size(), 0);
 					epollClose(socket);
-					//todo
-				}
-				else if (type == ASocket::WRITE)
-				{
 					//todo
 				}
 			}

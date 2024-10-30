@@ -229,7 +229,7 @@ std::string	CgiRequest::setLocalPath(void) const
 	std::string const	&file = UriNormalizer::decodeDots(uri.getPathInfo().fileName_);
 	std::string const	&pathWithRoot = root + "/" + file;
 
-	if (!FileHandler::checkPathExist(pathWithRoot))
+	if (!FileHandler::checkPathExist(root))
 		throw (HttpException(HttpCode::NOT_FOUND));
 	if (!FileHandler::checkIfFile(pathWithRoot))
 		throw (HttpException(HttpCode::CONFLICT));

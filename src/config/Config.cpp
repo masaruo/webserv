@@ -65,7 +65,7 @@ Config::Config(int flag)//!this is MOCK!
 	LocationConfig redir;
 	redir.pathType_ = REDIRECTION_PATH;
 	redir.directive_ = re;
-	location_.insert(std::make_pair("redirect", redir));
+	location_.insert(std::make_pair("/redirect", redir));
 }
 
 Config::~Config()

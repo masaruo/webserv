@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/30 03:58:57 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 04:15:27 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@
 #include "PostRequest.hpp"
 #include "CgiRequest.hpp"
 #include "PutRequest.hpp"
-#include "IO.class.hpp""
+#include "IO.class.hpp"
+#include "AResponseException.hpp"
 
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -212,6 +213,11 @@ void	Epoller::epollLoop(void)
 							socket->setSocketType(ASocket::SEND);
 						}
 					}
+				}
+				catch (AResponseException const &request)
+				{
+					client->response_ = request.generateResponse();
+					socket->setSocketType(ASocket::SEND);
 				}
 				catch (HttpException const &request)
 				{

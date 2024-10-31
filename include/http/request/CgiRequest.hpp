@@ -13,8 +13,8 @@ private:
 	//! add client sock adder? so that can be passed onto env?
 	std::string	setLocalPath(void) const;
 	std::string	execute(std::string const &path) const;
-	void		exec_child(int pipe_in[2], int pipe_out[2], std::string const &path) const;
-	std::string	exec_parent(int pipe_in[2], int pipe_out[2], pid_t child_pid) const; 
+	void		exec_child(int sockfds[2], std::string const &path) const;
+	std::string	exec_parent(int sockfds[2], pid_t child_pid) const; 
 	CgiRequest();//=delete
 public:
 	explicit CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);

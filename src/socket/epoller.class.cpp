@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:24:00 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/30 04:15:27 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 23:50:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,13 @@
 #include "RequestFactory.hpp"
 #include "GetRequest.hpp"
 #include "Response.hpp"
-#include "FileIOSocket.hpp"
 #include "DeleteRequest.hpp"
 #include "PostRequest.hpp"
 #include "CgiRequest.hpp"
 #include "PutRequest.hpp"
 #include "IO.class.hpp"
 #include "AResponseException.hpp"
+#include "CgiSocket.hpp"
 
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -75,8 +75,9 @@ void	Epoller::epollAdd(ASocket *socket)
 	{
 		// throw (EpollerException("epoll add failed at 49."));
 	}
-	// SocketHolder_.addSocket(socket);//todo try catch
-	// SocketHolder::addSocket(socket);
+	  std::cerr << "Adding socket FD:" << socket->getFd() 
+              << " Type:" << socket->getSocketType() 
+              << " Events:" << ev.events << std::endl;
 	return ;
 }
 
@@ -95,7 +96,6 @@ void	Epoller::epollClose(ASocket *socket)
 int	Epoller::epollWait(void)
 {
 	int size = SocketHolder::getSize();
-	// int	size = SocketHolder_.getSize();
 	event_list_.resize(size);
 	int	numEvents = 0;
 	numEvents = epoll_wait(epfd_, event_list_.data(), size, ft::TIMEOUT);
@@ -106,7 +106,9 @@ int	Epoller::epollWait(void)
 	}
 	// SocketHolder_.checkTimeout();
 	// SocketHolder_.deleteMarkedSocket();
-	SocketHolder::deleteMarkedSocket();
+	// SocketHolder::deleteMarkedSocket();
+	if (numEvents > 0)
+		std::cerr << "epollWait events:" << numEvents << std::endl;
 	return (numEvents);
 }
 
@@ -127,17 +129,37 @@ void	Epoller::epollLoop(void)
 			uint32_t			ev = it->events;
 			ASocket				*socket = static_cast<ASocket*>(it->data.ptr);
 			ASocket::SocType	type = socket->getSocketType();
+
+std::cerr << "Event bits: " 
+          << " EPOLLIN:" << (ev & EPOLLIN)
+          << " EPOLLOUT:" << (ev & EPOLLOUT)
+          << " RAW EVENT:" << ev        // 生のイベント値
+          << " Type:" << type 
+          << " FD:" << socket->getFd() << std::endl;
+
 			if (type == ASocket::IDLE)
+			{
+				it++;
 				continue ;
-			else if (ev & EPOLLIN && type == ASocket::LISTEN)
-			{
-				ASocket *new_socket = new ClientSocket(socket->getFd());
-				new_socket->setSocketType(ASocket::RECV);
-				SocketHolder::addSocket(new_socket);
-				// epollAdd(new_socket);
 			}
-			else if (ev & (EPOLLIN))
+			// else if (ev & EPOLLIN && type == ASocket::LISTEN)
+			// {
+			// 	ASocket *new_socket = new ClientSocket(socket->getFd());
+			// 	new_socket->setSocketType(ASocket::RECV);
+			// 	SocketHolder::addSocket(new_socket);
+			// 	// epollAdd(new_socket);
+			// }
+			else if (ev & EPOLLIN)
 			{
+				if (type == ASocket::LISTEN)
+				{
+					ASocket *new_socket = new ClientSocket(socket->getFd());
+					new_socket->setSocketType(ASocket::RECV);
+					SocketHolder::addSocket(new_socket);
+					it++;
+					continue ;
+				}
+
 				ClientSocket *client;
 				client = dynamic_cast<ClientSocket*>(socket);
 				if (client == NULL)
@@ -177,13 +199,13 @@ void	Epoller::epollLoop(void)
 							client->response_ = client->request_->generateResponse();
 							socket->setSocketType(ASocket::SEND);
 						}
+						it++;
+						continue ;
 					}
 					else if (type == ASocket::RECVBODY)
 					{
 						io::IO	input(fd);
 						std::string	bodyStr;
-						// RequestLine const &line = client->request_->getLine();
-						// HttpHeader const &header = client->request_->getHeader();
 						HttpHeader header = client->header_;
 						RequestLine line = client->line_;
 						int flg = RequestFactory::hasBody(header);
@@ -210,8 +232,29 @@ void	Epoller::epollLoop(void)
 							ft::unique_ptr<ARequest>put(new PutRequest(line, header, bodyStr, config));
 							client->request_ = put;
 							client->response_ = client->request_->generateResponse();
-							socket->setSocketType(ASocket::SEND);
+							socket->setSocketType(ASocket::IDLE);//! IDLE -> send
 						}
+						it++;
+						continue ;
+					}
+					else if (type == ASocket::CGIRECV)
+					{
+						CgiSocket *cgi = dynamic_cast<CgiSocket*>(socket);
+						io::IO input(fd);
+						std::string data = input.recv();
+						std::cerr << "CGI recv size: " << data.size() << " FD: " << fd << std::endl; 
+						if (data.empty())
+						{
+							std::cerr << " settting idle for FD: " << fd << std::endl; 
+							socket->setSocketType(ASocket::IDLE);
+							// socket->markSocketDelete();
+						}
+						else
+						{
+							cgi->response_body_ += data;
+						}
+						it++;
+						continue ;
 					}
 				}
 				catch (AResponseException const &request)
@@ -225,20 +268,43 @@ void	Epoller::epollLoop(void)
 					socket->setSocketType(ASocket::SEND);
 				}
 			}
-			else if (ev & (EPOLLOUT))
+			else if (ev & EPOLLOUT)
 			{
 				int fd = socket->getFd();
-				ClientSocket *client;
-				client = dynamic_cast<ClientSocket*>(socket);
-				if (client == NULL)
-					std::cout << "138" << std::endl;
+				std::cout << "EPOLLOUT event for FD: " << fd << " Type: " << type << std::endl;//!
 				if (type == ASocket::SEND)
 				{
+					ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
+					if (client == NULL)
+						std::cout << "138" << std::endl;
 					// Response res = client->request_->generateResponse();
 					Response res = client->response_;
 					send(fd, res.to_string().c_str(), res.to_string().size(), 0);
 					epollClose(socket);
 					//todo
+					it++;
+					continue ;
+				}
+				else if (type == ASocket::CGISEND)
+				{
+					CgiSocket *cgi = dynamic_cast<CgiSocket*>(socket);
+					std::cerr << "CGISEND event. Data size: " << cgi->request_body_.size() << std::endl;
+					if (!cgi->request_body_.empty())
+					{
+						ssize_t sent = send(fd, cgi->request_body_.c_str(), cgi->request_body_.size(), 0);
+						if (sent > 0)
+						{
+							cgi->request_body_ = cgi->request_body_.substr(sent);
+							if (cgi->request_body_.empty())
+								socket->setSocketType(ASocket::CGIRECV);
+						}
+					}
+					else
+					{
+						socket->setSocketType(ASocket::CGIRECV);
+					}
+					it++;
+					continue ;
 				}
 			}
 			else if (ev & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))

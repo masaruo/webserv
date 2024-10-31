@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 17:36:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/28 02:43:20 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 08:42:23 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,9 @@ public:
 		DELETE,
 		RECV,
 		RECVBODY,
-		RECVCHUNK,
-		READ,
 		SEND,
-		WRITE,
+		CGISEND,
+		CGIRECV,
 		IDLE,
 	};
 	typedef struct sockaddr_s
@@ -46,6 +45,7 @@ protected:
 	int				fd_;//todo const
 	sockaddr_t		addr_;
 	explicit ASocket(SocType type);
+	explicit ASocket(SocType type, int fd);
 public:
 	virtual			~ASocket() = 0;
 	virtual void	setSockaddr(void) = 0;

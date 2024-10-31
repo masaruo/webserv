@@ -7,6 +7,11 @@
 #include <cstring>// std::strcpy
 #include <cerrno>
 #include <sys/wait.h>// waitpid
+#include <sys/socket.h>// socket pair
+#include "define.hpp"
+#include "Fcntl.class.hpp"
+#include "CgiSocket.hpp"
+#include "SocketHolder.class.hpp"
 
 int const	CgiRequest::READ_FD = 0;
 int const	CgiRequest::WRITE_FD = 1;
@@ -83,26 +88,22 @@ static char	**generateArgv(std::string const &uri)
 	return (argv);
 }
 
-void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &abspath) const
+void	CgiRequest::exec_child(int sockfd[2], std::string const &abspath) const
 {
-	if (close(pipe_in[WRITE_FD]) == ft::err)
+	if (close(sockfd[ft::PARENTFD]) == -1)
 		std::exit(INTERNAL_SERVER_ERROR);
-	if (close(pipe_out[READ_FD]) == ft::err)
+	if (dup2(sockfd[ft::CHILDFD], STDIN_FILENO) == -1)
+		std::exit(INTERNAL_SERVER_ERROR);
+	if (dup2(sockfd[ft::CHILDFD], STDOUT_FILENO) == -1)
+		std::exit(INTERNAL_SERVER_ERROR);
+	if (close(sockfd[ft::CHILDFD]) == -1)
 		std::exit(INTERNAL_SERVER_ERROR);
 
-	if (dup2ThenClose(pipe_in[READ_FD], STDIN_FILENO) == ft::err)
-	{
-		std::exit(INTERNAL_SERVER_ERROR);
-	}
-	if (dup2ThenClose(pipe_out[WRITE_FD], STDOUT_FILENO) == ft::err)
-	{
-		std::exit(INTERNAL_SERVER_ERROR);
-	}
 
 	std::string const 						&path = getLine().getUri().getPath();
 	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
 	std::string	chdir_target = loc.directive_.getFirstValue(config::Config::CGI_ROOT);
-	if (chdir(chdir_target.c_str()) == ft::err)
+	if (chdir(chdir_target.c_str()) == -1)
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
@@ -126,96 +127,83 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
-std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_pid) const
+std::string	CgiRequest::exec_parent(int sockfds[2], int child_pid) const
 {
-	if (close(pipe_in[READ_FD]))
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	if (close(pipe_out[WRITE_FD]))
+	if (close(sockfds[ft::CHILDFD]) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
-	std::string const	&body = getBody().to_string();
-	ssize_t		total_written = 0;
-	std::size_t	remaining = getBody().getSize();
+	CgiSocket *cgisock = new CgiSocket(sockfds[ft::PARENTFD]);
+	cgisock->request_body_ = getBody().to_string();
+	cgisock->setSocketType(ASocket::CGISEND);
 
-	while (remaining > 0)
+std::cerr << "Creating CGI socket FD:" << sockfds[ft::PARENTFD] 
+              << " body:" << cgisock->request_body_.size() 
+              << " bytes" << std::endl;
+
+
+	SocketHolder::addSocket(cgisock);
+
+	while (cgisock->getSocketType() == ASocket::CGISEND)
+		usleep(1000);
+
+	while (cgisock->getSocketType() != ASocket::IDLE)
 	{
-		ssize_t	bytesWritten = write(pipe_in[WRITE_FD], body.c_str() + total_written, remaining);
-		if (bytesWritten == ft::err)
+		int	status = 0;
+		pid_t pid = waitpid(child_pid, &status, WNOHANG);
+		if (pid == -1)
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		if (pid > 0 && WIFEXITED(status))
 		{
-			if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
-				continue ;
-			else
-			{
-				close(pipe_in[WRITE_FD]);
-				close(pipe_out[READ_FD]);
+			int exit_status = WEXITSTATUS(status);
+			if (exit_status != 0)
 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-			}
-		}
-		total_written += bytesWritten;
-		remaining -= bytesWritten;
-	}
-	assertClose(pipe_in[WRITE_FD]);
-
-	std::string	result = "";
-	try
-	{
-		result = FileHandler::read(pipe_out[READ_FD]);
-	}
-	catch(...)
-	{
-		assertClose(pipe_out[READ_FD]);
-		throw;
-	}
-	
-	assertClose(pipe_out[READ_FD]);
-
-	int			status = 0;
-	pid_t		pid = 0;
-	while (pid == 0)
-	{
-		pid = waitpid(child_pid, &status, WNOHANG);
-	}
-	if (WIFEXITED(status))
-	{
-		int	exit_status = WEXITSTATUS(status);
-		if (exit_status != 0)
-		{
-			if (exit_status == INTERNAL_SERVER_ERROR)
-				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-			else
-				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//todo amend error
+			break ;
 		}
 	}
+	std::string	result = cgisock->response_body_;
+	SocketHolder::markSocketDelete(cgisock);
+	// delete cgisock;
 	return (result);
 }
 
 std::string	CgiRequest::execute(std::string const &abspath) const
 {
-	int			pipe_in[2];
-	int			pipe_out[2];
+	// int			pipe_in[2];
+	// int			pipe_out[2];
+	int			sockfds[2];
 	pid_t		child_pid = 0;
 	std::string	bodyStr = "";
 
-	if (pipe(pipe_in) == ft::err || pipe(pipe_out) == ft::err)
+	// if (pipe(pipe_in) == ft::err || pipe(pipe_out) == ft::err)
+	// {
+	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	// }
+
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfds) == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
+	// ft::Fcntl::setNonBlock(sockfds, 2);//? do i have to make nonblock on child sock fd?
+	ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
+	// ft::Fcntl::setNonBlock(sockfds[1]);
 	child_pid = fork();
 	if (child_pid == ft::err)
 	{
-		close(pipe_in[WRITE_FD]);
-		close(pipe_in[READ_FD]);
-		close(pipe_out[WRITE_FD]);
-		close(pipe_out[READ_FD]);
+		// close(pipe_in[WRITE_FD]);
+		// close(pipe_in[READ_FD]);
+		// close(pipe_out[WRITE_FD]);
+		// close(pipe_out[READ_FD]);
+		close(sockfds[ft::PARENTFD]);
+		close(sockfds[ft::CHILDFD]);
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 	else if (child_pid == CHILD_PID)
 	{
-		exec_child(pipe_in, pipe_out, abspath);
+		exec_child(sockfds, abspath);
 	}
 	else
 	{
-		bodyStr = exec_parent(pipe_in, pipe_out, child_pid);
+		bodyStr = exec_parent(sockfds, child_pid);
 	}
 	return (bodyStr);
 }

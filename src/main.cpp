@@ -5,7 +5,6 @@
 #include <string>
 #include <iostream>
 #include <csignal>
-#include "FileIOSocket.hpp"
 
 int main(void)
 {
@@ -17,7 +16,7 @@ int main(void)
 		//? how to add listen sockets from configs
 		// poller.epollAdd(new ListenSocket(7777));
 		// poller.epollAdd(new ListenSocket(8888));
-		SocketHolder::addSocket(new ListenSocket(7777));
+		// SocketHolder::addSocket(new ListenSocket(7777));
 		SocketHolder::addSocket(new ListenSocket(8888));
 		poller.epollLoop();
 	}

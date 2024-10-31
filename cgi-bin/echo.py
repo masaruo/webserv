@@ -4,6 +4,7 @@ import html
 import os
 import sys
 import select
+# import fcntl
 from urllib.parse import parse_qs
 
 def print_header():
@@ -49,12 +50,16 @@ def process_form():
     method = os.environ.get("request_method", "").upper()
     print(f"Method: {method}", file=sys.stderr)
 
+    # fl = fcntl.fcntl(sys.stdin.fileno(), fcntl.F_GETFL)
+    # fcntl.fcntl(sys.stdin.fileno(), fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
     if method == "POST":
         try:
             length = int(os.environ.get("content_length", 0))
             print(f"Expected length: {length}", file=sys.stderr)
             body = sys.stdin.read(length)  # この行を変更
             print(f"Actual length: {len(body)}", file=sys.stderr)
+            print(f"body: {body}", file=sys.stderr)
             parsed = parse_qs(body)
         except Exception as e:  # この例外処理を追加
             print(f"Error reading input: {e}", file=sys.stderr)
@@ -88,6 +93,25 @@ def process_form():
     
     print_footer()
 
+def dump_debug():
+   """Debug information for CGI execution"""
+   print("=== CGI DEBUG START ===", file=sys.stderr)
+   print(f"Method: {os.environ.get('REQUEST_METHOD')}", file=sys.stderr)
+   print(f"CWD: {os.getcwd()}", file=sys.stderr)
+   print("\n=== ENV VARS ===", file=sys.stderr)
+   for k, v in sorted(os.environ.items()):
+       print(f"{k}={v}", file=sys.stderr)
+   
+   if os.environ.get("request_method") == "POST":
+       content_length = os.environ.get("content-length", 0)
+       print(f"\n=== POST DATA ({content_length} bytes) ===", file=sys.stderr)
+       data = sys.stdin.read(int(content_length))
+       print(data, file=sys.stderr)
+   
+   print("=== CGI DEBUG END ===\n", file=sys.stderr)
+   sys.stderr.flush()
+
 if __name__ == "__main__":
+    # dump_debug()
     process_form()
     sys.exit(0)

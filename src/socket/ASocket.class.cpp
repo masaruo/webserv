@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 17:37:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 06:59:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 04:58:11 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,16 @@ ASocket::ASocket(SocType type)
 	return ;
 }
 
+ASocket::ASocket(SocType type, int fd)
+:type_(type)
+,fd_(fd)
+{
+	return ;
+}
+
 ASocket::~ASocket()
 {
+	//todo check close fd or now?!
 	return ;
 }
 

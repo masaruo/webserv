@@ -20,6 +20,8 @@ namespace ft
 	std::size_t const	TIMEOUT = 20;
 	int			const	READFD = 0;
 	int			const	WRITEFD = 1;
+	int			const	PARENTFD = 0;
+	int			const	CHILDFD = 1;
 
 	// typedef
 	typedef std::vector<std::string>			str_vec;

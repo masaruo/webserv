@@ -49,7 +49,7 @@ Config::Config(int flag)//!this is MOCK!
 	cgi.addValue(ALLOWED_METHOD, "GET");
 	cgi.addValue(ALLOWED_METHOD, "POST");
 	cgi.addValue(AUTOINDEX, "off");
-	cgi.addValue(CGI_ROOT, "cgi-bin");
+	cgi.addValue(CGI_ROOT, "/webserv/cgi-bin");
 	LocationConfig cgier;
 	cgier.pathType_ = CGI_PATH;
 	cgier.directive_ = cgi;
@@ -114,7 +114,7 @@ std::string	Config::getRoot(std::string const &path) const
 	LocationConfig const &loc = getConfigLocation(path);
 
 	if (loc.pathType_ == CGI_PATH)
-		return (root_ + loc.directive_.getFirstValue(CGI_ROOT));
+		return (loc.directive_.getFirstValue(CGI_ROOT));
 	else if (loc.pathType_ == UPLOAD_PATH)
 		return (root_ + loc.directive_.getFirstValue(UPLOAD_ROOT));
 	else

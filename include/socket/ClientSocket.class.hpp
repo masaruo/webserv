@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:10:22 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/30 02:28:36 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/30 04:51:16 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ public:
 	explicit ClientSocket(int listen_fd);
 	~ClientSocket();
 	void setSockaddr(void);//? need?
-	void	recv_handler(config::ConfigFactory const &config_factory);
+	void	recv_handler(config::ConfigFactory const &config_factory);//delete?
 	void	set_time(void);
 	void	check_timeouts(void);
 };

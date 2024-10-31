@@ -6,24 +6,27 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 02:34:26 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/31 03:04:24 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/31 05:46:14 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ClientImpl.hpp"
-#include "Fcntl.class.hpp"
 #include <sys/socket.h>
 #include <stdexcept>
 #include <cstring>
 #include <unistd.h>
+#include <fcntl.h>
 
-ClientImpl::ClientImpl(int listening_fd)
+static int	getAcceptedFd()
+
+ClientImpl::ClientImpl(int passive_fd)
 {
 	std::memset(&addr_, 0, sizeof(addr_));
-	int	fd = accept(listening_fd, (struct sockaddr *)&addr_, &addrlen_);
+	int	fd = accept(passive_fd, (struct sockaddr *)&addr_, &addrlen_);
 	if (fd == -1)
 		throw (std::runtime_error("clientimpl"));
-	ft::Fcntl::setNonBlock(fd);
+	if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
+		throw (std::runtime_error("clientimpl"));
 	fd_ = fd;
 }
 

@@ -1,22 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ISocket.hpp                                        :+:      :+:    :+:   */
+/*   Fd.cpp                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 00:32:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/31 05:13:12 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 04:34:06 by mogawa            #+#    #+#             */
+/*   Updated: 2024/10/31 05:16:23 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#include "Fd.hpp"
+#include "unistd.h"
 
-class ISocket
+Fd::Fd(int fd)
+:fd_(fd)
 {
-public:
-	virtual				~ISocket(){ return ; };
-	virtual int			getFd(void) const = 0;
-	virtual void		close(void) = 0;
-	// virtual ISocket		*clone(void) = 0;
-};
+	return ;
+}
+
+Fd::~Fd()
+{
+	close();
+}
+
+int	Fd::getFd(void) const
+{
+	return (fd_);
+}
+
+void	Fd::close(void)
+{
+	if (fd_ > 2)
+	{
+		::close(fd_);
+	}
+	fd_ = -1;
+}
+
+int	Fd::transfer(void)
+{
+	int	tmp = fd_;
+	fd_ = -1;
+	return (tmp);
+}

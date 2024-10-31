@@ -1,22 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ISocket.hpp                                        :+:      :+:    :+:   */
+/*   Fd.hpp                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 00:32:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/31 05:13:12 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 04:25:18 by mogawa            #+#    #+#             */
+/*   Updated: 2024/10/31 04:52:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-class ISocket
+class Fd
 {
+private:
+	int	fd_;
+
+	Fd();
+	Fd(Fd const &rhs);
+	Fd &operator=(Fd const &rhs);
 public:
-	virtual				~ISocket(){ return ; };
-	virtual int			getFd(void) const = 0;
-	virtual void		close(void) = 0;
-	// virtual ISocket		*clone(void) = 0;
+	Fd(int fd = -1);
+	~Fd();
+	int		getFd(void) const;
+	void	close(void);
+	int		transfer(void);
 };

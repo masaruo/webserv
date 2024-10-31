@@ -6,19 +6,19 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 01:44:51 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/31 03:02:32 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/10/31 05:02:12 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ListenImpl.hpp"
-#include "Fcntl.class.hpp"
+#include <fcntl.h>
 #include <stdexcept>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <cstring>
 #include <unistd.h>
 
-sockaddr_in	getSockAddr_(int port)
+static sockaddr_in	getSockAddr_(int port)
 {
 	sockaddr_in addr;
 
@@ -29,8 +29,7 @@ sockaddr_in	getSockAddr_(int port)
 	return (addr);
 }
 
-ListenImpl::ListenImpl(int port)
-:port_(port)
+static int	getListenSocket_(int port)
 {
 	sockaddr_in	const &addr = getSockAddr_(port);
 	int	fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -41,11 +40,24 @@ ListenImpl::ListenImpl(int port)
 		throw (std::runtime_error("Socket failed"));
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 		throw (std::runtime_error("Socket failed"));
-	ft::Fcntl::setNonBlock(fd);
+	if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
+		throw (std::runtime_error("Socket failed"));
 	if (listen(fd, SOMAXCONN) == -1)
 		throw (std::runtime_error("Socket failed"));
+	return (fd);
+}
 
-	fd_ = fd;
+ListenImpl::ListenImpl(int port)
+:port_(port)
+,fd_(getListenSocket_(port))
+{
+	return ;
+}
+
+ListenImpl::ListenImpl(int port, int fd)
+:port_(port)
+,fd_(fd)
+{
 	return ;
 }
 
@@ -55,16 +67,18 @@ ListenImpl::~ListenImpl()
 	return ;
 }
 
-void	ListenImpl::close(void)
-{
-	if (fd_ >= 3)
-	{
-		::close(fd_);
-		fd_ = -1;
-	}
-}
-
 int	ListenImpl::getFd(void) const
 {
-	return (fd_);
+	return (fd_.getFd());
 }
+
+void	ListenImpl::close(void)
+{
+	fd_.close();
+}
+
+// ISocket	*ListenImpl::clone(void)
+// {
+// 	ListenImpl	*copy = new ListenImpl(port_, fd_.transfer());
+// 	return (copy);
+// }

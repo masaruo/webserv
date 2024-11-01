@@ -9,6 +9,8 @@ config::ConfigFactory::ConfigFactory(std::string const &config_path)
 	std::istreambuf_iterator<char> it(ifs);
     std::istreambuf_iterator<char> last;
     std::string str(it, last);
+	if (str == "\0")
+		throw std::invalid_argument("config file is empty.");
 
 	Parser parse(str);
 	while (parse.get_token() != "\0")

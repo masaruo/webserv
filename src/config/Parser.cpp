@@ -22,13 +22,17 @@ bool isnums(const std::string& str)
     return (true);
 }
 
-Parser::Parser(std::string raw) : content_(raw), buf_idx_(0)
+Parser::Parser(std::string raw) : content_(raw), buf_idx_(0), new_line_num(0)
 {}
 
 std::string Parser::get_token()
 {
     while (isspace(content_[buf_idx_]))
+    {
+        if (content_[buf_idx_] == '\n')
+            new_line_num++;
         buf_idx_++;
+    }
     if (isbrace(content_[buf_idx_]) || issemicolon(content_[buf_idx_]))
         return (content_.substr(buf_idx_, 1));
     size_t token_len = 0;
@@ -43,7 +47,11 @@ std::string Parser::get_token()
 std::string Parser::consume_token()
 {
     while (isspace(content_[buf_idx_]))
+    {
+        if (content_[buf_idx_] == '\n')
+            new_line_num++;
         buf_idx_++;
+    }
     std::string token;
     if (isbrace(content_[buf_idx_]) || issemicolon(content_[buf_idx_]))
     {
@@ -62,6 +70,11 @@ std::string Parser::consume_token()
     return (token);
 }
 
+size_t Parser::get_new_lile_num() const
+{
+    return (new_line_num);
+}
+
 // int main()
 // {
 //     std::string str = "server {\n\tlisten 8080;\n\tserver_name localhost; \n\troot ./docs/;\n\tmax_body_size 10000;\n\tkeep_alive_timeout 75;\n\terror_page 404 /404.html;\n\t}\n";
@@ -70,20 +83,27 @@ std::string Parser::consume_token()
 //     // std::cout << std::boolalpha << is_config(str) << std::endl;
 
 //     Parser parser(str);
-//     Config config = parser.parse();
-//     std::cout << "port: " << config.port_ << std::endl;
-//     std::cout << "server_name: " << config.server_name_ << std::endl;
-//     std::cout << "root: " << config.root_ << std::endl;
-//     std::cout << "max_body_size: " << config.max_body_size_ << std::endl;
-//     std::cout << "keep_alive_timeout: " << config.keep_alive_timeout_ << std::endl;
-//     std::cout << "code: " << config.error_pages_.begin()->first << std::endl;
-//     std::cout << "error_page: " << config.error_pages_.begin()->second << std::endl;
-//     // std::cout << parser.get_token() << std::endl;
-//     // std::cout << parser.get_token() << std::endl;
-//     // std::cout << parser.get_token() << std::endl;
-//     // std::cout << parser.get_token() << std::endl;
-//     // std::cout << parser.get_token() << std::endl;
-//     // std::cout << parser.get_token() << std::endl;
+//     std::cout << "new line: " << parser.get_new_lile_num() << std::endl;
+//     // Config config = parser.parse();
+//     // std::cout << "port: " << config.port_ << std::endl;
+//     // std::cout << "server_name: " << config.server_name_ << std::endl;
+//     // std::cout << "root: " << config.root_ << std::endl;
+//     // std::cout << "max_body_size: " << config.max_body_size_ << std::endl;
+//     // std::cout << "keep_alive_timeout: " << config.keep_alive_timeout_ << std::endl;
+//     // std::cout << "code: " << config.error_pages_.begin()->first << std::endl;
+//     // std::cout << "error_page: " << config.error_pages_.begin()->second << std::endl;
+//     std::cout << parser.consume_token() << std::endl;
+//     std::cout << "new line: " << parser.get_new_lile_num() << std::endl;
+//     std::cout << parser.consume_token() << std::endl;
+//     std::cout << "new line: " << parser.get_new_lile_num() << std::endl;
+//     std::cout << parser.consume_token() << std::endl;
+//     std::cout << "new line: " << parser.get_new_lile_num() << std::endl;
+//     std::cout << parser.consume_token() << std::endl;
+//     std::cout << "new line: " << parser.get_new_lile_num() << std::endl;
+//     std::cout << parser.consume_token() << std::endl;
+//     std::cout << "new line: " << parser.get_new_lile_num() << std::endl;
+//     std::cout << parser.consume_token() << std::endl;
+//     std::cout << "new line: " << parser.get_new_lile_num() << std::endl;
 //     return (0);
 // }
 

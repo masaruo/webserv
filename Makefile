@@ -6,7 +6,7 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/10/29 18:59:10 by mogawa           ###   ########.fr        #
+#    Updated: 2024/11/02 22:00:28 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,6 +50,7 @@ gdb: debug
 
 clean:
 	$(RM) -r $(OBJDIR)
+	docker compose
 
 fclean: clean
 	$(RM) $(TARGET)
@@ -60,11 +61,14 @@ re: fclean
 docker:
 	docker container exec -it webserv bash
 
+down:
+	docker compose -f .devcontainer/docker-compose.yml down
+
 val:
 	valgrind ./$(TARGET)
 
 -include $(DEP)
 
-.PHONY: clean fclean re docker val
+.PHONY: clean fclean re docker val up down
 
 # $(info SRC=$(SRC))

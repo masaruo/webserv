@@ -1,29 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Fd.hpp                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/02 06:06:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 07:14:30 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 04:25:18 by mogawa            #+#    #+#             */
+/*   Updated: 2024/10/31 04:52:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
-#include <signal.h>
+#pragma once
 
-int main(void)
+class Fd
 {
-	signal(SIGINT, NULL);//todo sigintの時の終了処理？sigterm?
-	try
-	{
-		Server	server("./config/config.md");
-		server.run();
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-	return (0);
-}
+private:
+	int	fd_;
+
+	Fd();
+	Fd(Fd const &rhs);
+	Fd &operator=(Fd const &rhs);
+public:
+	Fd(int fd = -1);
+	~Fd();
+	int		getFd(void) const;
+	void	close(void);
+	int		transfer(void);
+};

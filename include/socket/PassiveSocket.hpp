@@ -1,29 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   PassiveSocket.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/02 06:06:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 07:14:30 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 07:35:20 by mogawa            #+#    #+#             */
+/*   Updated: 2024/11/02 06:33:06 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
-#include <signal.h>
+#pragma once
+#include "ASocket.hpp"
 
-int main(void)
+class PassiveSocket : public ASocket
 {
-	signal(SIGINT, NULL);//todo sigintの時の終了処理？sigterm?
-	try
-	{
-		Server	server("./config/config.md");
-		server.run();
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-	return (0);
-}
+private:
+	PassiveSocket();
+	PassiveSocket(PassiveSocket const &rhs);
+	PassiveSocket &operator=(PassiveSocket const &rhs);
+public:
+	explicit PassiveSocket(int port, Server &server);
+	~PassiveSocket();
+
+	void	execute(void);
+};

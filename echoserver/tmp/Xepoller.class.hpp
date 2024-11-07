@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   epoller.class.hpp                                  :+:      :+:    :+:   */
+/*   Xepoller.class.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:23:52 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 05:44:55 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/02 06:05:05 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ public:
 	void	epollAdd(ASocket *socket);
 	void	epollClose(ASocket *socket);
 	void	epollLoop(void);
+	void	loop(void);
 	class EpollerException : public std::runtime_error
 	{
 	public:

@@ -6,14 +6,15 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/28 02:39:03 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/02 02:38:59 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "SocketHolder.class.hpp"
+#include "ASocket.hpp"
 #include "epoller.class.hpp"
-#include "ClientSocket.class.hpp"
-#include "ListenSocket.class.hpp"
+// #include "ClientSocket.class.hpp"
+// #include "ListenSocket.class.hpp"
 #include "define.hpp"
 #include "HttpException.hpp"
 
@@ -54,7 +55,7 @@ void	SocketHolder::addSocket(ASocket *socket)
 
 void	SocketHolder::markSocketDelete(ASocket *socket)
 {
-	socket->markSocketDelete();
+	socket->setState(ft::DELETE);
 }
 
 int	SocketHolder::getSize()
@@ -82,7 +83,7 @@ void	SocketHolder::deleteMarkedSocket(void)
 
 	while (it != end)
 	{
-		if ((*it)->getSocketType() == ASocket::DELETE)
+		if ((*it)->getState() == ft::DELETE)
 		{
 			iterator tmp = it;
 			it++;

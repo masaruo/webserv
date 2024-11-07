@@ -9,26 +9,22 @@ static void	assertRequestLine(std::string const &buf)
 
 	if (line.empty())
 		is_badReqeust = true;
-	if (!line.end_with(ft::string::CR))// CR not at the end of the linst
+	if (!line.end_with_str(ft::string::CRLF))
 		is_badReqeust = true;
-	line.pop_back();// get rid of CR at the end of the line
-	if (line.has(ft::string::CR))// CR in the middle of line
+	line.pop_back();
+	line.pop_back();
+	if (line.empty() || line.has(ft::string::CR))// CR in the middle of line
 		is_badReqeust = true;
 
 	if (is_badReqeust)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
-RequestLine::RequestLine(std::istringstream &iss)
-:method_(), uri_(), version_()
+RequestLine::RequestLine(std::string const &line)
 {
-	std::string	buf;
-
-	std::getline(iss, buf);
-	assertRequestLine(buf);
-
-	ft::string	to_split(buf);
-	to_split.trim(ft::string::CR);
+	assertRequestLine(line);
+	ft::string	to_split(line);
+	to_split.trim(ft::string::CRLF);
 	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WS);
 
 	std::string method, uri, version;
@@ -49,8 +45,41 @@ RequestLine::RequestLine(std::istringstream &iss)
 
 	setMethod(method);
 	setUri(uri);
-	setVersion(version);
+	setVersion(version);	
 }
+
+// RequestLine::RequestLine(std::istringstream &iss)
+// :method_(), uri_(), version_()
+// {
+// 	std::string	buf;
+
+// 	std::getline(iss, buf);
+// 	assertRequestLine(buf);
+
+// 	ft::string	to_split(buf);
+// 	to_split.trim(ft::string::CR);
+// 	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WS);
+
+// 	std::string method, uri, version;
+// 	if (split_by_sp.size() == 2 && !split_by_sp.at(0).empty() && !split_by_sp.at(1).empty())
+// 	{
+// 		method = split_by_sp.at(0);
+// 		uri = "/";
+// 		version = split_by_sp.at(1);
+// 	}
+// 	else if (split_by_sp.size() == 3 && !split_by_sp.at(0).empty() && !split_by_sp.at(1).empty() && !split_by_sp.at(2).empty())
+// 	{
+// 		method = split_by_sp.at(0);
+// 		uri = split_by_sp.at(1);
+// 		version = split_by_sp.at(2);
+// 	}
+// 	else
+// 		throw (HttpException(HttpCode::BAD_REQUEST));
+
+// 	setMethod(method);
+// 	setUri(uri);
+// 	setVersion(version);
+// }
 
 RequestLine::RequestLine()
 :method_()

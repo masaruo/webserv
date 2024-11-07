@@ -1,29 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Fd.cpp                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/02 06:06:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 07:14:30 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 04:34:06 by mogawa            #+#    #+#             */
+/*   Updated: 2024/10/31 07:07:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
-#include <signal.h>
+#include "Fd.hpp"
+#include "unistd.h"
 
-int main(void)
+Fd::Fd(int fd)
+:fd_(fd)
 {
-	signal(SIGINT, NULL);//todo sigintの時の終了処理？sigterm?
-	try
+	return ;
+}
+
+Fd::~Fd()
+{
+	close();
+}
+
+int	Fd::getFd(void) const
+{
+	return (fd_);
+}
+
+void	Fd::close(void)
+{
+	if (fd_ > 2)
 	{
-		Server	server("./config/config.md");
-		server.run();
+		::close(fd_);
 	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-	return (0);
+	fd_ = -1;
+}
+
+int	Fd::transfer(void)
+{
+	int	tmp = fd_;
+	fd_ = -1;
+	return (tmp);
 }

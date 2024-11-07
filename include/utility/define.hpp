@@ -18,21 +18,33 @@ namespace ft
 	std::size_t const	READ_BUF_SIZE = 4000;
 	std::size_t const	WRITE_BUF_SIZE = 4000;
 	std::size_t const	TIMEOUT = 20;
-	int			const	READFD = 0;
-	int			const	WRITEFD = 1;
 	int			const	PARENTFD = 0;
 	int			const	CHILDFD = 1;
+
+	// Socket State
+	enum State
+	{
+		PASSIVE,
+		DELETE,
+		RECV_REQUESTLINE,
+		RECV_HEADER,
+		RECV_BODY,
+		SEND,
+		CGIRECV,
+		CGISEND,
+		IDLE,
+	};
 
 	// typedef
 	typedef std::vector<std::string>			str_vec;
 	typedef std::map<std::string, std::string>	str_map;
 
 	// communal functions
-	template <typename T>
-	T stonum(std::string const &str)
+	template <typename SocketT>
+	SocketT stonum(std::string const &str)
 	{
 		std::stringstream	ss(str);
-		T					num = 0;
+		SocketT					num = 0;
 		ss >> num;
 		if (ss.fail() || !ss.eof())
 		{
@@ -41,8 +53,8 @@ namespace ft
 		return (num);
 	}
 
-	template <typename T>
-	std::string	to_string(T num)
+	template <typename SocketT>
+	std::string	to_string(SocketT num)
 	{
 		std::stringstream	numStr;
 		numStr << num;

@@ -1,25 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   RequestFactory.hpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/02 22:58:08 by mogawa            #+#    #+#             */
+/*   Updated: 2024/11/02 23:01:36 by mogawa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
-// #include "unique_ptr.hpp"
 #include "ConfigFactory.hpp"
-// #include <string>
-// #include <stdexcept>
+#include "RequestLine.hpp"
+#include "HttpHeader.hpp"
+#include "HttpBody.hpp"
+#include "define.hpp"
 
 class ARequest;
-class RequestLine;
-class HttpHeader;
-class HttpBody;
 
 class RequestFactory
 {
-public:
-	static int const	HASCHUNK;
-	static int const	HASBODY;
-	static int const	NOBODY;
 private:
-	RequestFactory();
-	RequestFactory(RequestFactory const &rhs);
-	RequestFactory &operator=(RequestFactory const &rhs);
-	~RequestFactory();
+	ft::State	state_;
+	RequestLine	line_;
+	HttpHeader	header_;
+	HttpBody	body_;
+
+	bool	parseRequestLine(std::string &buffer);
+	bool	parseHeader(std::string &buffer);
+	bool	parseBody(std::string &buffer);
 public:
 	static ARequest	*createRequest(int fd, config::ConfigFactory const &config_factory);
 	static void		createRequestLineAndHeader(int fd, RequestLine &line, HttpHeader &header);

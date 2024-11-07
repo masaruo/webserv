@@ -10,8 +10,8 @@
 #include <sys/socket.h>// socket pair
 #include "define.hpp"
 #include "Fcntl.class.hpp"
-#include "CgiSocket.hpp"
-#include "SocketHolder.class.hpp"
+// #include "CgiSocket.hpp"
+// #include "SocketHolder.class.hpp"
 
 int const	CgiRequest::READ_FD = 0;
 int const	CgiRequest::WRITE_FD = 1;
@@ -132,37 +132,38 @@ std::string	CgiRequest::exec_parent(int sockfds[2], int child_pid) const
 	if (close(sockfds[ft::CHILDFD]) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
-	CgiSocket *cgisock = new CgiSocket(sockfds[ft::PARENTFD]);
-	cgisock->request_body_ = getBody().to_string();
-	cgisock->setSocketType(ASocket::CGISEND);
+	// CgiSocket *cgisock = new CgiSocket(sockfds[ft::PARENTFD]);
+	// cgisock->request_body_ = getBody().to_string();
+	// cgisock->setSocketType(ASocket::CGISEND);
 
-std::cerr << "Creating CGI socket FD:" << sockfds[ft::PARENTFD] 
-              << " body:" << cgisock->request_body_.size() 
-              << " bytes" << std::endl;
+// std::cerr << "Creating CGI socket FD:" << sockfds[ft::PARENTFD] 
+//               << " body:" << cgisock->request_body_.size() 
+//               << " bytes" << std::endl;
 
 
-	SocketHolder::addSocket(cgisock);
+// 	SocketHolder::addSocket(cgisock);
 
-	while (cgisock->getSocketType() == ASocket::CGISEND)
-		usleep(1000);
+// 	while (cgisock->getSocketType() == ASocket::CGISEND)
+// 		usleep(1000);
 
-	while (cgisock->getSocketType() != ASocket::IDLE)
-	{
-		int	status = 0;
-		pid_t pid = waitpid(child_pid, &status, WNOHANG);
-		if (pid == -1)
-			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-		if (pid > 0 && WIFEXITED(status))
-		{
-			int exit_status = WEXITSTATUS(status);
-			if (exit_status != 0)
-				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-			break ;
-		}
-	}
-	std::string	result = cgisock->response_body_;
-	SocketHolder::markSocketDelete(cgisock);
-	// delete cgisock;
+// 	while (cgisock->getSocketType() != ASocket::IDLE)
+// 	{
+// 		int	status = 0;
+// 		pid_t pid = waitpid(child_pid, &status, WNOHANG);
+// 		if (pid == -1)
+// 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+// 		if (pid > 0 && WIFEXITED(status))
+// 		{
+// 			int exit_status = WEXITSTATUS(status);
+// 			if (exit_status != 0)
+// 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+// 			break ;
+// 		}
+// 	}
+// 	std::string	result = cgisock->response_body_;
+// 	SocketHolder::markSocketDelete(cgisock);
+// 	// delete cgisock;
+	std::string result = "";
 	return (result);
 }
 

@@ -72,6 +72,14 @@ config::Config	config::ConfigFactory::getConfig(std::string const &server_name) 
 	return (configs_.front());
 }
 
+std::vector<std::size_t>	config::ConfigFactory::getAcceptedPorts(void) const
+{
+	std::vector<std::size_t> vec;
+	vec.push_back(8888);
+	vec.push_back(7777);
+	return (vec);
+}
+
 // int main()
 // {
 // 	config::ConfigFactory a("simple.conf");

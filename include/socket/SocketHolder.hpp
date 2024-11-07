@@ -1,21 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   SocketHolder.class.hpp                             :+:      :+:    :+:   */
+/*   SocketHolder.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:38:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/25 05:38:54 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/02 05:26:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include <vector>
 #include <string>
+#include <sys/epoll.h>
 
 class ASocket;
-class Epoller;
 
 class SocketHolder
 {
@@ -26,19 +26,15 @@ public://*typedef
 	typedef vec_socket::size_type		size_type;
 	typedef vec_socket::difference_type	difference_type;
 private:
-	static vec_socket	vec_sockets_;
-	static Epoller		*poller_;
-	SocketHolder();
-	~SocketHolder();
+	vec_socket	vec_sockets_;
 	SocketHolder(SocketHolder const &rhs);
 	SocketHolder &operator=(SocketHolder const &rhs);
 public:
-	static void		init(Epoller *poller);
-	static void		destructor(void);
+	SocketHolder();
+	~SocketHolder();
 
-	static void		addSocket(ASocket *socket);
+	void		addSocket(ASocket *socket);
 	// void		checkTimeout(void);
-	static void		markSocketDelete(ASocket *socket);
-	static void		deleteMarkedSocket(void);
-	static int		getSize(void);
+	void		deleteMarkedSocket(void);
+	int			getSize(void) const;
 };

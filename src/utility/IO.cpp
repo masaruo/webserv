@@ -127,10 +127,11 @@ bool	IO::parseBodyWithLength(ft::State &state, std::size_t size)
 		body_ = HttpBody(rest_);
 		rest_.clear();
 		state = ft::IDLE;
-		return (false);
+		// return (false);
 	}
-	else
-		return (true);
+	// else
+		// return (true);
+	return (false);
 }
 
 bool	IO::parseBodyWithChunk(ft::State &state)

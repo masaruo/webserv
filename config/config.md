@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name defaultserver;
+    server_name _;
 
     root /webserv/www/html;
     max_body_size 10000000;
@@ -18,8 +18,9 @@ server {
     }
 
     location /uploads {
-        allowed_methods PUT;
-        upload_store /webserv/www/uploads;
+        allowed_methods PUT DELETE GET;
+        upload_store /storage;
+        autoindex on;
     }
 
     location /cgi-bin {
@@ -29,6 +30,7 @@ server {
     }
 
     location /redirect {
+        allowed_methods GET PUT POST DELETE;
         return 301 http://example.com;
     }
 }

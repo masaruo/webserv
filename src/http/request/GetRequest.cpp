@@ -48,7 +48,7 @@ std::string	GetRequest::setLocalPath(void) const
 	{
 		assertAutoIndex(path, pathWithRoot);
 		std::string const &indexFileName = getIndexFileName(path);
-		finalPath = pathWithRoot + indexFileName;
+		finalPath = pathWithRoot + "/" + indexFileName;
 	}
 	if (!FileHandler::checkPathExist(finalPath))
 		throw (HttpException(HttpCode::NOT_FOUND));

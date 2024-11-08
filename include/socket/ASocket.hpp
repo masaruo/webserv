@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 07:06:34 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/08 06:36:55 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ private:
 protected:
 	void			setSockAddr(Addr addr);
 	Server			&getServer(void);
+	ft::State		&getRefState(void);
+	void			updateEventsWithState(void);
 
 public:
 	explicit	ASocket(int port, int fd, ft::State state, uint32_t event, Server &server);
@@ -46,7 +48,6 @@ public:
 	int				getFd(void) const;
 	void			setState(ft::State state);
 	ft::State		getState(void) const;
-	void			setEvents(uint32_t events);
 	uint32_t		getEvents(void) const;
 	Addr			getSockAddr(void) const;
 

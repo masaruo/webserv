@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 01:22:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/07 01:22:10 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/08 07:01:14 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,37 +19,48 @@
 #include <string>
 #include <sys/socket.h>
 
+namespace config
+{
+	class ConfigFactory;
+}
+
+class ARequest;
 
 class IO
 {
+public:
+	static int const	CHUNK_BODY;
+	static int const	LENGTH_BODY;
+	static int const	NO_BODY;
 private:
-	int			fd_;
-	std::string	data_;
-	std::string	rest_;
+	int							fd_;
+	std::string					data_;
+	std::string					rest_;
+	config::ConfigFactory const	&config_factory_;
+	RequestLine					line_;
+	HttpHeader					header_;
+	HttpBody					body_;
 
-	RequestLine	line_;
-	HttpHeader	header_;
-	HttpBody	body_;
-
-	void	parseBuffer(ft::State &state);
-	void	parseRequestLine(ft::State &state);
-	void	parseHeader(ft::State &state);
-	bool	parseBody(ft::State &state);
-	// internal function
-	ssize_t		recv_until(std::string const &until);
-	ssize_t		recv_length(std::size_t len);
-	ssize_t		recv_chunk(void);
+	bool	parseBuffer(ft::State &state);
+	bool	parseRequestLine(ft::State &state);
+	bool	parseHeader(ft::State &state, bool &request_complete);
+	bool	parseBody(ft::State &state, bool &request_complete);
+	bool	parseBodyWithLength(ft::State &state, std::size_t size);
+	bool	parseBodyWithChunk(ft::State &state);
 	IO();//=delete
 public:
-	explicit	IO(int fd);
+	explicit	IO(int fd, config::ConfigFactory const &factory);
 	~IO();
 	IO(IO const &rhs);
 	IO &operator=(IO const &rhs);
 
-	ssize_t	recv(ft::State &state);
-	ssize_t	send(std::string const &data) const;
+	bool	recv(ft::State &state);
+	bool	send(ft::State &state);
 
 	void		clear(void);
+	void		setData(std::string const &data);
 	std::string	getData(void) const;
 	std::size_t	getSize(void) const;
+
+	ARequest	*createRequest(void);
 };

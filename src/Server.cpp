@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 07:16:50 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/08 06:37:16 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,11 @@ int	Server::epollWait(void)
 	return (ev_num);
 }
 
+config::ConfigFactory const	&Server::getConfigFactory(void) const
+{
+	return (config_factory_);
+}
+
 void	Server::addSocket(ASocket *socket)
 {
 	if (holder_.getSize() > ft::MAX_SOCKET_NUM)
@@ -74,7 +79,6 @@ void	Server::addSocket(ASocket *socket)
 void	Server::modSocket(ASocket *socket, uint32_t event)
 {
 	epoll_event	ev;
-	socket->setEvents(event);
 	ev.events = event;
 	ev.data.ptr = socket;
 

@@ -6,11 +6,12 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 06:39:03 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/08 06:37:42 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ASocket.hpp"
+#include "Server.hpp"
 
 ASocket::ASocket(int port, int fd, ft::State state, uint32_t event, Server &server)
 :port_(port)
@@ -40,9 +41,29 @@ ASocket::~ASocket()
 	return ;
 }
 
-void	ASocket::setEvents(uint32_t events)
+void	ASocket::updateEventsWithState(void)
 {
-	events_ = events;
+	switch (state_)
+	{
+	case (ft::RECV_REQUESTLINE):
+	case (ft::RECV_HEADER):
+	case (ft::RECV_BODY):
+	case (ft::CGIRECV):
+	case (ft::PASSIVE):
+		events_ = EPOLLIN;
+		break;
+	case (ft::SEND):
+	case (ft::CGISEND):
+		events_ = EPOLLOUT;
+		break;
+	case (ft::IDLE):
+	case (ft::DELETE):
+		events_ = 0;
+		break ;
+	default:
+		break;
+	}
+	server_.modSocket(this, events_);
 }
 
 void	ASocket::setSockAddr(Addr addr)
@@ -67,11 +88,12 @@ int	ASocket::getFd(void) const
 
 void	ASocket::setState(ft::State state)
 {
-	if (state == ft::DELETE)
-	{
-		//todo change events to 0;
-	}
 	state_ = state;
+}
+
+ft::State	&ASocket::getRefState(void)
+{
+	return (state_);
 }
 
 ft::State	ASocket::getState(void) const

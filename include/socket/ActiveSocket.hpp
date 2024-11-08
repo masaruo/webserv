@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 11:33:05 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/08 06:27:52 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,13 @@
 
 class ActiveSocket : public ASocket
 {
-public:
-	static int const			NO_BODY;
-	static int const			LENGTH_BODY;
-	static int const			CHUNK_BODY;
 private:
 	IO							io_;
-	ft::unique_ptr<ARequest>	request_;
-	RequestLine					line_;
-	HttpHeader					header_;
-	HttpBody					body_;
-	Response					response_;
-
-	int			checkHasBody(void) const;
+	// ft::unique_ptr<ARequest>	request_;
+	// RequestLine					line_;
+	// HttpHeader					header_;
+	// HttpBody					body_;
+	// Response					response_;
 
 	ActiveSocket();
 	ActiveSocket(ActiveSocket const &rhs);

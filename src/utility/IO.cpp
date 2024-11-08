@@ -1,10 +1,22 @@
 #include "IO.hpp"
 #include "string.hpp"
+#include "GetRequest.hpp"
+#include "PostRequest.hpp"
+#include "DeleteRequest.hpp"
+#include "PutRequest.hpp"
 
-IO::IO(int fd)
+int const	IO::CHUNK_BODY = 1;
+int const	IO::LENGTH_BODY = 2;
+int const	IO::NO_BODY = 0;
+
+IO::IO(int fd, config::ConfigFactory const &factory)
 :fd_(fd)
 ,data_()
 ,rest_()
+,config_factory_(factory)
+,line_()
+,header_()
+,body_()
 {
 	return ;
 }
@@ -18,6 +30,10 @@ IO::IO(IO const &rhs)
 :fd_(rhs.fd_)
 ,data_(rhs.data_)
 ,rest_(rhs.rest_)
+,config_factory_(rhs.config_factory_)
+,line_(rhs.line_)
+,header_(rhs.header_)
+,body_(rhs.body_)
 {
 	return ;
 }
@@ -29,257 +45,208 @@ IO &IO::operator=(IO const &rhs)
 		fd_ = rhs.fd_;
 		data_ = rhs.data_;
 		rest_ = rhs.rest_;
+		line_ = rhs.line_;
+		header_ = rhs.header_;
+		body_ = rhs.body_;
 	}
 	return (*this);
 }
 
-static bool	is_chunk_body_(HttpHeader &header)
+static int	check_has_body_(HttpHeader &header)
 {
-	if (header.hasKey("content-length") && header.hasKey("transfer-endocing"))
+	if (header.hasKey("content-length") && header.hasKey("transfer-encoding"))
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	else if (header.hasKey("content-length") && ft::stonum<std::size_t>(header.getFirstValue("content-length")) > 0)
+		return (IO::LENGTH_BODY);
+	else if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
+		return (IO::CHUNK_BODY);
+	else
+		return (IO::NO_BODY);
+}
+
+static std::size_t	parseChunkSize_(std::string const &hex_str)
+{
+	if (hex_str.empty() || hex_str.size() > 8)
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	std::stringstream	ss(hex_str);
+	std::size_t			size = 0;
+	ss >> std::hex >> size;
+	if (ss.fail() || !ss.eof())
+		throw (HttpException(HttpCode::BAD_REQUEST));
+	return (size);
+}
+
+bool	IO::parseHeader(ft::State &state, bool &request_complete)
+{
+	std::string::size_type	posCRLFCRLF = rest_.find("\r\n\r\n");
+
+	if (posCRLFCRLF == std::string::npos)
 		return (false);
-	else if (header.hasKey("transfer-endocing") && header.getLastValue("transfer_encoding") == "chunked")
+
+	std::string const &headerline = rest_.substr(0, posCRLFCRLF + 4);
+	header_ = HttpHeader(headerline);
+	rest_ = rest_.substr(posCRLFCRLF + 4);
+
+	if (check_has_body_(header_))
+	{
+		state = ft::RECV_BODY;
 		return (true);
-	else
-		throw (HttpException(HttpCode::BAD_REQUEST));
-}
-
-static std::size_t	getChunkSize(std::string const &line)
-{
-	ft::string const				&ftline(line);
-	ft::string::string_vector const &split = ftline.split(ft::string::WS + ";=");
-	std::size_t						chunk_size = 0;
-
-	if (split.empty() || split[0].empty())
-		throw (HttpException(HttpCode::BAD_REQUEST));
-
-	std::stringstream	ss;
-	ss << std::hex << split[0].str();
-	ss >> chunk_size;
-	if (ss.fail())
-		throw (HttpException(HttpCode::BAD_REQUEST));
-	return (chunk_size);
-}
-
-ssize_t	IO::recv_chunk(void)
-{
-	// ssize_t	bytes = 0;
-	// ssize_t	sizeToRead = 0;
-	// std::string	peekSizeStr = "";
-	// std::string	contentStr = "";
-	// std::string::size_type	posCRLF = 0;
-
-	// peekSizeStr.resize(ft::READ_BUF_SIZE);
-	// bytes = ::recv(fd_, &peekSizeStr[0], peekSizeStr.size(), MSG_PEEK | MSG_DONTWAIT);
-	// if (bytes == ft::err)
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-
-	// peekSizeStr.resize(bytes);
-	// posCRLF = peekSizeStr.find("\r\n");
-	// if (posCRLF == std::string::npos)//! /r/n not in buf size => error
-	// {
-
-	// }
-
-	// peekSizeStr.resize(posCRLF + 2);
-	// bytes = ::recv(fd_, &peekSizeStr[0], posCRLF + 2, MSG_DONTWAIT);
-	// if (bytes == ft::err)
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-
-	// sizeToRead = getChunkSize(peekSizeStr);
-
-	// if (data_.size() + sizeToRead > max_data_size_)
-	// 	throw (HttpException(HttpCode::BAD_REQUEST));
-
-	// contentStr.resize(sizeToRead + 2);
-	// bytes = ::recv(fd_, &contentStr[0], sizeToRead + 2, MSG_DONTWAIT);
-	// if (bytes == ft::err)
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// else if (bytes != sizeToRead + 2)
-	// 	throw (HttpException(HttpCode::BAD_REQUEST));
-
-	// contentStr.resize(bytes);
-
-	// if (sizeToRead == 0)
-	// {
-	// 	if (contentStr != "\r\n")
-	// 		throw (HttpException(HttpCode::BAD_REQUEST));
-	// 	buf = contentStr;
-	// 	return (0);
-	// }
-
-	// ft::string	ftContent(contentStr);
-	// if (!ftContent.end_with_str("\r\n"))
-	// 	throw (HttpException(HttpCode::BAD_REQUEST));
-
-	// ftContent.trim(ft::string::CRLF);
-	// buf = ftContent;
-	// return (bytes);
-}
-
-ssize_t	IO::recv_length(std::size_t len)
-{
-	ssize_t		bytes = 0;
-	std::string	buf(ft::READ_BUF_SIZE, '\0');
-	std::size_t	readSize = 0;
-
-	data_ = rest_;
-	rest_.clear();
-
-	if (data_.size() == len)
-	{
-		data_.resize(len);
-		return (0);
-	}
-	else if (data_.size() > len)
-	{
-		throw (HttpException(HttpCode::BAD_REQUEST));
-	}
-
-	readSize = len - data_.size();
-	if (readSize > ft::READ_BUF_SIZE)
-	{
-		buf.resize(ft::READ_BUF_SIZE);
-		bytes = ::recv(fd_, &buf[0], buf.size(), MSG_DONTWAIT);
-		if (bytes == -1)
-			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-		else if (bytes != readSize)
-			throw (HttpException(HttpCode::BAD_REQUEST));
-		else
-		{
-			rest_.append(buf);
-			return (bytes);
-		}
 	}
 	else
 	{
-		buf.resize(readSize);
-		bytes = ::recv(fd_, &buf[0], buf.size(), MSG_DONTWAIT);
-		if (bytes == -1)
-			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-		else if (bytes != 0 && bytes != readSize)
-			throw (HttpException(HttpCode::BAD_REQUEST));
-		else
-		{
-			data_.append(buf);
-			return (0);
-		}
+		state = ft::IDLE;
+		request_complete = true;
+		return (false);
 	}
 }
 
-ssize_t	IO::recv_until(std::string const &until)
+bool	IO::parseRequestLine(ft::State &state)
 {
-	ssize_t		bytes = 0;
-	std::string	tmp(ft::READ_BUF_SIZE, '\0');
+	std::string::size_type	posCRLF = rest_.find("\r\n");
+	if (posCRLF == std::string::npos)
+		return (false);
 
-	data_.append(rest_);
-	rest_.clear();
-
-	bytes = ::recv(fd_, &tmp[0], tmp.size(), MSG_DONTWAIT);
-	if (bytes == -1)
-		return (-1);
-	tmp.resize(bytes);
-	std::string::size_type	posUntil = tmp.find(until);
-	if (posUntil == std::string::npos)
-	{
-		rest_.append(tmp);
-		return (bytes);
-	}
-	else
-	{
-		data_.append(tmp.substr(0, posUntil + until.size()));
-		rest_.append(tmp.substr(posUntil + until.size()));
-		return (0);
-	}
-}
-
-void	IO::parseHeader(ft::State &state)
-{
-	ssize_t	bytes = recv_until("\r\n\r\n");
-	if (bytes == -1)
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	else if (bytes > 0)
-		return ;
-
-	header_ = HttpHeader(getData());
-	clear();
-	state = ft::RECV_BODY;
-	return ;
-}
-
-void	IO::parseRequestLine(ft::State &state)
-{
-	ssize_t bytes = recv_until("\r\n");
-	if (bytes == -1)
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	else if (bytes > 0)
-		return ;
-
-	line_ = RequestLine(getData());
-	clear();
+	std::string const &requestline = rest_.substr(0, posCRLF + 2);
+	line_ = RequestLine(requestline);
+	rest_ = rest_.substr(posCRLF + 2);
 	state = ft::RECV_HEADER;
-	return ;
+
+	if (rest_.empty())
+		return (false);
+	else
+		return (true);
 }
 
-bool	IO::parseBody(ft::State &state)
+bool	IO::parseBodyWithLength(ft::State &state, std::size_t size)
 {
-	bool const	is_chunk = is_chunk_body_(header_);
-	ssize_t		bytes = 0;
-
-	if (is_chunk)
+	if (rest_.size() > size)
+		throw (HttpException(HttpCode::BAD_REQUEST));
+	else if (rest_.size() == size)
 	{
-		bytes = recv_chunk();
+		body_ = HttpBody(rest_);
+		rest_.clear();
+		state = ft::IDLE;
+		return (false);
+	}
+	else
+		return (true);
+}
+
+bool	IO::parseBodyWithChunk(ft::State &state)
+{
+ 	std::string::size_type	pos = rest_.find("\r\n");
+	if (pos == std::string::npos)
+	{
+		return (false);
+	}
+
+	std::string const	&sizeStr = rest_.substr(0, pos + 2);
+	std::size_t			size = parseChunkSize_(sizeStr);
+	if (size == 0)
+	{
+		rest_ = rest_.substr(pos + 2);
+		if (rest_ != "\r\n")
+			throw (HttpException(HttpCode::BAD_REQUEST));
+		body_ = HttpBody(data_);
+		data_.clear();
+		rest_.clear();
+		state = ft::IDLE;
+		return (false);
+	}
+	else if (rest_.size() < pos + 2 + size + 2)
+	{
+		return (false);
+	}
+
+	data_.append(rest_.substr(pos + 2, size));
+	rest_ = rest_.substr(pos + 2 + size + 2);
+	return (false);
+}
+
+bool	IO::parseBody(ft::State &state, bool &request_complete)
+{
+	int const	body_type = check_has_body_(header_);
+	bool		continue_parse;
+
+	if (body_type == CHUNK_BODY)
+	{
+		continue_parse = parseBodyWithChunk(state);
 	}
 	else
 	{
 		std::size_t	size = ft::stonum<std::size_t>(header_.getFirstValue("content-length"));
-		bytes = recv_length(size);
+		continue_parse = parseBodyWithLength(state, size);
 	}
-
-	if (bytes == 0)
+	if (!continue_parse && state == ft::IDLE)
 	{
-		body_ = HttpBody(data_);
-		data_.clear();
-		return (false);
+		request_complete = true;
 	}
-	else
-		return (true);
+	return (continue_parse);
 }
 
-void	IO::parseBuffer(ft::State &state)
+bool	IO::parseBuffer(ft::State &state)
 {
 	bool	parse_continue = true;
+	bool	request_completed = false;
 
 	while (parse_continue && !rest_.empty())
 	{
 		switch (state)
 		{
 			case (ft::RECV_REQUESTLINE):
-				parseRequestLine(state);
+				parse_continue = parseRequestLine(state);
 				break ;
 			case (ft::RECV_HEADER):
-				parseHeader(state);
+				parse_continue = parseHeader(state, request_completed);
 				break ;
 			case (ft::RECV_BODY):
-				parse_continue = parseBody(state);
+				parse_continue = parseBody(state, request_completed);
 				break ;
 			default:
 				break ;
 		}
 	}
+	return (request_completed);
 }
 
-ssize_t	IO::recv(ft::State &state)
+bool	IO::recv(ft::State &state)
 {
 	char	tmp[ft::READ_BUF_SIZE];
 	ssize_t	bytes = ::recv(fd_, tmp, sizeof(tmp), 0);
-	if (bytes > 0)
+	bool	is_request_ready = false;
+
+	if (bytes == -1)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	else if (bytes == 0)
+		return (false);
+	else
 	{
 		rest_.append(tmp, bytes);
-		parseBuffer(state);
+		is_request_ready = parseBuffer(state);
 	}
-	return (bytes);
+	return (is_request_ready);
+}
+
+bool	IO::send(ft::State &state)
+{
+	std::size_t	sendSize = data_.size();
+	if (data_.size() > ft::WRITE_BUF_SIZE)
+		sendSize = ft::WRITE_BUF_SIZE;
+	ssize_t	bytes = ::send(fd_, &data_[0], sendSize, MSG_DONTWAIT);
+	data_ = data_.substr(bytes);
+	if (data_.empty())
+	{
+		return (true);
+	}
+	return (false);
+}
+
+void	IO::setData(std::string const &data)
+{
+	data_.clear();
+	rest_.clear();
+	data_ = data;
 }
 
 std::string	IO::getData(void) const
@@ -295,4 +262,26 @@ std::size_t	IO::getSize(void) const
 void	IO::clear(void)
 {
 	data_.clear();
+}
+
+ARequest	*IO::createRequest(void)
+{
+	std::string const		&method = line_.getMethod();
+	std::string const		&host = header_.getFirstValue("host");
+	config::Config const	&config = config_factory_.getConfig(host);
+
+	HttpException::loadErrorPageMap(config);
+	HttpUri	&uri = line_.getUriReference();
+	uri.updateWithHostHeader(host);
+
+	if (method == "GET")
+		return (new GetRequest(line_, header_, config));
+	else if (method == "POST")
+		return (new PostRequest(line_, header_, body_, config));
+	else if (method == "DELETE")
+		return (new DeleteRequest(line_, header_, config));
+	else if (method == "PUT")
+		return (new PutRequest(line_, header_, body_, config));
+	else
+		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
 }

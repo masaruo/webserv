@@ -10,9 +10,9 @@
 #include "HttpException.hpp"
 #include <sstream>
 
-int const	RequestFactory::HASCHUNK = 1;
-int const	RequestFactory::HASBODY = 2;
-int const	RequestFactory::NOBODY = 0;
+// int const	RequestFactory::HASCHUNK = 1;
+// int const	RequestFactory::HASBODY = 2;
+// int const	RequestFactory::NOBODY = 0;
 
 ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &config_factory)
 {
@@ -81,13 +81,13 @@ void	RequestFactory::createRequestLineAndHeader(int fd, RequestLine &line, HttpH
 	// header = tmpheader;
 }
 
-int	RequestFactory::hasBody(HttpHeader const &header)
-{
-	if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
-		return (RequestFactory::HASCHUNK);
-	else if (header.hasKey("content-length") && header.getContentLen() > 0)
-		return (RequestFactory::HASBODY);
-	else 
-		return (RequestFactory::NOBODY);
-}
+// int	RequestFactory::hasBody(HttpHeader const &header)
+// {
+// 	if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
+// 		return (RequestFactory::HASCHUNK);
+// 	else if (header.hasKey("content-length") && header.getContentLen() > 0)
+// 		return (RequestFactory::HASBODY);
+// 	else 
+// 		return (RequestFactory::NOBODY);
+// }
 

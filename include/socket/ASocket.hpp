@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/08 06:36:55 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/11 02:55:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ private:
 	uint32_t	events_;
 	Addr		addr_;
 	Server		&server_;
+	ASocket(ASocket const &rhs);
+	ASocket &operator=(ASocket const &rhs);
 
 protected:
 	void			setSockAddr(Addr addr);

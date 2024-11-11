@@ -5,8 +5,8 @@
 #include "UriNormalizer.hpp"
 #include <sys/stat.h>
 
-GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
-:ARequest(line, header, config)
+GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+:ARequest(line, header, config, server)
 {
 	generateResponseData();
 	return ;
@@ -96,7 +96,7 @@ void	GetRequest::generateResponseData(void)
 
 	if (uri.IsCgi())
 	{
-		CgiRequest	cgi(getLine(), getHeader(), getConfig());
+		CgiRequest	cgi(getLine(), getHeader(), getConfig(), getServerReference());
 		setResponseStatus(cgi.getResponseStatus());
 		setResponseHeader(cgi.getResponseHeader());
 		setResponseBody(cgi.getResponseBody());

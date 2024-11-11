@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/08 06:27:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/10 03:59:05 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,5 +36,7 @@ private:
 public:
 	explicit	ActiveSocket(int port, int fd, ft::State state, uint32_t event, Server &server, Addr addr);
 	~ActiveSocket();
+	void		setData(std::string const &data);
+	std::string	getData(void) const;
 	void		execute(void);
 };

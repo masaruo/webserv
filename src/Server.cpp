@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/08 06:37:16 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/10 02:34:21 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,8 +107,23 @@ void	Server::run(void)
 		for (int i = 0; i < event_num; i++)
 		{
 			uint32_t	ev = polls_[i].events;
-			ASocket		*soc = static_cast<ASocket*>(polls_[i].data.ptr);
-			soc->execute();
+			ASocket		*socket = static_cast<ASocket*>(polls_[i].data.ptr);
+			if (ev & (EPOLLHUP | EPOLLERR))
+			{
+				deleteSocket(socket);
+			}
+			else
+			{
+				try
+				{
+					socket->execute();
+				}
+				catch(const std::exception& e)
+				{
+					deleteSocket(socket);
+					continue ;
+				}
+			}
 		}
 		holder_.deleteMarkedSocket();
 	}

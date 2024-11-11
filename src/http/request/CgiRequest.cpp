@@ -2,6 +2,7 @@
 #include "HttpException.hpp"
 #include "FileHandler.hpp"
 #include "UriNormalizer.hpp"
+#include "ActiveSocket.hpp"
 #include <unistd.h>// execve & chdir
 #include <cstdlib>// std::exit
 #include <cstring>// std::strcpy
@@ -10,6 +11,8 @@
 #include <sys/socket.h>// socket pair
 #include "define.hpp"
 #include "Fcntl.class.hpp"
+#include "sys/epoll.h"
+#include "Server.hpp"
 // #include "CgiSocket.hpp"
 // #include "SocketHolder.class.hpp"
 
@@ -18,15 +21,17 @@ int const	CgiRequest::WRITE_FD = 1;
 int const	CgiRequest::CHILD_PID = 0;
 int const	CgiRequest::INTERNAL_SERVER_ERROR = 50;
 
-CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
-:ARequest(line, header, config)
+CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+:ARequest(line, header, config, server)
+,cgi_socket_(NULL)
+,child_pid_(0)
 {
 	generateResponseData();
 	return ;
 }
 
-CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
-:ARequest(line, header, body, config)
+CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
+:ARequest(line, header, body, config, server)
 {
 	generateResponseData();
 	return ;
@@ -39,6 +44,8 @@ CgiRequest::~CgiRequest()
 
 CgiRequest::CgiRequest(CgiRequest const &rhs)
 :ARequest(rhs)
+,cgi_socket_(rhs.cgi_socket_)
+,child_pid_(rhs.child_pid_)
 {
 	return ;
 }
@@ -48,6 +55,8 @@ CgiRequest &CgiRequest::operator=(CgiRequest const &rhs)
 	if (this != &rhs)
 	{
 		ARequest::operator=(rhs);
+		cgi_socket_ = rhs.cgi_socket_;
+		child_pid_ = rhs.child_pid_;
 	}
 	return (*this);
 }
@@ -127,73 +136,55 @@ void	CgiRequest::exec_child(int sockfd[2], std::string const &abspath) const
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
-std::string	CgiRequest::exec_parent(int sockfds[2], int child_pid) const
+void	CgiRequest::exec_parent(int sockfds[2])
 {
 	if (close(sockfds[ft::CHILDFD]) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
-	// CgiSocket *cgisock = new CgiSocket(sockfds[ft::PARENTFD]);
-	// cgisock->request_body_ = getBody().to_string();
-	// cgisock->setSocketType(ASocket::CGISEND);
-
-// std::cerr << "Creating CGI socket FD:" << sockfds[ft::PARENTFD] 
-//               << " body:" << cgisock->request_body_.size() 
-//               << " bytes" << std::endl;
-
-
-// 	SocketHolder::addSocket(cgisock);
-
-// 	while (cgisock->getSocketType() == ASocket::CGISEND)
-// 		usleep(1000);
-
-// 	while (cgisock->getSocketType() != ASocket::IDLE)
-// 	{
-// 		int	status = 0;
-// 		pid_t pid = waitpid(child_pid, &status, WNOHANG);
-// 		if (pid == -1)
-// 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-// 		if (pid > 0 && WIFEXITED(status))
-// 		{
-// 			int exit_status = WEXITSTATUS(status);
-// 			if (exit_status != 0)
-// 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-// 			break ;
-// 		}
-// 	}
-// 	std::string	result = cgisock->response_body_;
-// 	SocketHolder::markSocketDelete(cgisock);
-// 	// delete cgisock;
-	std::string result = "";
-	return (result);
+	Server		&server = getServerReference();
+	cgi_socket_->setData(getBody().to_string());
+	server.addSocket(cgi_socket_);
+	// while (true)
+	// {
+	// 	// server.run();
+	// 	int status = 0;
+	// 	pid_t	pid = waitpid(child_pid_, &status, WNOHANG);
+	// 	if (pid > 0)
+	// 	{
+	// 		if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+	// 			break ;
+	// 		else
+	// 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	// 	}
+	// 	else if (pid == -1)
+	// 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	// }
 }
 
-std::string	CgiRequest::execute(std::string const &abspath) const
+void	CgiRequest::execute(std::string const &abspath)
 {
-	// int			pipe_in[2];
-	// int			pipe_out[2];
 	int			sockfds[2];
 	pid_t		child_pid = 0;
 	std::string	bodyStr = "";
-
-	// if (pipe(pipe_in) == ft::err || pipe(pipe_out) == ft::err)
-	// {
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// }
 
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfds) == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	// ft::Fcntl::setNonBlock(sockfds, 2);//? do i have to make nonblock on child sock fd?
 	ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
-	// ft::Fcntl::setNonBlock(sockfds[1]);
+
+	sockaddr_in	dummy_sockaddr = {};
+	std::memset(&dummy_sockaddr, 0, sizeof(sockaddr));
+	ASocket::Addr dummy;
+	dummy.addrin_ = dummy_sockaddr;
+	dummy.addrlen_ = sizeof(dummy);
+	cgi_socket_ = new ActiveSocket(0, sockfds[ft::PARENTFD], ft::CGISEND, EPOLLOUT, getServerReference(), dummy);
+	if (cgi_socket_ == NULL)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+
 	child_pid = fork();
 	if (child_pid == ft::err)
 	{
-		// close(pipe_in[WRITE_FD]);
-		// close(pipe_in[READ_FD]);
-		// close(pipe_out[WRITE_FD]);
-		// close(pipe_out[READ_FD]);
 		close(sockfds[ft::PARENTFD]);
 		close(sockfds[ft::CHILDFD]);
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
@@ -204,9 +195,47 @@ std::string	CgiRequest::execute(std::string const &abspath) const
 	}
 	else
 	{
-		bodyStr = exec_parent(sockfds, child_pid);
+		child_pid_ = child_pid;
+		exec_parent(sockfds);
 	}
-	return (bodyStr);
+}
+
+void	CgiRequest::waitForCompletion(void)
+{
+	// bool	child_completed = false;
+	// while (!child_completed || cgi_socket_->getState() != ft::IDLE)
+	// {
+	// 	if (!child_completed)
+	// 	{
+	// 		int status = 0;
+	// 		pid_t	pid = waitpid(child_pid_, &status, WNOHANG);
+	// 		if (pid > 0)
+	// 		{
+	// 			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+	// 				child_completed = true;
+	// 			else
+	// 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	// 		}
+	// 		else if (pid == -1)
+	// 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	// 	}
+	// 	usleep(1000);
+	// }
+
+	while (true)
+	{
+		int status = 0;
+		pid_t	pid = waitpid(child_pid_, &status, WNOHANG);
+		if (pid > 0)
+		{
+			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+				break ;
+			else
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		}
+		else if (pid == -1)
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
 }
 
 std::string	CgiRequest::setLocalPath(void) const
@@ -230,11 +259,11 @@ std::string	CgiRequest::setLocalPath(void) const
 void	CgiRequest::generateResponseData(void)
 {
 	std::string const	abspath = setLocalPath();
-	std::string const	resBody = execute(abspath);
+	execute(abspath);
 
-	if (resBody.empty())
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	// waitForCompletion();
 
+	std::string const	resBody = cgi_socket_->getData();
 	HttpBody	body(resBody);
 
 	HttpStatus	status(HttpCode::OK);

@@ -2,8 +2,8 @@
 #include "CgiRequest.hpp"
 #include "CgiRequest.hpp"
 
-PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
-:ARequest(line, header, body, config)
+PostRequest::PostRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
+:ARequest(line, header, body, config, server)
 {
 	generateResponseData();
 	return ;
@@ -40,7 +40,7 @@ void	PostRequest::generateResponseData(void)
 	std::string const dummy = setLocalPath();
 	(void) dummy;
 
-	CgiRequest	cgi(getLine(), getHeader(), getBody(), getConfig());
+	CgiRequest	cgi(getLine(), getHeader(), getBody(), getConfig(), getServerReference());
 	setResponseStatus(cgi.getResponseStatus());
 	setResponseHeader(cgi.getResponseHeader());
 	setResponseBody(cgi.getResponseBody());

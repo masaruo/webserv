@@ -5,8 +5,8 @@
 #include "string.hpp"
 #include <cstdio>// for std::remove
 
-DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
-:ARequest(line, header, config)
+DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+:ARequest(line, header, config, server)
 {
 	generateResponseData();
 	return ;

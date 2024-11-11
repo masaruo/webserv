@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/08 06:37:42 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/11 02:55:30 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ void	ASocket::updateEventsWithState(void)
 	case (ft::RECV_REQUESTLINE):
 	case (ft::RECV_HEADER):
 	case (ft::RECV_BODY):
-	case (ft::CGIRECV):
 	case (ft::PASSIVE):
 		events_ = EPOLLIN;
 		break;
@@ -56,6 +55,9 @@ void	ASocket::updateEventsWithState(void)
 	case (ft::CGISEND):
 		events_ = EPOLLOUT;
 		break;
+	case (ft::CGIRECV):
+		events_ = EPOLLIN | EPOLLRDHUP;
+		break ;
 	case (ft::IDLE):
 	case (ft::DELETE):
 		events_ = 0;

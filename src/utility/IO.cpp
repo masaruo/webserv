@@ -220,13 +220,29 @@ bool	IO::recv(ft::State &state)
 	if (bytes == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	else if (bytes == 0)
-		return (false);
+		return (true);
 	else
 	{
 		rest_.append(tmp, bytes);
 		is_request_ready = parseBuffer(state);
 	}
 	return (is_request_ready);
+}
+
+bool	IO::recv_cgi(void)
+{
+	char	tmp[ft::READ_BUF_SIZE];
+	ssize_t	bytes = ::recv(fd_, tmp, sizeof(tmp), 0);
+
+	if (bytes == -1)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	else if (bytes == 0)
+		return (true);
+	else
+	{
+		data_.append(tmp, bytes);
+		return (false);
+	}
 }
 
 bool	IO::send(ft::State &state)
@@ -265,7 +281,7 @@ void	IO::clear(void)
 	data_.clear();
 }
 
-ARequest	*IO::createRequest(void)
+ARequest	*IO::createRequest(Server &server)
 {
 	std::string const		&method = line_.getMethod();
 	std::string const		&host = header_.getFirstValue("host");
@@ -276,13 +292,13 @@ ARequest	*IO::createRequest(void)
 	uri.updateWithHostHeader(host);
 
 	if (method == "GET")
-		return (new GetRequest(line_, header_, config));
+		return (new GetRequest(line_, header_, config, server));
 	else if (method == "POST")
-		return (new PostRequest(line_, header_, body_, config));
+		return (new PostRequest(line_, header_, body_, config, server));
 	else if (method == "DELETE")
-		return (new DeleteRequest(line_, header_, config));
+		return (new DeleteRequest(line_, header_, config, server));
 	else if (method == "PUT")
-		return (new PutRequest(line_, header_, body_, config));
+		return (new PutRequest(line_, header_, body_, config, server));
 	else
 		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
 }

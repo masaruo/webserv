@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 01:22:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/08 07:01:14 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/10 04:21:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ namespace config
 	class ConfigFactory;
 }
 
+class Server;
 class ARequest;
 
 class IO
@@ -55,6 +56,7 @@ public:
 	IO &operator=(IO const &rhs);
 
 	bool	recv(ft::State &state);
+	bool	recv_cgi(void);
 	bool	send(ft::State &state);
 
 	void		clear(void);
@@ -62,5 +64,5 @@ public:
 	std::string	getData(void) const;
 	std::size_t	getSize(void) const;
 
-	ARequest	*createRequest(void);
+	ARequest	*createRequest(Server &server);
 };

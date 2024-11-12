@@ -175,7 +175,7 @@ Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 	// return (loc);
 }
 
-config::Config::Config(Parser& parse)
+config::Config::Config(Parser& parse) : port_(80)
 {
 	Config::setConfig(parse);
 }

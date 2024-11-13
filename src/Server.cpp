@@ -6,12 +6,13 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/10 02:34:21 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/12 04:11:53 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "ASocket.hpp"
+#include "ActiveSocket.hpp"
 #include "PassiveSocket.hpp"
 #include <sys/epoll.h>
 #include "unistd.h"
@@ -103,13 +104,22 @@ void	Server::run(void)
 {
 	while (true)
 	{
+		holder_.deleteMarkedSocket();
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
 		{
 			uint32_t	ev = polls_[i].events;
 			ASocket		*socket = static_cast<ASocket*>(polls_[i].data.ptr);
-			if (ev & (EPOLLHUP | EPOLLERR))
+			if (ev & EPOLLERR)
 			{
+				deleteSocket(socket);
+			}
+			else if (ev & EPOLLHUP)
+			{
+				if (socket->getState() == ft::CGIEND)
+				{
+					socket->execute();
+				}
 				deleteSocket(socket);
 			}
 			else
@@ -125,6 +135,5 @@ void	Server::run(void)
 				}
 			}
 		}
-		holder_.deleteMarkedSocket();
 	}
 }

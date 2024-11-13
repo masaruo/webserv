@@ -32,6 +32,7 @@ namespace ft
 		SEND,
 		CGIRECV,
 		CGISEND,
+		CGIEND,
 		IDLE,
 	};
 

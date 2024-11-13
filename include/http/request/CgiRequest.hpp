@@ -15,6 +15,7 @@ private:
 	//! add client sock adder? so that can be passed onto env?
 	ActiveSocket	*cgi_socket_;
 	pid_t			child_pid_;
+	bool			is_response_ready_;
 	std::string	setLocalPath(void) const;
 	void		execute(std::string const &path);
 	void		exec_child(int sockfds[2], std::string const &path) const;
@@ -27,6 +28,7 @@ public:
 	CgiRequest(CgiRequest const &rhs);
 	CgiRequest &operator=(CgiRequest const &rhs);
 
-	void	waitForCompletion(void);
+	void	wait(void);
+	void	engageWithChild(void);
 	void	generateResponseData(void);
 };

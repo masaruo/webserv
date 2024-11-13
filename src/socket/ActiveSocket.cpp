@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/11 01:12:08 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 01:47:52 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,39 +45,32 @@ void	ActiveSocket::execute(void)//todo
 	bool		parse_completed = false;
 	Response	res;
 
-	// updateEventsWithState();
-
 	if (state == ft::CGISEND)
 	{
-		std::cerr << "CGISEND activated" << std::endl;
+		// std::cerr << "CGISEND: before send, datasize: " << io_.getSize() << std::endl;
 		if (io_.send(state))
 		{
-			shutdown(this->getFd(), SHUT_WR);
+			std::cerr << "CGISEND: send complete" << io_.getSize() << std::endl;
+			// shutdown(this->getFd(), SHUT_WR);
 			state = ft::CGIRECV;
 			io_.clear();
 			updateEventsWithState();
 		}
 		return ;
 	}
-	if (state == ft::CGIRECV)
-	{
-		std::cerr << "CGIRECV activated" << std::endl;
-		if (io_.recv_cgi())
-		{
-			state = ft::IDLE;
-			updateEventsWithState();
-		}
-		return ;
-	}
-	if (state == ft::RECV_REQUESTLINE || state == ft::RECV_HEADER || state == ft::RECV_BODY)
+	if (state == ft::RECV_REQUESTLINE || state == ft::RECV_HEADER || state == ft::RECV_BODY || state == ft::CGIRECV)
 	{
 		parse_completed = io_.recv(state);
 		if (!parse_completed)
 			return ;
 		updateEventsWithState();
 	}
-	if (state == ft::IDLE)
+	if (state == ft::IDLE || state == ft::CGIEND)
 	{
+		if (state == ft::CGIEND)
+		{
+			//todo wait
+		}
 		try
 		{
 			ft::unique_ptr<ARequest>request(io_.createRequest(getServer()));

@@ -204,6 +204,9 @@ bool	IO::parseBuffer(ft::State &state)
 			case (ft::RECV_BODY):
 				parse_continue = parseBody(state, request_completed);
 				break ;
+			case (ft::CGIRECV):
+				parse_continue = false;
+				request_completed = false;
 			default:
 				break ;
 		}
@@ -220,7 +223,13 @@ bool	IO::recv(ft::State &state)
 	if (bytes == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	else if (bytes == 0)
+	{
+		// rest_.append(tmp, bytes);
+		// data_.append(rest_);
+		// rest_.clear();
+		// state = ft::CGIEND;
 		return (true);
+	}
 	else
 	{
 		rest_.append(tmp, bytes);
@@ -229,31 +238,22 @@ bool	IO::recv(ft::State &state)
 	return (is_request_ready);
 }
 
-bool	IO::recv_cgi(void)
-{
-	char	tmp[ft::READ_BUF_SIZE];
-	ssize_t	bytes = ::recv(fd_, tmp, sizeof(tmp), 0);
-
-	if (bytes == -1)
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	else if (bytes == 0)
-		return (true);
-	else
-	{
-		data_.append(tmp, bytes);
-		return (false);
-	}
-}
-
 bool	IO::send(ft::State &state)
 {
 	std::size_t	sendSize = data_.size();
 	if (data_.size() > ft::WRITE_BUF_SIZE)
 		sendSize = ft::WRITE_BUF_SIZE;
-	ssize_t	bytes = ::send(fd_, &data_[0], sendSize, MSG_DONTWAIT);
+
+	std::cerr << "IO::SEND. sendsize= " << sendSize << std::endl;
+
+	ssize_t	bytes = ::send(fd_, &data_[0], sendSize, 0);
+
+	std::cerr << "IO::SEND. sentsize= " << bytes << std::endl;
+
 	data_ = data_.substr(bytes);
 	if (data_.empty())
 	{
+		std::cerr << "IO::send completed" << std::endl;
 		return (true);
 	}
 	return (false);

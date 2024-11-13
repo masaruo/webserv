@@ -13,8 +13,6 @@
 #include "Fcntl.class.hpp"
 #include "sys/epoll.h"
 #include "Server.hpp"
-// #include "CgiSocket.hpp"
-// #include "SocketHolder.class.hpp"
 
 int const	CgiRequest::READ_FD = 0;
 int const	CgiRequest::WRITE_FD = 1;
@@ -24,7 +22,8 @@ int const	CgiRequest::INTERNAL_SERVER_ERROR = 50;
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
 :ARequest(line, header, config, server)
 ,cgi_socket_(NULL)
-,child_pid_(0)
+,child_pid_(-1)
+,is_response_ready_(false)
 {
 	generateResponseData();
 	return ;
@@ -32,6 +31,9 @@ CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config
 
 CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
 :ARequest(line, header, body, config, server)
+,cgi_socket_(NULL)
+,child_pid_(-1)
+,is_response_ready_(false)
 {
 	generateResponseData();
 	return ;
@@ -46,6 +48,7 @@ CgiRequest::CgiRequest(CgiRequest const &rhs)
 :ARequest(rhs)
 ,cgi_socket_(rhs.cgi_socket_)
 ,child_pid_(rhs.child_pid_)
+,is_response_ready_(rhs.is_response_ready_)
 {
 	return ;
 }
@@ -57,6 +60,7 @@ CgiRequest &CgiRequest::operator=(CgiRequest const &rhs)
 		ARequest::operator=(rhs);
 		cgi_socket_ = rhs.cgi_socket_;
 		child_pid_ = rhs.child_pid_;
+		is_response_ready_ = rhs.is_response_ready_;
 	}
 	return (*this);
 }
@@ -143,22 +147,11 @@ void	CgiRequest::exec_parent(int sockfds[2])
 
 	Server		&server = getServerReference();
 	cgi_socket_->setData(getBody().to_string());
+	ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
 	server.addSocket(cgi_socket_);
-	// while (true)
-	// {
-	// 	// server.run();
-	// 	int status = 0;
-	// 	pid_t	pid = waitpid(child_pid_, &status, WNOHANG);
-	// 	if (pid > 0)
-	// 	{
-	// 		if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
-	// 			break ;
-	// 		else
-	// 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// 	}
-	// 	else if (pid == -1)
-	// 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// }
+
+	// shutdown(sockfds[ft::PARENTFD], SHUT_WR);
+
 }
 
 void	CgiRequest::execute(std::string const &abspath)
@@ -171,7 +164,6 @@ void	CgiRequest::execute(std::string const &abspath)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
 
 	sockaddr_in	dummy_sockaddr = {};
 	std::memset(&dummy_sockaddr, 0, sizeof(sockaddr));
@@ -200,44 +192,6 @@ void	CgiRequest::execute(std::string const &abspath)
 	}
 }
 
-void	CgiRequest::waitForCompletion(void)
-{
-	// bool	child_completed = false;
-	// while (!child_completed || cgi_socket_->getState() != ft::IDLE)
-	// {
-	// 	if (!child_completed)
-	// 	{
-	// 		int status = 0;
-	// 		pid_t	pid = waitpid(child_pid_, &status, WNOHANG);
-	// 		if (pid > 0)
-	// 		{
-	// 			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
-	// 				child_completed = true;
-	// 			else
-	// 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// 		}
-	// 		else if (pid == -1)
-	// 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// 	}
-	// 	usleep(1000);
-	// }
-
-	while (true)
-	{
-		int status = 0;
-		pid_t	pid = waitpid(child_pid_, &status, WNOHANG);
-		if (pid > 0)
-		{
-			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
-				break ;
-			else
-				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-		}
-		else if (pid == -1)
-			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	}
-}
-
 std::string	CgiRequest::setLocalPath(void) const
 {
 	std::string			finalPath;
@@ -256,13 +210,33 @@ std::string	CgiRequest::setLocalPath(void) const
 	return (pathWithRoot);
 }
 
-void	CgiRequest::generateResponseData(void)
+void	CgiRequest::engageWithChild(void)
 {
 	std::string const	abspath = setLocalPath();
 	execute(abspath);
+}
 
-	// waitForCompletion();
+void	CgiRequest::wait(void)
+{
+	int	status;
+	pid_t res = waitpid(child_pid_, &status, WNOHANG);
+	if (res == child_pid_)
+	{
+		if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+		{
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		}
+		child_pid_ = -1;
+	}
+}
 
+void	CgiRequest::generateResponseData(void)
+{
+	if (!is_response_ready_)
+	{
+		engageWithChild();
+		return ;
+	}
 	std::string const	resBody = cgi_socket_->getData();
 	HttpBody	body(resBody);
 

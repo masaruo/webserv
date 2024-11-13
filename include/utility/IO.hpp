@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 01:22:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/10 04:21:13 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/11 03:50:47 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ public:
 	IO &operator=(IO const &rhs);
 
 	bool	recv(ft::State &state);
-	bool	recv_cgi(void);
+	// bool	recv_cgi(void);
 	bool	send(ft::State &state);
 
 	void		clear(void);

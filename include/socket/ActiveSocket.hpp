@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/10 03:59:05 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/12 04:04:16 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,6 @@ class ActiveSocket : public ASocket
 {
 private:
 	IO							io_;
-	// ft::unique_ptr<ARequest>	request_;
-	// RequestLine					line_;
-	// HttpHeader					header_;
-	// HttpBody					body_;
-	// Response					response_;
 
 	ActiveSocket();
 	ActiveSocket(ActiveSocket const &rhs);

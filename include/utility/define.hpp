@@ -30,9 +30,11 @@ namespace ft
 		RECV_HEADER,
 		RECV_BODY,
 		SEND,
-		CGIRECV,
-		CGISEND,
-		CGIEND,
+		CGI_INIT,
+		CGI_RECV,
+		CGI_SEND,
+		CGI_COMPLETE,
+		PROCESSING,
 		IDLE,
 	};
 

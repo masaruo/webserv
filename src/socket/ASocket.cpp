@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/11 02:55:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 06:06:30 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,14 +52,16 @@ void	ASocket::updateEventsWithState(void)
 		events_ = EPOLLIN;
 		break;
 	case (ft::SEND):
-	case (ft::CGISEND):
+	case (ft::CGI_SEND):
 		events_ = EPOLLOUT;
 		break;
-	case (ft::CGIRECV):
+	case (ft::CGI_RECV):
 		events_ = EPOLLIN | EPOLLRDHUP;
 		break ;
 	case (ft::IDLE):
 	case (ft::DELETE):
+	case (ft::CGI_INIT):
+	case (ft::CGI_COMPLETE):
 		events_ = 0;
 		break ;
 	default:
@@ -71,6 +73,11 @@ void	ASocket::updateEventsWithState(void)
 void	ASocket::setSockAddr(Addr addr)
 {
 	addr_ = addr;
+}
+
+void	ASocket::setFd(int fd)
+{
+	fd_.setFd(fd);
 }
 
 Server	&ASocket::getServer(void)

@@ -204,7 +204,7 @@ bool	IO::parseBuffer(ft::State &state)
 			case (ft::RECV_BODY):
 				parse_continue = parseBody(state, request_completed);
 				break ;
-			case (ft::CGIRECV):
+			case (ft::CGI_RECV):
 				parse_continue = false;
 				request_completed = false;
 			default:

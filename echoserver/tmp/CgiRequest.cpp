@@ -145,10 +145,10 @@ void	CgiRequest::exec_parent(int sockfds[2])
 	if (close(sockfds[ft::CHILDFD]) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
-	Server		&server = getServerReference();
-	cgi_socket_->setData(getBody().to_string());
-	ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
-	server.addSocket(cgi_socket_);
+	// Server		&server = getServerReference();
+	// cgi_socket_->setData(getBody().to_string());
+	// ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
+	// server.addSocket(cgi_socket_);
 
 	// shutdown(sockfds[ft::PARENTFD], SHUT_WR);
 

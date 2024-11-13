@@ -1,5 +1,5 @@
 #include "GetRequest.hpp"
-#include "CgiRequest.hpp"
+// #include "CgiRequest.hpp"
 #include "AutoIndexException.hpp"
 #include "FileHandler.hpp"
 #include "UriNormalizer.hpp"
@@ -94,16 +94,16 @@ void	GetRequest::generateResponseData(void)
 	HttpUri const		uri = getLine().getUri();
 	std::string const	path = uri.getPath();
 
-	if (uri.IsCgi())
-	{
-		CgiRequest	cgi(getLine(), getHeader(), getConfig(), getServerReference());
-		setResponseStatus(cgi.getResponseStatus());
-		setResponseHeader(cgi.getResponseHeader());
-		setResponseBody(cgi.getResponseBody());
-		setResponseHasBody(cgi.getResponseHasBody());
-		return;
-	}
-	else
+	// if (uri.IsCgi())
+	// {
+	// 	CgiRequest	cgi(getLine(), getHeader(), getConfig(), getServerReference());
+	// 	setResponseStatus(cgi.getResponseStatus());
+	// 	setResponseHeader(cgi.getResponseHeader());
+	// 	setResponseBody(cgi.getResponseBody());
+	// 	setResponseHasBody(cgi.getResponseHasBody());
+	// 	return;
+	// }
+	// else
 	{
 		std::string const &abspath = setLocalPath();
 

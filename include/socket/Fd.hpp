@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 04:25:18 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/31 04:52:28 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 06:02:59 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ public:
 	Fd(int fd = -1);
 	~Fd();
 	int		getFd(void) const;
+	void	setFd(int vd);
 	void	close(void);
 	int		transfer(void);
 };

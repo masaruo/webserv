@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 04:34:06 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/31 07:07:13 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 06:05:14 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@ Fd::~Fd()
 int	Fd::getFd(void) const
 {
 	return (fd_);
+}
+
+void	Fd::setFd(int fd)
+{
+	close();
+	fd_ = fd;
 }
 
 void	Fd::close(void)

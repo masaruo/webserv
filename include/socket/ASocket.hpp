@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/11 02:55:28 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 06:05:58 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ protected:
 	Server			&getServer(void);
 	ft::State		&getRefState(void);
 	void			updateEventsWithState(void);
+	void			setFd(int fd);
 
 public:
 	explicit	ASocket(int port, int fd, ft::State state, uint32_t event, Server &server);

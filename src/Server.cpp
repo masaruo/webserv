@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/12 04:11:53 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 04:16:06 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void	Server::run(void)
 			}
 			else if (ev & EPOLLHUP)
 			{
-				if (socket->getState() == ft::CGIEND)
+				if (socket->getState() == ft::CGI_COMPLETE)
 				{
 					socket->execute();
 				}

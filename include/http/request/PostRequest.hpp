@@ -2,10 +2,12 @@
 #include "ARequest.hpp"
 
 class Response;
+class CgiSocket;
 
 class PostRequest : public ARequest
 {
 private:
+	CgiSocket	*cgi_socket_;
 	std::string	setLocalPath(void) const;
 	PostRequest();//=delete
 public:

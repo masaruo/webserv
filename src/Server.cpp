@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/13 04:16:06 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 08:08:44 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 Server::Server(std::string const &config_path)
 :config_factory_(config_path)
 ,epollFd_(epoll_create(1))
-,polls_()
+,eventQueue_()
 ,holder_()
 {
 	std::vector<std::size_t>	ports = config_factory_.getAcceptedPorts();
@@ -46,8 +46,8 @@ Server::~Server()
 int	Server::epollWait(void)
 {
 	int	const	size = holder_.getSize();
-	polls_.resize(size);
-	int	ev_num = epoll_wait(epollFd_, polls_.data(), size, ft::TIMEOUT);//todo timeout?
+	eventQueue_.resize(size);
+	int	ev_num = epoll_wait(epollFd_, eventQueue_.data(), size, ft::TIMEOUT);//todo timeout?
 	if (ev_num == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
@@ -108,8 +108,8 @@ void	Server::run(void)
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
 		{
-			uint32_t	ev = polls_[i].events;
-			ASocket		*socket = static_cast<ASocket*>(polls_[i].data.ptr);
+			uint32_t	ev = eventQueue_[i].events;
+			ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
 			if (ev & EPOLLERR)
 			{
 				deleteSocket(socket);

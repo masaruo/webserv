@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/13 05:55:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/16 04:21:10 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ private:
 	std::string	request_body_;
 	std::string	response_body_;
 	IO			io_;
+	ASocket		*parent_socket_;
 	void	setupCGI(void);
 	void	execChild(int sockfd[2]);
 

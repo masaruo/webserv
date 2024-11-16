@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/13 06:14:50 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/16 04:23:41 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "string.hpp"
 #include "Server.hpp"
 #include "Fcntl.class.hpp"
+#include "ActiveSocket.hpp"
 
 int const	CgiSocket::INTERNAL_SERVER_ERROR = 50;
 
@@ -46,6 +47,7 @@ CgiSocket::CgiSocket(Env const &env, std::string const &script_path, std::string
 ,request_body_(request_body)
 ,response_body_()
 ,io_(-1, server.getConfigFactory())
+,parent_socket_(NULL)
 {
 	setupCGI();
 	return ;
@@ -150,11 +152,6 @@ void	CgiSocket::execute(void)
 
 	switch (state)
 	{
-		// case (ft::CGI_INIT):
-		// 	setupCGI();
-		// 	setState(ft::CGI_SEND);
-		// 	updateEventsWithState();
-		// 	break ;
 		case (ft::CGI_SEND):
 			complete = io_.send(state);
 			if (complete)
@@ -176,7 +173,13 @@ void	CgiSocket::execute(void)
 			break ;
 		case (ft::CGI_COMPLETE):
 			assert_wait_(child_pid_);
-			child_pid_ = -1;
+			if (parent_socket_)
+			{
+				ActiveSocket *active = dynamic_cast<ActiveSocket*>(parent_socket_);
+				active->setData(response_body_);
+				parent_socket_->setState(ft::SEND);
+			}
+			setState(ft::DELETE);
 			break ;
 		default:
 			break ;

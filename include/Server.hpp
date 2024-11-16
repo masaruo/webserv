@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 03:52:05 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/08 01:33:37 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/13 08:08:45 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ public:
 private:
 	config::ConfigFactory	config_factory_;
 	int						epollFd_;
-	event_vec				polls_;
+	event_vec				eventQueue_;
 	SocketHolder			holder_;
 
 	int	epollWait(void);

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/13 06:06:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/18 01:22:29 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ ASocket::ASocket(int port, int fd, ft::State state, uint32_t event, Server &serv
 ,state_(state)
 ,events_(event)
 ,addr_()
+,io_(fd)
 ,server_(server)
 {
 	return ;
@@ -30,6 +31,7 @@ ASocket::ASocket(int port, int fd, ft::State state, uint32_t event, Server &serv
 ,state_(state)
 ,events_(event)
 ,addr_(addr)
+,io_(fd)
 ,server_(server)
 {
 	return ;

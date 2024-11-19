@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/16 04:23:41 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/18 01:25:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ CgiSocket::CgiSocket(Env const &env, std::string const &script_path, std::string
 ,script_path_(script_path)
 ,request_body_(request_body)
 ,response_body_()
-,io_(-1, server.getConfigFactory())
+,io_(-1)
 ,parent_socket_(NULL)
 {
 	setupCGI();

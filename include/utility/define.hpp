@@ -34,6 +34,7 @@ namespace ft
 		CGI_RECV,
 		CGI_SEND,
 		CGI_COMPLETE,
+		RESPONSE_READY,
 		PROCESSING,
 		IDLE,
 	};

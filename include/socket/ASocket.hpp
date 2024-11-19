@@ -6,14 +6,15 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/13 06:05:58 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/18 01:18:22 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "define.hpp"
 #include "Fd.hpp"
-#include "netinet/in.h"
+#include "IO.hpp""
+#include <netinet/in.h>
 
 class Server;
 
@@ -31,7 +32,9 @@ private:
 	ft::State	state_;
 	uint32_t	events_;
 	Addr		addr_;
+	IO			io_;
 	Server		&server_;
+
 	ASocket(ASocket const &rhs);
 	ASocket &operator=(ASocket const &rhs);
 

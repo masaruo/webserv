@@ -1,19 +1,18 @@
 #include "IO.hpp"
 #include "string.hpp"
-#include "GetRequest.hpp"
-#include "PostRequest.hpp"
-#include "DeleteRequest.hpp"
-#include "PutRequest.hpp"
+// #include "GetRequest.hpp"
+// #include "PostRequest.hpp"
+// #include "DeleteRequest.hpp"
+// #include "PutRequest.hpp"
 
 int const	IO::CHUNK_BODY = 1;
 int const	IO::LENGTH_BODY = 2;
 int const	IO::NO_BODY = 0;
 
-IO::IO(int fd, config::ConfigFactory const &factory)
+IO::IO(int fd)
 :fd_(fd)
 ,data_()
 ,rest_()
-,config_factory_(factory)
 ,line_()
 ,header_()
 ,body_()
@@ -30,7 +29,6 @@ IO::IO(IO const &rhs)
 :fd_(rhs.fd_)
 ,data_(rhs.data_)
 ,rest_(rhs.rest_)
-,config_factory_(rhs.config_factory_)
 ,line_(rhs.line_)
 ,header_(rhs.header_)
 ,body_(rhs.body_)
@@ -281,24 +279,38 @@ void	IO::clear(void)
 	data_.clear();
 }
 
-ARequest	*IO::createRequest(Server &server)
+RequestLine	IO::getLine(void) const
 {
-	std::string const		&method = line_.getMethod();
-	std::string const		&host = header_.getFirstValue("host");
-	config::Config const	&config = config_factory_.getConfig(host);
-
-	HttpException::loadErrorPageMap(config);
-	HttpUri	&uri = line_.getUriReference();
-	uri.updateWithHostHeader(host);
-
-	if (method == "GET")
-		return (new GetRequest(line_, header_, config, server));
-	else if (method == "POST")
-		return (new PostRequest(line_, header_, body_, config, server));
-	else if (method == "DELETE")
-		return (new DeleteRequest(line_, header_, config, server));
-	else if (method == "PUT")
-		return (new PutRequest(line_, header_, body_, config, server));
-	else
-		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
+	return (line_);
 }
+
+HttpHeader	IO::getHeader(void) const
+{
+	return (header_);
+}
+
+HttpBody	IO::getBody(void) const
+{
+	return (body_);
+}
+// ARequest	*IO::createRequest(Server &server)
+// {
+// 	std::string const		&method = line_.getMethod();
+// 	std::string const		&host = header_.getFirstValue("host");
+// 	config::Config const	&config = config_factory_.getConfig(host);
+
+// 	HttpException::loadErrorPageMap(config);
+// 	HttpUri	&uri = line_.getUriReference();
+// 	uri.updateWithHostHeader(host);
+
+// 	if (method == "GET")
+// 		return (new GetRequest(line_, header_, config, server));
+// 	else if (method == "POST")
+// 		return (new PostRequest(line_, header_, body_, config, server));
+// 	else if (method == "DELETE")
+// 		return (new DeleteRequest(line_, header_, config, server));
+// 	else if (method == "PUT")
+// 		return (new PutRequest(line_, header_, body_, config, server));
+// 	else
+// 		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
+// }

@@ -6,7 +6,7 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/11/07 06:22:20 by mogawa           ###   ########.fr        #
+#    Updated: 2024/11/28 05:10:26 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,9 +17,10 @@ LDFLAGS		:=
 INCDIRS		:=	$(shell find include -type d)
 INC			:=	$(addprefix -I, $(INCDIRS))
 
-SRC			:=	$(wildcard src/*.cpp) \
+SRC			:=	$(filter-out %/test/%, \
+				$(wildcard src/*.cpp) \
 				$(wildcard src/*/*.cpp) \
-				$(wildcard src/*/*/*.cpp)
+				$(wildcard src/*/*/*.cpp))
 SRCDIR		:=	$(sort $(dir $(SRC)))
 VPATH		:=	$(SRCDIR)
 OBJDIR		:=	obj

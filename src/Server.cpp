@@ -6,31 +6,35 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/13 08:08:44 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 05:10:47 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "ASocket.hpp"
-#include "ActiveSocket.hpp"
-#include "PassiveSocket.hpp"
+#include "ListenSocket.hpp"
 #include <sys/epoll.h>
-#include "unistd.h"
+#include <unistd.h>
 
 Server::Server(std::string const &config_path)
 :config_factory_(config_path)
-,epollFd_(epoll_create(1))
+,epollFd_(-1)
 ,eventQueue_()
 ,holder_()
 {
-	std::vector<std::size_t>	ports = config_factory_.getAcceptedPorts();
-	std::vector<std::size_t>::const_iterator it = ports.begin();
-	std::vector<std::size_t>::const_iterator end = ports.end();
-	while (it != end)
+	epollFd_ = epoll_create(1);
+	if (epollFd_ == -1)
 	{
-		ASocket	*soc = new PassiveSocket(*it, *this);
+		throw (std::runtime_error("epoll_create failed"));
+	}
+	std::vector<std::size_t>	ports = config_factory_.getAcceptedPorts();
+	std::vector<std::size_t>::const_iterator	it = ports.begin();
+	std::vector<std::size_t>::const_iterator	ite = ports.end();
+	while (it != ite)
+	{
+		ASocket	*soc = new ListenSocket(*it, *this);
 		// soc->setState(ft::PASSIVE);
-		addSocket(soc);
+		add(soc, EPOLLIN);
 		it++;
 	}
 	return ;
@@ -38,16 +42,14 @@ Server::Server(std::string const &config_path)
 
 Server::~Server()
 {
-	if (epollFd_ > 2)
-		close (epollFd_);
-	return ;
+	close (epollFd_);
 }
 
 int	Server::epollWait(void)
 {
 	int	const	size = holder_.getSize();
 	eventQueue_.resize(size);
-	int	ev_num = epoll_wait(epollFd_, eventQueue_.data(), size, ft::TIMEOUT);//todo timeout?
+	int	ev_num = epoll_wait(epollFd_, eventQueue_.data(), size, ft::TIMEOUT);//todo timeout
 	if (ev_num == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
@@ -60,13 +62,13 @@ config::ConfigFactory const	&Server::getConfigFactory(void) const
 	return (config_factory_);
 }
 
-void	Server::addSocket(ASocket *socket)
+void	Server::add(ASocket *socket, uint32_t event)
 {
 	if (holder_.getSize() > ft::MAX_SOCKET_NUM)
 		throw (HttpException(HttpCode::SERVICE_UNAVAILABLE));
 
 	epoll_event	ev;
-	ev.events = socket->getEvents();
+	ev.events = event;
 	ev.data.ptr = socket;
 
 	int	res = epoll_ctl(epollFd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
@@ -74,10 +76,10 @@ void	Server::addSocket(ASocket *socket)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	holder_.addSocket(socket);
+	// holder_.add(socket);
 }
 
-void	Server::modSocket(ASocket *socket, uint32_t event)
+void	Server::mod(ASocket *socket, uint32_t event)
 {
 	epoll_event	ev;
 	ev.events = event;
@@ -90,50 +92,49 @@ void	Server::modSocket(ASocket *socket, uint32_t event)
 	}
 }
 
-void	Server::deleteSocket(ASocket *socket)
+void	Server::del(ASocket *socket)
 {
 	int	res = epoll_ctl(epollFd_, EPOLL_CTL_DEL, socket->getFd(), NULL);
 	if (res == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	socket->setState(ft::DELETE);
 }
 
 void	Server::run(void)
 {
-	while (true)
-	{
-		holder_.deleteMarkedSocket();
-		int	event_num = epollWait();
-		for (int i = 0; i < event_num; i++)
-		{
-			uint32_t	ev = eventQueue_[i].events;
-			ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
-			if (ev & EPOLLERR)
-			{
-				deleteSocket(socket);
-			}
-			else if (ev & EPOLLHUP)
-			{
-				if (socket->getState() == ft::CGI_COMPLETE)
-				{
-					socket->execute();
-				}
-				deleteSocket(socket);
-			}
-			else
-			{
-				try
-				{
-					socket->execute();
-				}
-				catch(const std::exception& e)
-				{
-					deleteSocket(socket);
-					continue ;
-				}
-			}
-		}
-	}
+	// while (true)
+	// {
+	// 	holder_.deleteMarkedSocket();
+	// 	int	event_num = epollWait();
+	// 	for (int i = 0; i < event_num; i++)
+	// 	{
+	// 		uint32_t	ev = eventQueue_[i].events;
+	// 		ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
+	// 		if (ev & EPOLLERR)
+	// 		{
+	// 			deleteSocket(socket);
+	// 		}
+	// 		else if (ev & EPOLLHUP)
+	// 		{
+	// 			if (socket->getState() == ft::CGI_COMPLETE)
+	// 			{
+	// 				socket->execute();
+	// 			}
+	// 			deleteSocket(socket);
+	// 		}
+	// 		else
+	// 		{
+	// 			try
+	// 			{
+	// 				socket->execute();
+	// 			}
+	// 			catch(const std::exception& e)
+	// 			{
+	// 				deleteSocket(socket);
+	// 				continue ;
+	// 			}
+	// 		}
+	// 	}
+	// }
 }

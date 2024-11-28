@@ -6,32 +6,16 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/18 01:22:29 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/26 06:46:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ASocket.hpp"
 #include "Server.hpp"
+#include <unistd.h>
 
-ASocket::ASocket(int port, int fd, ft::State state, uint32_t event, Server &server)
-:port_(port)
-,fd_(fd)
-,state_(state)
-,events_(event)
-,addr_()
-,io_(fd)
-,server_(server)
-{
-	return ;
-}
-
-ASocket::ASocket(int port, int fd, ft::State state, uint32_t event, Server &server, Addr addr)
-:port_(port)
-,fd_(fd)
-,state_(state)
-,events_(event)
-,addr_(addr)
-,io_(fd)
+ASocket::ASocket(int fd, Server &server)
+:fd_(fd)
 ,server_(server)
 {
 	return ;
@@ -39,85 +23,11 @@ ASocket::ASocket(int port, int fd, ft::State state, uint32_t event, Server &serv
 
 ASocket::~ASocket()
 {
-	fd_.close();
+	close (fd_);
 	return ;
-}
-
-void	ASocket::updateEventsWithState(void)
-{
-	switch (state_)
-	{
-	case (ft::RECV_REQUESTLINE):
-	case (ft::RECV_HEADER):
-	case (ft::RECV_BODY):
-	case (ft::PASSIVE):
-		events_ = EPOLLIN;
-		break;
-	case (ft::SEND):
-	case (ft::CGI_SEND):
-		events_ = EPOLLOUT;
-		break;
-	case (ft::CGI_RECV):
-		events_ = EPOLLIN | EPOLLRDHUP;
-		break ;
-	case (ft::IDLE):
-	case (ft::DELETE):
-	case (ft::CGI_INIT):
-	case (ft::CGI_COMPLETE):
-		events_ = 0;
-		break ;
-	default:
-		break;
-	}
-	server_.modSocket(this, events_);
-}
-
-void	ASocket::setSockAddr(Addr addr)
-{
-	addr_ = addr;
-}
-
-void	ASocket::setFd(int fd)
-{
-	fd_.setFd(fd);
-}
-
-Server	&ASocket::getServer(void)
-{
-	return (server_);
-}
-
-int	ASocket::getPort(void) const
-{
-	return (port_);
 }
 
 int	ASocket::getFd(void) const
 {
-	return (fd_.getFd());
-}
-
-void	ASocket::setState(ft::State state)
-{
-	state_ = state;
-}
-
-ft::State	&ASocket::getRefState(void)
-{
-	return (state_);
-}
-
-ft::State	ASocket::getState(void) const
-{
-	return (state_);
-}
-
-uint32_t	ASocket::getEvents(void) const
-{
-	return (events_);
-}
-
-ASocket::Addr	ASocket::getSockAddr(void) const
-{
-	return (addr_);
+	return (fd_);
 }

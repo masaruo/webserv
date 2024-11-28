@@ -48,7 +48,7 @@ namespace ft
 	SocketT stonum(std::string const &str)
 	{
 		std::stringstream	ss(str);
-		SocketT					num = 0;
+		SocketT				num = 0;
 		ss >> num;
 		if (ss.fail() || !ss.eof())
 		{

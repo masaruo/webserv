@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   PassiveSocket.cpp                                  :+:      :+:    :+:   */
+/*   ListenSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 06:58:49 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 01:45:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "PassiveSocket.hpp"
-#include "ActiveSocket.hpp"
-#include "Server.hpp"
+#include "ListenSocket.hpp"
+// #include "ActiveSocket.hpp"
+// #include "Server.hpp"
 #include <cstring>
 #include <stdexcept>
 #include <fcntl.h>
@@ -29,7 +29,7 @@ static sockaddr_in	getPassiveSockAddr_(int port)
 	return (addr);
 }
 
-static int	getPassiveFd_(int port)
+static int	getListenFd_(int port)
 {
 	sockaddr_in	const &addr = getPassiveSockAddr_(port);
 	int	fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -47,27 +47,37 @@ static int	getPassiveFd_(int port)
 	return (fd);
 }
 
-PassiveSocket::PassiveSocket(int port, Server &server)
-:ASocket(port, getPassiveFd_(port), ft::PASSIVE, EPOLLIN, server)
+ListenSocket::ListenSocket(int port, Server &server)
+:ASocket(getListenFd_(port), server)
 {
 	return ;
 }
 
-PassiveSocket::~PassiveSocket()
+ListenSocket::~ListenSocket()
 {
 	return ;
 }
 
-void	PassiveSocket::execute(void)
+void	ListenSocket::handleEvent(uint32_t event)
 {
-	Addr	addr;
-	int		fd = 0;
-
-	fd = accept(getFd(),(struct sockaddr*)&addr.addrin_, &addr.addrlen_);
-	if (fd == -1)
+	if (event != EPOLLIN)
 	{
 		throw (std::runtime_error("Socket failed"));
 	}
-	getServer().addSocket(new ActiveSocket(getPort(), fd, ft::RECV_REQUESTLINE, EPOLLIN, getServer(),addr));
+
+	sockaddr_in	addr;
+	socklen_t	addrlen = sizeof(addr);
+
+	int clientFd = accept(getFd(), (struct sockaddr*)&addr, &addrlen);
+	if (clientFd == -1)
+	{
+		throw (std::runtime_error("Socket failed"));
+	}
+	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+	{
+		throw (std::runtime_error("Socket failed"));
+	}
+	//todo add activesocket
+	// getServer().addSocket(new ActiveSocket(getPort(), fd, ft::RECV_REQUESTLINE, EPOLLIN, getServer(),addr));
 	// SocketHolder::addSocket(new ActiveSocket(getPort(), fd, ft::RECV_REQUESTLINE, EPOLLIN, addr));
 }

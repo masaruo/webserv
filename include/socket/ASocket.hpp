@@ -6,56 +6,32 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/18 01:18:22 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 04:54:08 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "define.hpp"
-#include "Fd.hpp"
-#include "IO.hpp""
 #include <netinet/in.h>
 
 class Server;
 
 class ASocket
 {
-public:
-	struct Addr
-	{
-		sockaddr_in	addrin_;
-		socklen_t	addrlen_;
-	};
 private:
-	int			port_;
-	Fd			fd_;
-	ft::State	state_;
-	uint32_t	events_;
-	Addr		addr_;
-	IO			io_;
-	Server		&server_;
+	int			fd_;
+	sockaddr_in	addr_;
+	// IO			io_;
 
 	ASocket(ASocket const &rhs);
 	ASocket &operator=(ASocket const &rhs);
-
 protected:
-	void			setSockAddr(Addr addr);
-	Server			&getServer(void);
-	ft::State		&getRefState(void);
-	void			updateEventsWithState(void);
-	void			setFd(int fd);
+	Server		&server_;
 
 public:
-	explicit	ASocket(int port, int fd, ft::State state, uint32_t event, Server &server);
-	explicit	ASocket(int port, int fd, ft::State state, uint32_t event, Server &server, Addr addr);
+	explicit	ASocket(int fd, Server &server);
 	virtual		~ASocket();
 
-	int				getPort(void) const;
 	int				getFd(void) const;
-	void			setState(ft::State state);
-	ft::State		getState(void) const;
-	uint32_t		getEvents(void) const;
-	Addr			getSockAddr(void) const;
-
-	virtual void	execute(void) = 0;
+	virtual void	handleEvent(uint32_t event) = 0;
 };

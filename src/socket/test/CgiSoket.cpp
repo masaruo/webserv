@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/18 01:25:28 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 04:08:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 #include "string.hpp"
 #include "Server.hpp"
 #include "Fcntl.class.hpp"
-#include "ActiveSocket.hpp"
 
 int const	CgiSocket::INTERNAL_SERVER_ERROR = 50;
 

@@ -1,27 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   PassiveSocket.hpp                                  :+:      :+:    :+:   */
+/*   ListenSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:35:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 06:33:06 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 01:43:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "ASocket.hpp"
 
-class PassiveSocket : public ASocket
+class ListenSocket : public ASocket
 {
 private:
-	PassiveSocket();
-	PassiveSocket(PassiveSocket const &rhs);
-	PassiveSocket &operator=(PassiveSocket const &rhs);
+	ListenSocket();
+	ListenSocket(ListenSocket const &rhs);
+	ListenSocket &operator=(ListenSocket const &rhs);
 public:
-	explicit PassiveSocket(int port, Server &server);
-	~PassiveSocket();
-
-	void	execute(void);
+	explicit ListenSocket(int port, Server &server);
+	~ListenSocket();
+	void	handleEvent(uint32_t event);
 };

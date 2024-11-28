@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/02 05:26:07 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 04:53:29 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,14 @@ void	SocketHolder::deleteMarkedSocket(void)
 
 	while (it != end)
 	{
-		if ((*it)->getState() == ft::DELETE)
-		{
-			iterator tmp = it;
-			it++;
-			delete *tmp;
-			vec_sockets_.erase(tmp);
-		}
-		else
-			it++;
+		// if ((*it)->getState() == ft::DELETE)
+		// {
+		// 	iterator tmp = it;
+		// 	it++;
+		// 	delete *tmp;
+		// 	vec_sockets_.erase(tmp);
+		// }
+		// else
+		// 	it++;
 	}
 }

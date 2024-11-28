@@ -23,11 +23,11 @@ private:
 	bool		isHeaderParsed_;
 	bool		isParseCompleted_;
 
-	void		parseRequestLine(void);
-	void		parseHeader(void);
-	void		parseBody(void);
-	void		parseBodyWithLength(std::size_t size);
-	void		parseBodyWithChunk(void);
+	bool		parseRequestLine(void);
+	bool		parseHeader(void);
+	bool		parseBody(void);
+	bool		parseBodyWithLength(std::size_t size);
+	bool		parseBodyWithChunk(void);
 public:
 	RequestFactory();
 	~RequestFactory();

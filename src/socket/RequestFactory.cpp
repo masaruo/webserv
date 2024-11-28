@@ -48,16 +48,20 @@ RequestFactory &RequestFactory::operator=(RequestFactory const &rhs)
 
 void	RequestFactory::parse(std::string const &data, ssize_t size)
 {
-	buf_.append(data, size);
+	buf_.append(data.c_str(), size);
+	bool	recv_required = false;
 
-	if (!isRequestLineParsed_)
-		parseRequestLine();
-	else if (!isHeaderParsed_)
-		parseHeader();
-	else if (!isParseCompleted_)
-		parseBody();
-	else
-		throw (HttpException(HttpCode::BAD_REQUEST));
+	while (!isParseCompleted_ && !recv_required)
+	{
+		if (!isRequestLineParsed_)
+			recv_required = parseRequestLine();
+		else if (!isHeaderParsed_)
+			recv_required = parseHeader();
+		else if (!isParseCompleted_)
+			parseBody();
+		else
+			throw (HttpException(HttpCode::BAD_REQUEST));
+	}
 }
 
 static RequestFactory::BodyType	isRequestBodyPresent(HttpHeader const &header)
@@ -72,23 +76,24 @@ static RequestFactory::BodyType	isRequestBodyPresent(HttpHeader const &header)
 		return (RequestFactory::EMPTY);
 }
 
-void	RequestFactory::parseRequestLine(void)
+bool	RequestFactory::parseRequestLine(void)
 {
 	std::string::size_type	pos = buf_.find("\r\n");
 	if (pos == std::string::npos)
-		return ;
+		return (true);
 
 	line_ = RequestLine(buf_.substr(0, pos + 2));
 	buf_ = buf_.substr(pos + 2);
 	isRequestLineParsed_ = true;
+	return (false);
 }
 
-void	RequestFactory::parseHeader(void)
+bool	RequestFactory::parseHeader(void)
 {
 	std::string::size_type	posCRLFCRLF = buf_.find("\r\n\r\n");
 
 	if (posCRLFCRLF == std::string::npos)
-		return ;
+		return (true);
 
 	header_ = HttpHeader(buf_.substr(0, posCRLFCRLF + 4));
 	buf_ = buf_.substr(posCRLFCRLF + 4);
@@ -103,39 +108,43 @@ void	RequestFactory::parseHeader(void)
 		isHeaderParsed_ = true;
 		isParseCompleted_ = false;
 	}
+	return (false);
 }
 
-void	RequestFactory::parseBody(void)
+bool	RequestFactory::parseBody(void)
 {
 	RequestFactory::BodyType	body_type = isRequestBodyPresent(header_);
+	bool						recv_required = false;
 
 	if (body_type == RequestFactory::CHUNK)
 	{
-		parseBodyWithChunk();
+		recv_required = parseBodyWithChunk();
 	}
 	else
 	{
 		std::size_t	size = ft::stonum<std::size_t>(header_.getFirstValue("content-length"));
-		parseBodyWithLength(size);
+		recv_required = parseBodyWithLength(size);
 	}
+	return (recv_required);
 }
 
-void	RequestFactory::parseBodyWithLength(std::size_t size)
+bool	RequestFactory::parseBodyWithLength(std::size_t size)
 {
 	if (buf_.size() < size)
-		return ;
+		return (true);
 
 	body_ = HttpBody(buf_.substr(0, size));
 	buf_.clear();
 	isParseCompleted_ = true;
+	return (false);
 }
 
-void	RequestFactory::parseBodyWithChunk(void)
+bool	RequestFactory::parseBodyWithChunk(void)
 {
 	std::string::size_type	pos = buf_.find("\r\n");
 
 	if (pos == std::string::npos)
-		return ;
+		return (true);
 
 	std::string const	&sizeStr = buf_.substr(0, pos);
 	std::size_t			size = ft::stonum<std::size_t>(sizeStr);
@@ -148,14 +157,16 @@ void	RequestFactory::parseBodyWithChunk(void)
 		body_ = HttpBody(buf_);
 		buf_.clear();
 		isParseCompleted_ = true;
+		return (false);
 	}
 	else if (buf_.size() < pos + 2 + size + 2)
 	{
-		return ;
+		return (true);
 	}
 
 	body_ = HttpBody(buf_.substr(pos + 2, size));
 	buf_ = buf_.substr(pos + 2 + size + 2);
+	return (false);
 }
 
 bool	RequestFactory::isParseCompleted(void) const

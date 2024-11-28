@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 05:45:13 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 06:08:00 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ Server::Server(std::string const &config_path)
 	while (it != ite)
 	{
 		ASocket	*soc = new ListenSocket(*it, *this);
-		// soc->setState(ft::PASSIVE);
 		add(soc, EPOLLIN);
 		it++;
 	}
@@ -76,7 +75,7 @@ void	Server::add(ASocket *socket, uint32_t event)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	holder_.addSocket(socket);
+	holder_.add(socket);
 }
 
 void	Server::mod(ASocket *socket, uint32_t event)
@@ -99,7 +98,7 @@ void	Server::del(ASocket *socket)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	//todo delete socket from holder
+	holder_.del(socket);
 }
 
 void	Server::run(void)

@@ -6,13 +6,13 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 01:45:07 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 06:12:44 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ListenSocket.hpp"
-// #include "ActiveSocket.hpp"
-// #include "Server.hpp"
+#include "Server.hpp"
+#include "ClientSocket.hpp"
 #include <cstring>
 #include <stdexcept>
 #include <fcntl.h>
@@ -77,7 +77,6 @@ void	ListenSocket::handleEvent(uint32_t event)
 	{
 		throw (std::runtime_error("Socket failed"));
 	}
-	//todo add activesocket
-	// getServer().addSocket(new ActiveSocket(getPort(), fd, ft::RECV_REQUESTLINE, EPOLLIN, getServer(),addr));
-	// SocketHolder::addSocket(new ActiveSocket(getPort(), fd, ft::RECV_REQUESTLINE, EPOLLIN, addr));
+	ClientSocket	*client = new ClientSocket(clientFd, server_);
+	server_.add(client, EPOLLIN);
 }

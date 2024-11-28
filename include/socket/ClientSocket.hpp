@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 04:04:35 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 05:40:05 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ private:
 	ClientSocket(ClientSocket const &rhs);
 	ClientSocket &operator=(ClientSocket const &rhs);
 protected:
-	virtual ARequest	*generateRequest(Server &server) const;
+	// virtual ARequest	*generateRequest(Server &server) const;
 public:
 	explicit ClientSocket(int fd, Server &server);
-	~ClientSocket();
+	virtual ~ClientSocket();
 	void	handleEvent(uint32_t event);
 };

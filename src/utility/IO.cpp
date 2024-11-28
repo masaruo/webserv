@@ -1,5 +1,6 @@
 #include "IO.hpp"
 #include "string.hpp"
+#include <iostream>
 // #include "GetRequest.hpp"
 // #include "PostRequest.hpp"
 // #include "DeleteRequest.hpp"

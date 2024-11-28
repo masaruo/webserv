@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/16 04:21:10 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 05:36:40 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,5 @@ public:
 	~CgiSocket();
 	void		execute(void);
 	std::string	getData(void) const;
+	void	handleEvent(uint32_t event){};
 };

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 05:10:47 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 05:45:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	Server::add(ASocket *socket, uint32_t event)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	// holder_.add(socket);
+	holder_.addSocket(socket);
 }
 
 void	Server::mod(ASocket *socket, uint32_t event)
@@ -99,10 +99,23 @@ void	Server::del(ASocket *socket)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
+	//todo delete socket from holder
 }
 
 void	Server::run(void)
 {
+	while (true)
+	{
+		int	event_num = epollWait();
+		for (int i = 0; i < event_num; i++)
+		{
+			uint32_t	ev = eventQueue_[i].events;
+			ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
+			socket->handleEvent(ev);
+		}
+	}
+
+
 	// while (true)
 	// {
 	// 	holder_.deleteMarkedSocket();

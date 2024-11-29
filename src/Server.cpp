@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 06:08:00 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 09:55:59 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,10 +101,16 @@ void	Server::del(ASocket *socket)
 	holder_.del(socket);
 }
 
+void Server::cleanUp(void)
+{
+	holder_.deleteMarkedSockets();
+}
+
 void	Server::run(void)
 {
 	while (true)
 	{
+		cleanUp();
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
 		{

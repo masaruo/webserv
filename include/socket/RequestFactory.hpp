@@ -4,8 +4,6 @@
 #include "HttpBody.hpp"
 #include "Request.hpp"
 
-// class ARequest;
-
 class RequestFactory
 {
 public:

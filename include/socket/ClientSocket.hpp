@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 07:54:47 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 05:57:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ class ClientSocket : public ASocket
 {
 private:
 	RequestFactory	factory_;
-
+	std::string		data_;
 	// IO							io_;
 	// // ARequest					*request_;
 	// Response					*response_;
@@ -32,4 +32,5 @@ public:
 	explicit ClientSocket(int fd, Server &server);
 	virtual ~ClientSocket();
 	virtual void	handleEvent(uint32_t event);
+	void			setData(std::string const &data);
 };

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 06:07:19 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 09:55:40 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,22 @@ void	SocketHolder::del(ASocket *socket)
 		it++;
 	}
 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+}
+
+void	SocketHolder::deleteMarkedSockets(void)
+{
+	iterator		it = vec_sockets_.begin();
+	const_iterator	end = vec_sockets_.end();
+
+	while (it != end)
+	{
+		if ((*it)->toDelete())
+		{
+			delete *it;
+			vec_sockets_.erase(it);
+		}
+		it++;
+	}
 }
 
 // void	SocketHolder::checkTimeout(void)

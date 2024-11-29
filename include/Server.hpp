@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 03:52:05 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 05:13:12 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 09:55:59 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ private:
 	Server();
 	Server(Server const &rhs);
 	Server &operator=(Server const &rhs);
+	void						cleanUp(void);
 public:
 	Server(std::string const &config_path);
 	~Server();

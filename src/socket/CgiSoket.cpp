@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 13:10:06 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 09:57:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static void	assert_wait_(pid_t child_pid)
 	}
 }
 
-CgiSocket::CgiSocket(ASocket *parent, RequestFactory const &factory, Server &server)
+CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server)
 :ASocket(-1, server)
 ,parent_socket_(parent)
 ,factory_(factory)
@@ -147,62 +147,34 @@ void	CgiSocket::execChild(int sockfd[2])
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
-// void	CgiSocket::execute(void)
-// {
-	// ft::State	&state = getRefState();
-	// bool		complete = false;
-
-	// switch (state)
-	// {
-	// 	case (ft::CGI_SEND):
-	// 		complete = io_.send(state);
-	// 		if (complete)
-	// 		{
-	// 			shutdown(getFd(), SHUT_WR);
-	// 			setState(ft::CGI_RECV);
-	// 			io_.clear();
-	// 			updateEventsWithState();
-	// 		}
-	// 		break ;
-	// 	case (ft::CGI_RECV):
-	// 		complete = io_.recv(state);
-	// 		if (complete)
-	// 		{
-	// 			response_body_ = io_.getData();
-	// 			setState(ft::CGI_COMPLETE);
-	// 			updateEventsWithState();
-	// 		}
-	// 		break ;
-	// 	case (ft::CGI_COMPLETE):
-	// 		assert_wait_(child_pid_);
-	// 		if (parent_socket_)
-	// 		{
-	// 			ActiveSocket *active = dynamic_cast<ActiveSocket*>(parent_socket_);
-	// 			active->setData(response_body_);
-	// 			parent_socket_->setState(ft::SEND);
-	// 		}
-	// 		setState(ft::DELETE);
-	// 		break ;
-	// 	default:
-	// 		break ;
-
-	// }
-// }
-
-// std::string	CgiSocket::getData(void) const
-// {
-// 	return (response_body_);
-// }
-
 void	CgiSocket::handleEvent(uint32_t event)
 {
-	if (event == EPOLLOUT)
+	char buf[2043];
+	ssize_t bytes;
+
+	if (event & EPOLLOUT)
 	{
-		// setupCGI();
+		//todo change to chunk or large file
+		std::string const &body = factory_.getBody().c_str();
+		send(getFd(), body.c_str(), body.size(), 0);
+		server_.mod(this, EPOLLIN);
 	}
-	else if (event == EPOLLIN)
+	else if (event & (EPOLLIN | EPOLLHUP))
 	{
-		
+	 	bytes = recv(fd_, buf, sizeof(buf), 0);
+		if (bytes <= 0)
+		{
+			int status;
+			waitpid(child_pid_, &status, WNOHANG);
+			if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
+				data_ = "Status: 500 Internal Server Error\r\n\r\n";
+			}
+			parent_socket_->setData(data_);
+			server_.mod(parent_socket_, EPOLLOUT);
+			to_delete_ = true;
+			return;
+		}
+		data_.append(buf, bytes);
 	}
 	else
 	{

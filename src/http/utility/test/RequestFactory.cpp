@@ -14,7 +14,7 @@
 // int const	RequestFactory::HASBODY = 2;
 // int const	RequestFactory::NOBODY = 0;
 
-ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &config_factory)
+ARequest	*Parser::createRequest(int fd, config::ConfigFactory const &config_factory)
 {
 	// io::IO	input(fd);
 	// std::string	raw_request = input.recv();
@@ -60,7 +60,7 @@ ARequest	*RequestFactory::createRequest(int fd, config::ConfigFactory const &con
 	// }
 }
 
-void	RequestFactory::createRequestLineAndHeader(int fd, RequestLine &line, HttpHeader &header)
+void	Parser::createRequestLineAndHeader(int fd, RequestLine &line, HttpHeader &header)
 {
 	// io::IO				input(fd);
 	// std::string			raw_request = input.recv();

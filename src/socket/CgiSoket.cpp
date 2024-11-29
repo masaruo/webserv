@@ -6,21 +6,23 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 05:30:29 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 13:10:06 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiSocket.hpp"
 #include "define.hpp"
-#include <sys/epoll.h>
-#include <sys/wait.h>
-#include <cstring>
-#include <cstdlib>
-#include <unistd.h>
-#include "HttpException.hpp"
-#include "Env.hpp"
-#include "string.hpp"
 #include "Server.hpp"
+#include "Env.hpp"
+// #include <sys/epoll.h>
+#include <sys/wait.h>
+#include <cstring>//strcpy
+// #include <cstdlib>
+#include <unistd.h>
+// #include "HttpException.hpp"
+// #include "Env.hpp"
+// #include "string.hpp"
+// #include "Server.hpp"
 #include "Fcntl.class.hpp"
 
 int const	CgiSocket::INTERNAL_SERVER_ERROR = 50;
@@ -38,66 +40,54 @@ static void	assert_wait_(pid_t child_pid)
 	}
 }
 
-CgiSocket::CgiSocket(Env const &env, std::string const &script_path, std::string const &request_body, Server &server)
+CgiSocket::CgiSocket(ASocket *parent, RequestFactory const &factory, Server &server)
 :ASocket(-1, server)
-// :ASocket(-1, -1, ft::CGI_SEND, EPOLLIN, server)
-,env_(env)
+,parent_socket_(parent)
+,factory_(factory)
 ,child_pid_(-1)
-,script_path_(script_path)
-,request_body_(request_body)
-,response_body_()
-,io_(-1)
-,parent_socket_(NULL)
+,data_()
 {
+	sockfd_[ft::PARENTFD] = -1;
+	sockfd_[ft::CHILDFD] = -1;
 	setupCGI();
 	return ;
 }
 
 CgiSocket::~CgiSocket()
 {
+	if (sockfd_[ft::PARENTFD] > 2)
+	{
+		close(sockfd_[ft::PARENTFD]);
+		fd_ = -1;
+	}
+	if (sockfd_[ft::CHILDFD] > 2)
+		close(sockfd_[ft::CHILDFD]);
 	return ;
 }
 
 void	CgiSocket::setupCGI(void)
 {
-	// int			sockfds[2];
-	// pid_t		pid = 0;
-	// std::string	bodyStr = "";
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfd_) == -1)
+	{
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
+	ft::Fcntl::setNonBlock(sockfd_[ft::PARENTFD]);
+	fd_ = sockfd_[ft::PARENTFD];
 
-	// if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfds) == -1)
-	// {
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// }
+	child_pid_ = fork();
+	if (child_pid_ == ft::err)
+	{
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
+	else if (child_pid_ == 0)
+	{
+		execChild(sockfd_);
+	}
 
-	// ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
-	// // setFd(sockfds[ft::PARENTFD]);
-
-	// sockaddr_in	dummy_sockaddr = {};
-	// std::memset(&dummy_sockaddr, 0, sizeof(sockaddr));
-	// // ASocket::Addr dummy;
-	// dummy.addrin_ = dummy_sockaddr;
-	// dummy.addrlen_ = sizeof(dummy);
-
-	// cgi_socket_ = new ActiveSocket(0, sockfds[ft::PARENTFD], ft::CGISEND, EPOLLOUT, getServerReference(), dummy);
-	// if (cgi_socket_ == NULL)
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-
-	// pid = fork();
-	// if (pid == ft::err)
-	// {
-	// 	close(sockfds[ft::PARENTFD]);
-	// 	close(sockfds[ft::CHILDFD]);
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// }
-	// else if (pid == 0)
-	// {
-	// 	execChild(sockfds);
-	// }
-
-	// //parent
-	// if (close(sockfds[ft::CHILDFD]) == -1)
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-
+	//parent
+	if (close(sockfd_[ft::CHILDFD]) == -1)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	server_.add(this, EPOLLOUT);
 }
 
 static char	**generateArgv(std::string const &uri)
@@ -123,13 +113,25 @@ void	CgiSocket::execChild(int sockfd[2])
 		std::exit(INTERNAL_SERVER_ERROR);
 	if (close(sockfd[ft::CHILDFD]) == -1)
 		std::exit(INTERNAL_SERVER_ERROR);
-	if (chdir(script_path_.c_str()) == -1)
-		std::exit(INTERNAL_SERVER_ERROR);
+	// if (chdir(script_path_.c_str()) == -1)
+	// 	std::exit(INTERNAL_SERVER_ERROR);
 	
-	ft::string const &path(script_path_);
-	ft::string::string_vector	split_by_slash = path.split("/");
-	ft::string const &filename = split_by_slash.back();
+	// ft::string const &path(script_path_);
+	// ft::string::string_vector	split_by_slash = path.split("/");
+	// ft::string const &filename = split_by_slash.back();
 
+	// std::string const &path = factory_.getRequestLine().getUri().getPath();
+	// config::ConfigFactory &loc = server_.getConfigFactory().getConfig().getConfigLocation(path);
+	std::string chdir_target = "/webserv/cgi-bin";//todo get from config
+	if (chdir(chdir_target.c_str()) == -1)
+	{
+		std::exit(INTERNAL_SERVER_ERROR);
+	}
+
+	Env env(factory_.getRequestLine(), factory_.getHeader(), factory_.getBody());
+
+	std::string const &filename = "echo.py";//todo get from config
+	// std::string const &filename = factory_.getRequestLine().getUri().getPathInfo().fileName_;
 	char	**argv;
 	try
 	{
@@ -140,13 +142,13 @@ void	CgiSocket::execChild(int sockfd[2])
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
-	execve(argv[0], argv, env_.c_env());
+	execve(argv[0], argv, env.c_env());
 
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
-void	CgiSocket::execute(void)
-{
+// void	CgiSocket::execute(void)
+// {
 	// ft::State	&state = getRefState();
 	// bool		complete = false;
 
@@ -185,9 +187,25 @@ void	CgiSocket::execute(void)
 	// 		break ;
 
 	// }
-}
+// }
 
-std::string	CgiSocket::getData(void) const
+// std::string	CgiSocket::getData(void) const
+// {
+// 	return (response_body_);
+// }
+
+void	CgiSocket::handleEvent(uint32_t event)
 {
-	return (response_body_);
+	if (event == EPOLLOUT)
+	{
+		// setupCGI();
+	}
+	else if (event == EPOLLIN)
+	{
+		
+	}
+	else
+	{
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
 }

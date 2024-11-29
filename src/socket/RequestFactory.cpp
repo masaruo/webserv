@@ -2,6 +2,8 @@
 #include "GetRequest.hpp"
 #include "Server.hpp"
 
+//! todo assertion such as allowed method?
+
 RequestFactory::RequestFactory()
 :buf_()
 ,line_()
@@ -58,7 +60,7 @@ void	RequestFactory::parse(std::string const &data, ssize_t size)
 		else if (!isHeaderParsed_)
 			recv_required = parseHeader();
 		else if (!isParseCompleted_)
-			parseBody();
+			recv_required = parseBody();
 		else
 			throw (HttpException(HttpCode::BAD_REQUEST));
 	}
@@ -174,14 +176,25 @@ bool	RequestFactory::isParseCompleted(void) const
 	return (isParseCompleted_);
 }
 
-// ARequest	*RequestFactory::createRequest(Server &server)
-// {
-// 	if (!isParseCompleted_)
-// 		throw (HttpException(HttpCode::BAD_REQUEST));
+RequestLine const	&RequestFactory::getRequestLine(void) const
+{
+	return (line_);
+}
 
-// 	ARequest				*request;
-// 	config::Config const	&config = server.getConfigFactory().getConfig(line_.getUri().getHost());
-// 	if (line_.getMethod() == "GET")
-// 		request = new GetRequest(line_, header_, body_, config, server);
-// 	return (request);
-// }
+HttpHeader const	&RequestFactory::getHeader(void) const
+{
+	return (header_);
+}
+
+HttpBody const		&RequestFactory::getBody(void) const
+{
+	return (body_);
+}
+
+Request	RequestFactory::createRequest(Server &server) const
+{
+	if (!isParseCompleted_)
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	return (Request(line_, header_, body_, server));
+}

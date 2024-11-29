@@ -2,8 +2,9 @@
 #include "RequestLine.hpp"
 #include "HttpHeader.hpp"
 #include "HttpBody.hpp"
+#include "Request.hpp"
 
-class ARequest;
+// class ARequest;
 
 class RequestFactory
 {
@@ -33,7 +34,10 @@ public:
 	~RequestFactory();
 	RequestFactory(RequestFactory const &rhs);
 	RequestFactory &operator=(RequestFactory const &rhs);
-	void		parse(std::string const &data, ssize_t size);
-	bool		isParseCompleted(void) const;
-	// ARequest	*createRequest(Server &server) const;
+	void				parse(std::string const &data, ssize_t size);
+	bool				isParseCompleted(void) const;
+	RequestLine const	&getRequestLine(void) const;
+	HttpHeader const	&getHeader(void) const;
+	HttpBody const		&getBody(void) const;
+	Request				createRequest(Server &server) const;
 };

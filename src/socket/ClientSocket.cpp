@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 04:03:56 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 07:38:06 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ ClientSocket::~ClientSocket()
 {
 	// delete request_;
 }
-
-
 
 void	ClientSocket::handleEvent(uint32_t event)
 {

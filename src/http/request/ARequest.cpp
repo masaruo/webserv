@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 01:05:46 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/08 07:48:51 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 00:59:06 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,18 @@
 #include "Response.hpp"
 #include <sstream>
 #include <unistd.h>// for access
+
+// ARequest::ARequest(Request const &request, Server &server)
+// :requestLine_(request.line_)
+// ,header_(request.header_)
+// ,body_(request.body_)
+// // ,config_(server.getConfigFactory().getConfig(requestLine_.getUri().getHost()))
+// ,response_()
+// {
+// 	assertAllowedMethod();
+// 	assertRedirection();
+// 	return ;
+// }
 
 ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
 :requestLine_(line)
@@ -32,18 +44,18 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 	return ;
 }
 
-ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
-:requestLine_(line)
-,header_(header)
-,body_(body)
-,config_(config)
-,response_()
-,server_(server)
-{
-	assertAllowedMethod();
-	assertRedirection();
-	return ;
-}
+// ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
+// :requestLine_(line)
+// ,header_(header)
+// ,body_(body)
+// ,config_(config)
+// ,response_()
+// ,server_(server)
+// {
+// 	assertAllowedMethod();
+// 	assertRedirection();
+// 	return ;
+// }
 
 ARequest::ARequest(ARequest const &rhs)
 :requestLine_(rhs.requestLine_)

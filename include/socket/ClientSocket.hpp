@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 05:40:05 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/28 07:54:47 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,5 @@ protected:
 public:
 	explicit ClientSocket(int fd, Server &server);
 	virtual ~ClientSocket();
-	void	handleEvent(uint32_t event);
+	virtual void	handleEvent(uint32_t event);
 };

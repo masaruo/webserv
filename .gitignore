@@ -18,6 +18,7 @@ obj/*
 !www/*
 !www/*/*
 !www/*/*/*
+!echoserver/*
 
 asset/*
 googletest

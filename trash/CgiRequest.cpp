@@ -7,21 +7,32 @@
 #include <cstring>// std::strcpy
 #include <cerrno>
 #include <sys/wait.h>// waitpid
+#include <sys/socket.h>// socket pair
+#include "define.hpp"
+#include "Fcntl.class.hpp"
+#include "sys/epoll.h"
+#include "Server.hpp"
 
 int const	CgiRequest::READ_FD = 0;
 int const	CgiRequest::WRITE_FD = 1;
 int const	CgiRequest::CHILD_PID = 0;
 int const	CgiRequest::INTERNAL_SERVER_ERROR = 50;
 
-CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
-:ARequest(line, header, config)
+CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+:ARequest(line, header, config, server)
+,cgi_socket_(NULL)
+,child_pid_(-1)
+,is_response_ready_(false)
 {
 	generateResponseData();
 	return ;
 }
 
-CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
-:ARequest(line, header, body, config)
+CgiRequest::CgiRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
+:ARequest(line, header, body, config, server)
+,cgi_socket_(NULL)
+,child_pid_(-1)
+,is_response_ready_(false)
 {
 	generateResponseData();
 	return ;
@@ -34,6 +45,9 @@ CgiRequest::~CgiRequest()
 
 CgiRequest::CgiRequest(CgiRequest const &rhs)
 :ARequest(rhs)
+,cgi_socket_(rhs.cgi_socket_)
+,child_pid_(rhs.child_pid_)
+,is_response_ready_(rhs.is_response_ready_)
 {
 	return ;
 }
@@ -43,6 +57,9 @@ CgiRequest &CgiRequest::operator=(CgiRequest const &rhs)
 	if (this != &rhs)
 	{
 		ARequest::operator=(rhs);
+		cgi_socket_ = rhs.cgi_socket_;
+		child_pid_ = rhs.child_pid_;
+		is_response_ready_ = rhs.is_response_ready_;
 	}
 	return (*this);
 }
@@ -83,32 +100,28 @@ static char	**generateArgv(std::string const &uri)
 	return (argv);
 }
 
-void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &abspath) const
+void	CgiRequest::exec_child(int sockfd[2], std::string const &abspath) const
 {
-	if (close(pipe_in[WRITE_FD]) == ft::err)
+	if (close(sockfd[ft::PARENTFD]) == -1)
 		std::exit(INTERNAL_SERVER_ERROR);
-	if (close(pipe_out[READ_FD]) == ft::err)
+	if (dup2(sockfd[ft::CHILDFD], STDIN_FILENO) == -1)
+		std::exit(INTERNAL_SERVER_ERROR);
+	if (dup2(sockfd[ft::CHILDFD], STDOUT_FILENO) == -1)
+		std::exit(INTERNAL_SERVER_ERROR);
+	if (close(sockfd[ft::CHILDFD]) == -1)
 		std::exit(INTERNAL_SERVER_ERROR);
 
-	if (dup2ThenClose(pipe_in[READ_FD], STDIN_FILENO) == ft::err)
-	{
-		std::exit(INTERNAL_SERVER_ERROR);
-	}
-	if (dup2ThenClose(pipe_out[WRITE_FD], STDOUT_FILENO) == ft::err)
-	{
-		std::exit(INTERNAL_SERVER_ERROR);
-	}
 
 	std::string const 						&path = getLine().getUri().getPath();
 	config::Config::LocationConfig	const	&loc = getConfig().getConfigLocation(path);
 	std::string	chdir_target = loc.directive_.getFirstValue(config::Config::CGI_ROOT);
-	if (chdir(chdir_target.c_str()) == ft::err)
+	if (chdir(chdir_target.c_str()) == -1)
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
 	//generate ENV with chdir dir
-	Env env(getLine(), getHeader(), getBody(), abspath);
+	// Env env(getLine(), getHeader(), getBody(), abspath);
 
 	std::string const &file = getLine().getUri().getPathInfo().fileName_;
 
@@ -122,102 +135,60 @@ void	CgiRequest::exec_child(int pipe_in[2], int pipe_out[2], std::string const &
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
 
-	execve(argv[0], argv, env.c_env());
+	// execve(argv[0], argv, env.c_env());
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
-std::string	CgiRequest::exec_parent(int pipe_in[2], int pipe_out[2], int child_pid) const
+void	CgiRequest::exec_parent(int sockfds[2])
 {
-	if (close(pipe_in[READ_FD]))
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	if (close(pipe_out[WRITE_FD]))
+	if (close(sockfds[ft::CHILDFD]) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 
-	std::string const	&body = getBody().to_string();
-	ssize_t		total_written = 0;
-	std::size_t	remaining = getBody().getSize();
+	// Server		&server = getServerReference();
+	// cgi_socket_->setData(getBody().to_string());
+	// ft::Fcntl::setNonBlock(sockfds[ft::PARENTFD]);
+	// server.addSocket(cgi_socket_);
 
-	while (remaining > 0)
-	{
-		ssize_t	bytesWritten = write(pipe_in[WRITE_FD], body.c_str() + total_written, remaining);
-		if (bytesWritten == ft::err)
-		{
-			if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
-				continue ;
-			else
-			{
-				close(pipe_in[WRITE_FD]);
-				close(pipe_out[READ_FD]);
-				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-			}
-		}
-		total_written += bytesWritten;
-		remaining -= bytesWritten;
-	}
-	assertClose(pipe_in[WRITE_FD]);
+	// shutdown(sockfds[ft::PARENTFD], SHUT_WR);
 
-	std::string	result = "";
-	try
-	{
-		result = FileHandler::read(pipe_out[READ_FD]);
-	}
-	catch(...)
-	{
-		assertClose(pipe_out[READ_FD]);
-		throw;
-	}
-	
-	assertClose(pipe_out[READ_FD]);
-
-	int			status = 0;
-	pid_t		pid = 0;
-	while (pid == 0)
-	{
-		pid = waitpid(child_pid, &status, WNOHANG);
-	}
-	if (WIFEXITED(status))
-	{
-		int	exit_status = WEXITSTATUS(status);
-		if (exit_status != 0)
-		{
-			if (exit_status == INTERNAL_SERVER_ERROR)
-				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-			else
-				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//todo amend error
-		}
-	}
-	return (result);
 }
 
-std::string	CgiRequest::execute(std::string const &abspath) const
+void	CgiRequest::execute(std::string const &abspath)
 {
-	int			pipe_in[2];
-	int			pipe_out[2];
+	int			sockfds[2];
 	pid_t		child_pid = 0;
 	std::string	bodyStr = "";
 
-	if (pipe(pipe_in) == ft::err || pipe(pipe_out) == ft::err)
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfds) == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
+
+	sockaddr_in	dummy_sockaddr = {};
+	std::memset(&dummy_sockaddr, 0, sizeof(sockaddr));
+	ASocket::Addr dummy;
+	dummy.addrin_ = dummy_sockaddr;
+	dummy.addrlen_ = sizeof(dummy);
+	cgi_socket_ = new ActiveSocket(0, sockfds[ft::PARENTFD], ft::CGISEND, EPOLLOUT, getServerReference(), dummy);
+	if (cgi_socket_ == NULL)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+
 	child_pid = fork();
 	if (child_pid == ft::err)
 	{
-		close(pipe_in[WRITE_FD]);
-		close(pipe_in[READ_FD]);
-		close(pipe_out[WRITE_FD]);
-		close(pipe_out[READ_FD]);
+		close(sockfds[ft::PARENTFD]);
+		close(sockfds[ft::CHILDFD]);
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 	else if (child_pid == CHILD_PID)
 	{
-		exec_child(pipe_in, pipe_out, abspath);
+		exec_child(sockfds, abspath);
 	}
 	else
 	{
-		bodyStr = exec_parent(pipe_in, pipe_out, child_pid);
+		child_pid_ = child_pid;
+		exec_parent(sockfds);
 	}
-	return (bodyStr);
 }
 
 std::string	CgiRequest::setLocalPath(void) const
@@ -229,7 +200,7 @@ std::string	CgiRequest::setLocalPath(void) const
 	std::string const	&file = UriNormalizer::decodeDots(uri.getPathInfo().fileName_);
 	std::string const	&pathWithRoot = root + "/" + file;
 
-	if (!FileHandler::checkPathExist(pathWithRoot))
+	if (!FileHandler::checkPathExist(root))
 		throw (HttpException(HttpCode::NOT_FOUND));
 	if (!FileHandler::checkIfFile(pathWithRoot))
 		throw (HttpException(HttpCode::CONFLICT));
@@ -238,14 +209,34 @@ std::string	CgiRequest::setLocalPath(void) const
 	return (pathWithRoot);
 }
 
-void	CgiRequest::generateResponseData(void)
+void	CgiRequest::engageWithChild(void)
 {
 	std::string const	abspath = setLocalPath();
-	std::string const	resBody = execute(abspath);
+	execute(abspath);
+}
 
-	if (resBody.empty())
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+void	CgiRequest::wait(void)
+{
+	int	status;
+	pid_t res = waitpid(child_pid_, &status, WNOHANG);
+	if (res == child_pid_)
+	{
+		if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+		{
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		}
+		child_pid_ = -1;
+	}
+}
 
+void	CgiRequest::generateResponseData(void)
+{
+	if (!is_response_ready_)
+	{
+		engageWithChild();
+		return ;
+	}
+	std::string const	resBody = cgi_socket_->getData();
 	HttpBody	body(resBody);
 
 	HttpStatus	status(HttpCode::OK);

@@ -3,7 +3,7 @@
 config::ConfigFactory::ConfigFactory(std::string const &config_path)
 {
 	// config_pathから読み取ってConfigに入れる
-	std::ifstream ifs(config_path);
+	std::ifstream ifs(config_path.c_str());
 	if (!ifs)
 		throw std::invalid_argument("can not open file.");
 	std::istreambuf_iterator<char> it(ifs);
@@ -70,6 +70,14 @@ config::Config	config::ConfigFactory::getConfig(std::string const &server_name) 
 		iter++;
 	}
 	return (configs_.front());
+}
+
+std::vector<std::size_t>	config::ConfigFactory::getAcceptedPorts(void) const
+{
+	std::vector<std::size_t> vec;
+	vec.push_back(8888);
+	vec.push_back(7777);
+	return (vec);
 }
 
 // int main()

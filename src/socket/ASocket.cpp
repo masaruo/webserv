@@ -1,25 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ASocket.class.cpp                                  :+:      :+:    :+:   */
+/*   ASocket.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/24 17:37:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 10:48:27 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
+/*   Updated: 2024/11/29 09:55:30 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ASocket.class.hpp"
+#include "ASocket.hpp"
+#include "Server.hpp"
+#include <unistd.h>
 
-ASocket::ASocket(socket_type_t type)
-:type_(type)
+ASocket::ASocket(int fd, Server &server)
+:fd_(fd)
+,server_(server)
+,to_delete_(false)
 {
 	return ;
 }
 
 ASocket::~ASocket()
 {
+	if (fd_ > 2)
+		close (fd_);
 	return ;
 }
 
@@ -28,19 +34,7 @@ int	ASocket::getFd(void) const
 	return (fd_);
 }
 
-ASocket::socket_type_t	ASocket::getSocketType(void) const
+bool	ASocket::toDelete(void) const
 {
-	return (type_);
-}
-
-void	ASocket::markSocketDelete(void)
-{
-	type_ = to_delete;
-}
-
-//exception
-ASocket::SocketException::SocketException(std::string const &msg)
-:std::runtime_error(msg)
-{
-	return ;
+	return (to_delete_);
 }

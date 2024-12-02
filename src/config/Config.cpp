@@ -13,7 +13,7 @@ Config::Config(int flag)//!this is MOCK!
 	// main directives
 	port_ = 80;
 	server_name_ = "_";
-	root_ = "www/html";
+	root_ = "/webserv/www/html";
 	others_.addValue(MAX_BODY_SIZE, "60000000");
 	error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
 	error_pages_.insert(std::make_pair(HttpCode::METHOD_NOT_ALLOWED, "/405.html"));
@@ -39,7 +39,7 @@ Config::Config(int flag)//!this is MOCK!
 	upload.addValue(ALLOWED_METHOD, "DELETE");
 	upload.addValue(ALLOWED_METHOD, "GET");
 	upload.addValue(AUTOINDEX, "on");
-	upload.addValue(UPLOAD_ROOT, "www/storage");//? have to create folder?
+	upload.addValue(UPLOAD_ROOT, "/storage");//? have to create folder?
 	LocationConfig	uploader;
 	uploader.pathType_ = UPLOAD_PATH;
 	uploader.directive_ = upload;
@@ -49,7 +49,7 @@ Config::Config(int flag)//!this is MOCK!
 	cgi.addValue(ALLOWED_METHOD, "GET");
 	cgi.addValue(ALLOWED_METHOD, "POST");
 	cgi.addValue(AUTOINDEX, "off");
-	cgi.addValue(CGI_ROOT, "cgi-bin");
+	cgi.addValue(CGI_ROOT, "/webserv/cgi-bin");
 	LocationConfig cgier;
 	cgier.pathType_ = CGI_PATH;
 	cgier.directive_ = cgi;
@@ -65,7 +65,7 @@ Config::Config(int flag)//!this is MOCK!
 	LocationConfig redir;
 	redir.pathType_ = REDIRECTION_PATH;
 	redir.directive_ = re;
-	location_.insert(std::make_pair("redirect", redir));
+	location_.insert(std::make_pair("/redirect", redir));
 }
 
 Config::~Config()
@@ -116,7 +116,7 @@ std::string	Config::getRoot(std::string const &path) const
 	if (loc.pathType_ == CGI_PATH)
 		return (loc.directive_.getFirstValue(CGI_ROOT));
 	else if (loc.pathType_ == UPLOAD_PATH)
-		return (loc.directive_.getFirstValue(UPLOAD_ROOT));
+		return (root_ + loc.directive_.getFirstValue(UPLOAD_ROOT));
 	else
 		return (root_);
 }

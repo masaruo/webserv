@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 01:05:46 by mogawa            #+#    #+#             */
-/*   Updated: 2024/10/16 01:05:48 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 06:08:39 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,24 +19,38 @@
 #include <sstream>
 #include <unistd.h>// for access
 
-ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
+// ARequest::ARequest(Request const &request, Server &server)
+// :requestLine_(request.line_)
+// ,header_(request.header_)
+// ,body_(request.body_)
+// ,config_(server.getConfigFactory().getConfig(requestLine_.getUri().getHost()))
+// ,response_()
+// {
+// 	assertAllowedMethod();
+// 	assertRedirection();
+// 	return ;
+// }
+
+ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
 :requestLine_(line)
 ,header_(header)
 ,body_()
 ,config_(config)
 ,response_()
+,server_(server)
 {
 	assertAllowedMethod();
 	assertRedirection();
 	return ;
 }
 
-ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
+ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
 :requestLine_(line)
 ,header_(header)
 ,body_(body)
 ,config_(config)
 ,response_()
+,server_(server)
 {
 	assertAllowedMethod();
 	assertRedirection();
@@ -49,6 +63,7 @@ ARequest::ARequest(ARequest const &rhs)
 ,body_(rhs.body_)
 ,config_(rhs.config_)
 ,response_(rhs.response_)
+,server_(rhs.server_)
 {
 	return ;
 }
@@ -178,4 +193,9 @@ Response	ARequest::generateResponse(void) const
 		Response r(getResponseStatus(), getResponseHeader());
 		return (r);
 	}
+}
+
+Server	&ARequest::getServerReference(void)
+{
+	return (server_);
 }

@@ -8,7 +8,7 @@ private:
 	std::string	getIndexFileName(std::string const &path) const;
 	GetRequest();//=delete
 public:
-	explicit	GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
+	explicit	GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server);
 	~GetRequest();
 	GetRequest(GetRequest const &rhs);
 	GetRequest	&operator=(GetRequest const &rhs);

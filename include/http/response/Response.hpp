@@ -13,7 +13,6 @@ private:
 	HttpBody					body_;
 	bool						has_body_;
 
-	Response();//=delete
 
 	void		setStatus(HttpStatus const &code);
 	void		setHeader(HttpHeader const &inHeader);
@@ -21,6 +20,7 @@ private:
 	void		addMandetaryHeader(void);
 
 public:
+	Response();
 	explicit Response(HttpStatus const &status, HttpHeader const &header);
 	explicit Response(HttpStatus const &status, HttpHeader const &header, HttpBody const &body);
 	~Response();

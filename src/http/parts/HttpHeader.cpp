@@ -130,17 +130,34 @@ static void	assertHeaderValue(std::string const &a_value)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
-HttpHeader::HttpHeader(std::istringstream &iss)
-:vm::VecMap<std::string, std::string>()
+// HttpHeader::HttpHeader(std::istringstream &iss)
+// :vm::VecMap<std::string, std::string>()
+// {
+// 	std::string	line;
+// 	while (true)
+// 	{
+// 		std::getline(iss, line);
+// 		if (line == ft::string::CR)//!ヘッダーの最後（CRLFCRLF）だが、LFはGETLINEで削除される＝single CR
+// 			break ;
+// 		assertHeaderLine(line);
+// 		ft::string ftline = line;
+// 		ftline.trim(ft::string::CR);
+// 		addValue(ftline.str());
+// 	}
+// 	assertSemanticValue();
+// }
+
+HttpHeader::HttpHeader(std::string const &str)
 {
-	std::string	line;
+	std::istringstream	iss(str);
+	std::string			line;
 	while (true)
 	{
 		std::getline(iss, line);
-		if (line == ft::string::CR)//!ヘッダーの最後（CRLFCRLF）だが、LFはGETLINEで削除される＝single CR
+		if (line == ft::string::CR)
 			break ;
 		assertHeaderLine(line);
-		ft::string ftline = line;
+		ft::string	ftline = line;
 		ftline.trim(ft::string::CR);
 		addValue(ftline.str());
 	}

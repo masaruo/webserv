@@ -11,11 +11,11 @@ private:
 	ft::str_map	env_;
 
 	ft::str_map	getEnviron(void) const;
-	void	addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body, std::string const &local_path);
+	void	addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
 	void	addEnvItem(std::string const &key, std::string const &value);
 	Env();//=delete
 public:
-	explicit Env(RequestLine const &line, HttpHeader const &header, HttpBody const &body, std::string const &local_path);
+	explicit Env(RequestLine const &line, HttpHeader const &header, HttpBody const &body);
 	~Env();
 	Env(Env const &rhs);
 	Env &operator=(Env const &rhs);

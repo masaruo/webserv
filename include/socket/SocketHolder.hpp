@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   SocketHolder.class.hpp                             :+:      :+:    :+:   */
+/*   SocketHolder.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:38:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 14:02:00 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/11/29 09:54:18 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include <vector>
 #include <string>
+#include <sys/epoll.h>
 
 class ASocket;
 
@@ -31,10 +32,10 @@ private:
 public:
 	SocketHolder();
 	~SocketHolder();
-	void		addSocket(ASocket *socket);
-	void		checkTimeout(void);
-	void		markSocketDelete(ASocket *socket);
-	void		deleteSocketHolder(void);
-	void		deleteMarkedSocket(void);
+
+	void		add(ASocket *socket);
+	void		del(ASocket *socket);
+	void		deleteMarkedSockets(void);
+	// void		checkTimeout(void);
 	int			getSize(void) const;
 };

@@ -6,6 +6,7 @@
 #include "Config.hpp"
 
 class Response;
+class Server;
 
 class ARequest
 {
@@ -18,12 +19,19 @@ public:
 		bool		has_body_;
 		ResponseData():has_body_(false){};
 	};
+	struct Request
+	{
+		RequestLine	line_;
+		HttpHeader	header_;
+		HttpBody	body_;
+	};
 private:
 	RequestLine						requestLine_;
 	HttpHeader						header_;
 	HttpBody						body_;
 	config::Config					config_;
 	ResponseData					response_;
+	Server							&server_;
 
 	// helper function
 	config::Config::LocationConfig	setServerConfigLocation(void);
@@ -38,9 +46,11 @@ protected:
 	void							setResponseHeader(HttpHeader const &response_header);
 	void							setResponseBody(HttpBody const &response_body);
 	void							setResponseHasBody(bool hasBody);
+	Server							&getServerReference(void);
 public:
-	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config);
-	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config);
+	// explicit ARequest(Request const &request, Server &server);
+	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server);
+	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server);
 	virtual ~ARequest();
 	ARequest(ARequest const &rhs);
 	ARequest &operator=(ARequest const &rhs);

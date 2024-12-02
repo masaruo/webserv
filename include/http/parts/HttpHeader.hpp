@@ -39,7 +39,8 @@ private:
 	void	assertSemanticValue(void) const;
 public:
 	HttpHeader();
-	explicit HttpHeader(std::istringstream &iss);
+	// explicit HttpHeader(std::istringstream &iss);
+	explicit	HttpHeader(std::string const &str);
 	~HttpHeader();
 	HttpHeader(HttpHeader const &rhs);
 	HttpHeader &operator=(HttpHeader const &rhs);

@@ -1,39 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ClientSocket.class.hpp                             :+:      :+:    :+:   */
+/*   ClientSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/24 22:10:22 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/28 10:08:18 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
+/*   Updated: 2024/12/02 04:29:50 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#include "ASocket.class.hpp"
-#include "unique_ptr.hpp"
-#include "ARequest.hpp"
-#include "ConfigFactory.hpp"
-#include <ctime>
+#include "ASocket.hpp"
+#include "RequestFactory.hpp"
 
 class ClientSocket : public ASocket
 {
 private:
-	ft::unique_ptr<ARequest>	request_;
-	std::time_t					last_activity_;
-	std::time_t					timeout_;
+	RequestFactory	factory_;
+	std::string		data_;
 
-	int	acceptHandler(int listen_fd);
-	std::time_t	get_time(void) const;
 	ClientSocket();//=delete
 	ClientSocket(ClientSocket const &rhs);//=delete
 	ClientSocket &operator=(ClientSocket const &rhs);//=delete
+protected:
+	// virtual ARequest	*generateRequest(Server &server) const;
 public:
-	explicit ClientSocket(int listen_fd);
-	~ClientSocket();
-	void setSockaddr(void);//? need?
-	void	recv_handler(config::ConfigFactory const &config_factory);
-	void	set_time(void);
-	void	check_timeouts(void);
+	explicit ClientSocket(int fd, Server &server);
+	virtual ~ClientSocket();
+	virtual void	handleEvent(uint32_t event);
+	void			setData(std::string const &data);
 };

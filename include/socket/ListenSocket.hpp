@@ -1,28 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ListenSocket.class.hpp                             :+:      :+:    :+:   */
+/*   ListenSocket.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/24 18:44:49 by mogawa            #+#    #+#             */
-/*   Updated: 2024/07/24 22:10:09 by mogawa           ###   ########.fr       */
+/*   Created: 2024/10/31 07:35:20 by mogawa            #+#    #+#             */
+/*   Updated: 2024/11/28 01:43:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#include "ASocket.class.hpp"
+#include "ASocket.hpp"
 
 class ListenSocket : public ASocket
 {
 private:
-	int	const	listening_port_;
-	int	makeListenSocket(void);
 	ListenSocket();
 	ListenSocket(ListenSocket const &rhs);
 	ListenSocket &operator=(ListenSocket const &rhs);
 public:
-	explicit ListenSocket(int in_port);
+	explicit ListenSocket(int port, Server &server);
 	~ListenSocket();
-	void	setSockaddr(void);
+	void	handleEvent(uint32_t event);
 };

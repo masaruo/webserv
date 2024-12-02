@@ -4,6 +4,8 @@
 #include <set>
 #include <vector>
 #include <stdexcept>
+#include <sstream>
+#include <iostream>
 #include "HttpCode.hpp"
 #include "Parser.hpp"
 
@@ -105,5 +107,16 @@ public:
 	std::string		getErrorPage(HttpCode::StatusCode error_code) const;
 	std::string		getOtherDirective(DirectiveType type) const;
 	LocationConfig	getConfigLocation(std::string const &path) const;
+
+	// exception
+	class ConfigErrorException : public std::exception {
+		private:
+			std::string msg_;
+		public:
+			~ConfigErrorException() throw() {};
+			ConfigErrorException(size_t line);
+			ConfigErrorException(size_t line, std::string msg);
+			const char* what() const throw() { return msg_.c_str(); };
+	};
 };
 }

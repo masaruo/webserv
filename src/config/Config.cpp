@@ -175,17 +175,31 @@ Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 	// return (loc);
 }
 
-config::Config::Config(Parser& parse)
+config::Config::Config(Parser& parse) : port_(80)
 {
 	Config::setConfig(parse);
+}
+
+Config::ConfigErrorException::ConfigErrorException(size_t line)
+{
+    std::ostringstream ss;
+    ss << line;
+    msg_ = "invalid config:" + ss.str();
+}
+
+Config::ConfigErrorException::ConfigErrorException(size_t line, std::string msg)
+{
+    std::ostringstream ss;
+    ss << line;
+    msg_ = "invalid config " + msg + ss.str();
 }
 
 void	config::Config::setConfig(Parser& parse)
 {
 	if (parse.consume_token() != "server")
-        throw std::runtime_error("invalid config");
+		throw ConfigErrorException(parse.get_new_lile_num() + 1);
     if (parse.consume_token() != "{")
-        throw std::runtime_error("invalid config");
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \"{\":");
     while (parse.get_token() != "}" && parse.get_token() != "\0")
     {
 		if (!isPort(parse) \
@@ -194,10 +208,10 @@ void	config::Config::setConfig(Parser& parse)
 			&& !isMaxBodySize(parse) \
 			&& !isErrorPage(parse) \
 			&& !isLocation(parse))
-			throw std::runtime_error("invalid config");
+			throw ConfigErrorException(parse.get_new_lile_num() + 1, ":Not an element of Server:");
     }
     if (parse.consume_token() != "}")
-        throw std::runtime_error("invalid config");
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \"}\":");
 }
 
 void	config::Config::setServerName(std::string name)
@@ -218,7 +232,6 @@ void	config::Config::setRoot(std::string root)
 void	config::Config::setMaxBodySize(std::string size)
 {
 	others_.addValue(MAX_BODY_SIZE, size);
-	// max_body_size_ = size;
 }
 
 void	config::Config::setErrorPage(HttpCode::StatusCode code, std::string page)
@@ -237,7 +250,7 @@ bool	config::Config::isPort(Parser& parse)
     ss >> port;
 	setPort(port);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
     return true;
 }
 
@@ -248,7 +261,7 @@ bool	config::Config::isServerName(Parser& parse)
     parse.consume_token();
     setServerName(parse.consume_token());
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
     return true;
 }
 
@@ -257,12 +270,9 @@ bool	config::Config::isRoot(Parser& parse)
     if (parse.get_token() != "root")
         return false;
     parse.consume_token();
-	// std::cout << parse.get_token() << std::endl;
-	// if (!isnums(parse.get_token()))
-	// 	return false;
     setRoot(parse.consume_token());
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
     return true;
 }
 
@@ -277,7 +287,7 @@ bool	config::Config::isMaxBodySize(Parser& parse)
     size = parse.consume_token();
 	setMaxBodySize(size);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
     return true;
 }
 
@@ -295,7 +305,7 @@ bool	config::Config::isErrorPage(Parser& parse)
     std::string error_page = parse.consume_token();
     setErrorPage(HttpCode::StatusCode(code), error_page);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
     return true;
 }
 
@@ -309,7 +319,7 @@ void	config::Config::setLocation(Parser& parse, LocationConfig& location, std::s
 			&& !isUploadRoot(parse, location) \
 			&& !isCgiRoot(parse, location) \
 			&& !isRedirect(parse, location))
-			throw std::runtime_error("invalid config");
+			throw ConfigErrorException(parse.get_new_lile_num() + 1, ":Not an element of location:");
     }
 	location_.insert(std::make_pair(location_path, location));
 }
@@ -355,10 +365,10 @@ bool	config::Config::isLocation(Parser& parse)
 	std::string	location_path = parse.consume_token();
 	location.pathType_ = STATIC_PATH;
     if (parse.consume_token() != "{")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \"{\":");
 	setLocation(parse, location, location_path);
     if (parse.consume_token() != "}")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \"}\":");
 	return true;
 }
 
@@ -369,7 +379,7 @@ bool	config::Config::isIndex(Parser& parse, LocationConfig& location)
     parse.consume_token();
     setIndex(parse.consume_token(), location);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
     return true;
 }
 
@@ -381,7 +391,7 @@ bool	config::Config::isMethod(Parser& parse, LocationConfig& location)
 	while (parse.get_token() != ";" && parse.get_token() != "\0")
     	setMethod(parse.consume_token(), location);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
 	return true;
 }
 
@@ -392,7 +402,7 @@ bool	config::Config::isAoutIndex(Parser& parse, LocationConfig& location)
     parse.consume_token();
     setAoutIndex(parse.consume_token(), location);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
 	return true;
 }
 
@@ -403,7 +413,7 @@ bool	config::Config::isUploadRoot(Parser& parse, LocationConfig& location)
     parse.consume_token();
     setUploadRoot(parse.consume_token(), location);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
 	return true;
 }
 
@@ -414,7 +424,7 @@ bool	config::Config::isCgiRoot(Parser& parse, LocationConfig& location)
     parse.consume_token();
     setCgiRoot(parse.consume_token(), location);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
 	return true;
 }
 
@@ -426,7 +436,7 @@ bool	config::Config::isRedirect(Parser& parse, LocationConfig& location)
     setRedirect(parse.consume_token(), location);
     setRedirect(parse.consume_token(), location);
     if (parse.consume_token() != ";")
-        return false;
+        throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
 	return true;
 }
 

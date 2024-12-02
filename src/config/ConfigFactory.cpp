@@ -9,6 +9,8 @@ config::ConfigFactory::ConfigFactory(std::string const &config_path)
 	std::istreambuf_iterator<char> it(ifs);
     std::istreambuf_iterator<char> last;
     std::string str(it, last);
+	if (str == "\0")
+		throw std::invalid_argument("config file is empty.");
 
 	Parser parse(str);
 	while (parse.get_token() != "\0")
@@ -72,38 +74,48 @@ config::Config	config::ConfigFactory::getConfig(std::string const &server_name) 
 	return (configs_.front());
 }
 
-std::vector<std::size_t>	config::ConfigFactory::getAcceptedPorts(void) const
+std::vector<std::size_t> config::ConfigFactory::getAcceptedPorts(void) const
 {
-	std::vector<std::size_t> vec;
-	vec.push_back(8888);
-	vec.push_back(7777);
-	return (vec);
+	std::vector<size_t> ports;
+	for(size_t i = 0; i < configs_.size(); i++)
+		ports.push_back(configs_[i].getPort());
+
+	return (ports);
 }
 
 // int main()
 // {
-// 	config::ConfigFactory a("simple.conf");
+// 	try
+// 	{
+// 		config::ConfigFactory a("simple.conf");
+// 		// std::cout << a.getConfig("localhost").getServerName() << std::endl;
+// 		// std::cout << a.getConfig("2").getServerName() << std::endl;
+// 		// std::cout << std::endl;
 
-// 	std::cout << a.getConfig("localhost").getServerName() << std::endl;
-// 	std::cout << a.getConfig("2").getServerName() << std::endl;
-// 	std::cout << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/").pathType_ << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getFirstValue(config::Config::INDEX) << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getFirstValue(config::Config::ALLOWED_METHOD) << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getLastValue(config::Config::ALLOWED_METHOD) << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getFirstValue(config::Config::AUTOINDEX) << std::endl;
+		
+// 		// std::cout << std::endl;
 
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/").pathType_ << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getFirstValue(config::Config::INDEX) << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getFirstValue(config::Config::ALLOWED_METHOD) << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getLastValue(config::Config::ALLOWED_METHOD) << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/").directive_.getFirstValue(config::Config::AUTOINDEX) << std::endl;
-	
-// 	std::cout << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/uploads").pathType_ << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/uploads").directive_.getFirstValue(config::Config::ALLOWED_METHOD) << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/uploads").directive_.getFirstValue(config::Config::UPLOAD_ROOT) << std::endl;
+		
+// 		// std::cout << std::endl;
+		
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/redirect").pathType_ << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/redirect").directive_.getFirstValue(config::Config::REDIRECT_TO) << std::endl;
+// 		// std::cout << a.getConfig("localhost").getConfigLocation("/redirect").directive_.getLastValue(config::Config::REDIRECT_TO) << std::endl;
 
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/uploads").pathType_ << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/uploads").directive_.getFirstValue(config::Config::ALLOWED_METHOD) << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/uploads").directive_.getFirstValue(config::Config::UPLOAD_ROOT) << std::endl;
-	
-// 	std::cout << std::endl;
-	
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/redirect").pathType_ << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/redirect").directive_.getFirstValue(config::Config::REDIRECT_TO) << std::endl;
-// 	std::cout << a.getConfig("localhost").getConfigLocation("/redirect").directive_.getLastValue(config::Config::REDIRECT_TO) << std::endl;
-
+// 		std::vector<std::size_t> ports = a.getAcceptedPorts();
+// 		for (int i = 0; i < ports.size(); i++)
+// 			std::cout << ports[i] << std::endl;
+// 	}
+// 	catch(const std::exception& e)
+// 	{
+// 		std::cerr << e.what() << '\n';
+// 	}
 // }

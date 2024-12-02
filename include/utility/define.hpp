@@ -22,22 +22,22 @@ namespace ft
 	int			const	CHILDFD = 1;
 
 	// Socket State
-	enum State
-	{
-		PASSIVE,
-		DELETE,
-		RECV_REQUESTLINE,
-		RECV_HEADER,
-		RECV_BODY,
-		SEND,
-		CGI_INIT,
-		CGI_RECV,
-		CGI_SEND,
-		CGI_COMPLETE,
-		RESPONSE_READY,
-		PROCESSING,
-		IDLE,
-	};
+	// enum State
+	// {
+	// 	PASSIVE,
+	// 	DELETE,
+	// 	RECV_REQUESTLINE,
+	// 	RECV_HEADER,
+	// 	RECV_BODY,
+	// 	SEND,
+	// 	CGI_INIT,
+	// 	CGI_RECV,
+	// 	CGI_SEND,
+	// 	CGI_COMPLETE,
+	// 	RESPONSE_READY,
+	// 	PROCESSING,
+	// 	IDLE,
+	// };
 
 	// typedef
 	typedef std::vector<std::string>			str_vec;

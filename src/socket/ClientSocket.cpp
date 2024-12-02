@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/02 06:27:03 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/02 09:10:56 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ void	ClientSocket::handleEvent(uint32_t event)
 			catch (AResponseException const &e)
 			{
 				Response res = e.generateResponse();
+				data_ = res.to_string();
+				server_.mod(this, EPOLLOUT);
 			}
 			catch (HttpException const &e)
 			{
@@ -76,14 +78,28 @@ void	ClientSocket::handleEvent(uint32_t event)
 	}
 	else if (event == EPOLLOUT)
 	{
-		// todo chunk
-		std::string const &data = data_;
-		send(getFd(), data.c_str(), data.size(), 0);
-		// server_.del(this);
+		std::size_t	sendSize = std::min(data_.size(), ft::WRITE_BUF_SIZE);
+		try
+		{
+			ssize_t	bytes = ::send(getFd(), data_.c_str(), sendSize, 0);
+			if (bytes == -1)
+			{
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+			}
+			data_ = data_.substr(bytes);
+			if (data_.empty())
+			{
+				server_.mod(this, 0);
+			}
+		}
+		catch (std::exception const &e)
+		{
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		}
 		to_delete_ = true;
 	}
 	else
 	{
-		throw (std::runtime_error("Socket failed"));
+		throw (std::runtime_error("Socket failed"));//? where to pick up exception?
 	}
 }

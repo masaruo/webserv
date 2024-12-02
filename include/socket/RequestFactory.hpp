@@ -2,7 +2,7 @@
 #include "RequestLine.hpp"
 #include "HttpHeader.hpp"
 #include "HttpBody.hpp"
-#include "Request.hpp"
+#include "Server.hpp"
 
 class ARequest;
 

@@ -1,6 +1,8 @@
 #include "RequestFactory.hpp"
-#include "ARequest.hpp""
+#include "ARequest.hpp"
 #include "GetRequest.hpp"
+#include "PutRequest.hpp"
+#include "DeleteRequest.hpp"
 #include "Server.hpp"
 
 //! todo assertion such as allowed method?
@@ -225,8 +227,10 @@ ARequest	*RequestFactory::createRequest(Server &server) const
 
 	if (line_.getMethod() == "GET")
 		return (new GetRequest(line_, header_, config, server));
-	// else if (line_.getMethod() == "PUT")
-	// 	return (PutRequest(line_, header_, body_, server));
+	else if (line_.getMethod() == "PUT")
+		return (new PutRequest(line_, header_, body_, config, server));
+	else if (line_.getMethod() == "DELETE")
+		return (new DeleteRequest(line_, header_, config, server));
 	else
 		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
 }

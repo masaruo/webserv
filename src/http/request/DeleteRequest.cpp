@@ -8,7 +8,6 @@
 DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
 :ARequest(line, header, config, server)
 {
-	generateResponseData();
 	return ;
 }
 

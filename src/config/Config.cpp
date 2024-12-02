@@ -39,7 +39,7 @@ Config::Config(int flag)//!this is MOCK!
 	upload.addValue(ALLOWED_METHOD, "DELETE");
 	upload.addValue(ALLOWED_METHOD, "GET");
 	upload.addValue(AUTOINDEX, "on");
-	upload.addValue(UPLOAD_ROOT, "/webserv/www/uploadstore");//? have to create folder?
+	upload.addValue(UPLOAD_ROOT, "/storage");//? have to create folder?
 	LocationConfig	uploader;
 	uploader.pathType_ = UPLOAD_PATH;
 	uploader.directive_ = upload;
@@ -116,7 +116,7 @@ std::string	Config::getRoot(std::string const &path) const
 	if (loc.pathType_ == CGI_PATH)
 		return (loc.directive_.getFirstValue(CGI_ROOT));
 	else if (loc.pathType_ == UPLOAD_PATH)
-		return (loc.directive_.getFirstValue(UPLOAD_ROOT));
+		return (root_ + loc.directive_.getFirstValue(UPLOAD_ROOT));
 	else
 		return (root_);
 }

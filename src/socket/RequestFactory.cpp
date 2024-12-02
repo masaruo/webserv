@@ -1,4 +1,5 @@
 #include "RequestFactory.hpp"
+#include "ARequest.hpp""
 #include "GetRequest.hpp"
 #include "Server.hpp"
 
@@ -12,6 +13,7 @@ RequestFactory::RequestFactory()
 ,isRequestLineParsed_(false)
 ,isHeaderParsed_(false)
 ,isParseCompleted_(false)
+,isCgiRequest_(false)
 {
 	return ;
 }
@@ -29,6 +31,7 @@ RequestFactory::RequestFactory(RequestFactory const &rhs)
 ,isRequestLineParsed_(rhs.isRequestLineParsed_)
 ,isHeaderParsed_(rhs.isHeaderParsed_)
 ,isParseCompleted_(rhs.isParseCompleted_)
+,isCgiRequest_(rhs.isCgiRequest_)
 {
 	return ;
 }
@@ -44,8 +47,24 @@ RequestFactory &RequestFactory::operator=(RequestFactory const &rhs)
 		isRequestLineParsed_ = rhs.isRequestLineParsed_;
 		isHeaderParsed_ = rhs.isHeaderParsed_;
 		isParseCompleted_ = rhs.isParseCompleted_;
+		isCgiRequest_ = rhs.isCgiRequest_;
 	}
 	return (*this);
+}
+
+void	RequestFactory::checkIsCgiRequest(void)
+{
+	if (line_.getMethod() != "GET" && line_.getMethod() != "POST")
+		isCgiRequest_ = false;
+	else if (line_.getUri().getPath().find("/cgi-bin/") == std::string::npos)
+		isCgiRequest_ = false;
+	else
+		isCgiRequest_ = true;
+}
+
+bool	RequestFactory::isCgiRequest(void) const
+{
+	return (isCgiRequest_);
 }
 
 void	RequestFactory::parse(std::string const &data, ssize_t size)
@@ -63,6 +82,12 @@ void	RequestFactory::parse(std::string const &data, ssize_t size)
 			recv_required = parseBody();
 		else
 			throw (HttpException(HttpCode::BAD_REQUEST));
+	}
+	if (isParseCompleted_)
+	{
+		std::string const &hostValueFromHeader = header_.getFirstValue("host");
+		line_.getUriReference().updateWithHostHeader(hostValueFromHeader);
+		checkIsCgiRequest();
 	}
 }
 
@@ -191,10 +216,17 @@ HttpBody const		&RequestFactory::getBody(void) const
 	return (body_);
 }
 
-Request	RequestFactory::createRequest(Server &server) const
+ARequest	*RequestFactory::createRequest(Server &server) const
 {
 	if (!isParseCompleted_)
 		throw (HttpException(HttpCode::BAD_REQUEST));
+	
+	config::Config	config = server.getConfigFactory().getConfig(line_.getUri().getHost());
 
-	return (Request(line_, header_, body_, server));
+	if (line_.getMethod() == "GET")
+		return (new GetRequest(line_, header_, config, server));
+	// else if (line_.getMethod() == "PUT")
+	// 	return (PutRequest(line_, header_, body_, server));
+	else
+		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
 }

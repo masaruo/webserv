@@ -6,16 +6,19 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 09:58:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/02 06:27:03 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ClientSocket.hpp"
 #include "define.hpp"
 #include "Server.hpp"
+#include "ARequest.hpp"
+#include "Response.hpp"
+#include "AResponseException.hpp"
+#include "CgiSocket.hpp"
 
 #include <sys/epoll.h>
-#include "CgiSocket.hpp"
 
 ClientSocket::ClientSocket(int fd, Server &server)
 :ASocket(fd, server)
@@ -42,9 +45,33 @@ void	ClientSocket::handleEvent(uint32_t event)
 		factory_.parse(buf, bytes);
 		if (factory_.isParseCompleted())
 		{
-			server_.mod(this, 0);
-			// todo process request
-			CgiSocket	*cgi = new CgiSocket(this, factory_, server_);
+			try
+			{
+				if (factory_.isCgiRequest())
+				{
+					server_.mod(this, 0);
+					CgiSocket	*cgi = new CgiSocket(this, factory_, server_);
+				}
+				else
+				{
+					ARequest	*request = factory_.createRequest(server_);
+					request->generateResponseData();
+					Response res = request->generateResponse();
+					data_ = res.to_string();
+					server_.mod(this, EPOLLOUT);
+					delete request;
+				}
+			}
+			catch (AResponseException const &e)
+			{
+				Response res = e.generateResponse();
+			}
+			catch (HttpException const &e)
+			{
+				Response res = e.generateResponse();
+				data_ = res.to_string();
+				server_.mod(this, EPOLLOUT);
+			}
 		}
 	}
 	else if (event == EPOLLOUT)

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 05:57:07 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/02 04:29:50 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,10 @@ class ClientSocket : public ASocket
 private:
 	RequestFactory	factory_;
 	std::string		data_;
-	// IO							io_;
-	// // ARequest					*request_;
-	// Response					*response_;
 
-	ClientSocket();
-	ClientSocket(ClientSocket const &rhs);
-	ClientSocket &operator=(ClientSocket const &rhs);
+	ClientSocket();//=delete
+	ClientSocket(ClientSocket const &rhs);//=delete
+	ClientSocket &operator=(ClientSocket const &rhs);//=delete
 protected:
 	// virtual ARequest	*generateRequest(Server &server) const;
 public:

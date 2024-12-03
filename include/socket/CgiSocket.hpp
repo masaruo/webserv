@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 09:23:42 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/03 06:04:43 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ private:
 	int				sockfd_[2];
 
 	void	setupSocketPair(void);
-	void	setupCGI(void);
 	void	execChild(int fd[2]);
 	void	execParent(int fd);
 
@@ -37,7 +36,7 @@ private:
 	CgiSocket &operator=(CgiSocket const &rhs);
 public:
 	explicit	CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server);
-	// explicit CgiSocket(Env const &env, std::string const &script_path, std::string const &request_body, Server &server);
 	~CgiSocket();
+	void	handleCgiExecution(void);
 	void	handleEvent(uint32_t event);
 };

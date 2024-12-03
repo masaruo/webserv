@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CgiSoket.cpp                                       :+:      :+:    :+:   */
+/*   CgiSocket.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 09:57:28 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/03 07:52:01 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,15 @@
 #include "define.hpp"
 #include "Server.hpp"
 #include "Env.hpp"
-// #include <sys/epoll.h>
+#include "UriNormalizer.hpp"
+#include "FileHandler.hpp"
+#include "string.hpp"
 #include <sys/wait.h>
 #include <cstring>//strcpy
-// #include <cstdlib>
 #include <unistd.h>
-// #include "HttpException.hpp"
-// #include "Env.hpp"
-// #include "string.hpp"
-// #include "Server.hpp"
-#include "Fcntl.class.hpp"
+#include <fcntl.h>
 
 int const	CgiSocket::INTERNAL_SERVER_ERROR = 50;
-
-static void	assert_wait_(pid_t child_pid)
-{
-	int	status;
-	pid_t	res = waitpid(child_pid, &status, WNOHANG);
-	if (res == child_pid)
-	{
-		if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-		{
-			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-		}
-	}
-}
 
 CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server)
 :ASocket(-1, server)
@@ -47,9 +31,9 @@ CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server
 ,child_pid_(-1)
 ,data_()
 {
+	setAddr(parent->getAddr());
 	sockfd_[ft::PARENTFD] = -1;
 	sockfd_[ft::CHILDFD] = -1;
-	setupCGI();
 	return ;
 }
 
@@ -58,21 +42,24 @@ CgiSocket::~CgiSocket()
 	if (sockfd_[ft::PARENTFD] > 2)
 	{
 		close(sockfd_[ft::PARENTFD]);
-		fd_ = -1;
+		setFd(-1);
 	}
 	if (sockfd_[ft::CHILDFD] > 2)
 		close(sockfd_[ft::CHILDFD]);
 	return ;
 }
 
-void	CgiSocket::setupCGI(void)
+void	CgiSocket::handleCgiExecution(void)
 {
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfd_) == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	ft::Fcntl::setNonBlock(sockfd_[ft::PARENTFD]);
-	fd_ = sockfd_[ft::PARENTFD];
+	if (fcntl(sockfd_[ft::PARENTFD], F_SETFL, O_NONBLOCK) == -1)
+	{
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
+	setFd(sockfd_[ft::PARENTFD]);
 
 	child_pid_ = fork();
 	if (child_pid_ == ft::err)
@@ -103,6 +90,17 @@ static char	**generateArgv(std::string const &uri)
 	return (argv);
 }
 
+static void assertCgiPath(std::string const &dir, std::string const &file)
+{
+	std::string const pathWithRoot = dir + "/" + file;
+	if (!FileHandler::checkPathExist(dir))
+		throw (HttpException(HttpCode::NOT_FOUND));
+	if (!FileHandler::checkIfFile(pathWithRoot))
+		throw (HttpException(HttpCode::CONFLICT));
+	if (access(pathWithRoot.c_str(), X_OK) == -1)
+		throw (HttpException(HttpCode::FORBIDDEN));
+}
+
 void	CgiSocket::execChild(int sockfd[2])
 {
 	if (close(sockfd[ft::PARENTFD]) == -1)
@@ -113,29 +111,47 @@ void	CgiSocket::execChild(int sockfd[2])
 		std::exit(INTERNAL_SERVER_ERROR);
 	if (close(sockfd[ft::CHILDFD]) == -1)
 		std::exit(INTERNAL_SERVER_ERROR);
-	// if (chdir(script_path_.c_str()) == -1)
-	// 	std::exit(INTERNAL_SERVER_ERROR);
 	
-	// ft::string const &path(script_path_);
-	// ft::string::string_vector	split_by_slash = path.split("/");
-	// ft::string const &filename = split_by_slash.back();
-
-	// std::string const &path = factory_.getRequestLine().getUri().getPath();
-	// config::ConfigFactory &loc = server_.getConfigFactory().getConfig().getConfigLocation(path);
-	std::string chdir_target = "/webserv/cgi-bin";//todo get from config
-	if (chdir(chdir_target.c_str()) == -1)
+	HttpUri const &uri = factory_.getRequestLine().getUri();
+	config::Config const &config = server_.getConfigFactory().getConfig(uri.getHost());
+	std::string const &cgiPath = config.getConfigLocation(uri.getPath()).directive_.getFirstValue(config::Config::CGI_ROOT);
+	// std::string const &cgiDir = uri.getPathInfo().directory_;
+	// std::string const &cgiPath = cgiRoot + cgiDir;
+	std::string const &scriptName = uri.getPathInfo().fileName_;
+	assertCgiPath(cgiPath, scriptName);
+	if (chdir(cgiPath.c_str()) == -1)
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
-
 	Env env(factory_.getRequestLine(), factory_.getHeader(), factory_.getBody());
+	uint32_t const ip = ntohl(getAddr().sin_addr.s_addr);
+	std::stringstream ip_ss;
+	ip_ss << ((ip >> 24) & 0xFF) << '.' << ((ip >> 16) & 0xFF) << '.' << ((ip >> 8) & 0xFF) << '.' << (ip & 0xFF);
+	env.addEnvItem("remote_addr", ip_ss.str());
 
-	std::string const &filename = "echo.py";//todo get from config
+	// ft::string const &path = getCgiPath();
+	// ft::string::string_vector	split_by_slash = path.split("/");
+	// ft::string const &filename = split_by_slash.back();
+	// split_by_slash.pop_back();
+	// ft::string const &chdir_target = ft::reverse_split(split_by_slash, '/');
+
+	// std::string const &path = factory_.getRequestLine().getUri().getPath();
+	// config::ConfigFactory &loc = server_.getConfigFactory().getConfig().getConfigLocation(path);
+	// std::string chdir_target = "/webserv/cgi-bin";//todo get from config
+
+	// if (chdir(chdir_target.c_str()) == -1)
+	// {
+	// 	std::exit(INTERNAL_SERVER_ERROR);
+	// }
+
+	// Env env(factory_.getRequestLine(), factory_.getHeader(), factory_.getBody(), getAddr());
+
+	// std::string const &filename = "echo.py";//todo get from config
 	// std::string const &filename = factory_.getRequestLine().getUri().getPathInfo().fileName_;
 	char	**argv;
 	try
 	{
-		argv = generateArgv(filename);
+		argv = generateArgv(scriptName);
 	}
 	catch(std::bad_alloc const &e)
 	{
@@ -146,6 +162,7 @@ void	CgiSocket::execChild(int sockfd[2])
 
 	std::exit(INTERNAL_SERVER_ERROR);
 }
+
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
@@ -161,7 +178,7 @@ void	CgiSocket::handleEvent(uint32_t event)
 	}
 	else if (event & (EPOLLIN | EPOLLHUP))
 	{
-	 	bytes = recv(fd_, buf, sizeof(buf), 0);
+	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
 		if (bytes <= 0)
 		{
 			int status;
@@ -169,9 +186,10 @@ void	CgiSocket::handleEvent(uint32_t event)
 			if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 				data_ = "Status: 500 Internal Server Error\r\n\r\n";
 			}
+			//todo assert data from child
 			parent_socket_->setData(data_);
 			server_.mod(parent_socket_, EPOLLOUT);
-			to_delete_ = true;
+			setSocketAsClose();
 			return;
 		}
 		data_.append(buf, bytes);

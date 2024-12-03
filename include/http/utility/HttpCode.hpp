@@ -79,7 +79,7 @@ public:
 		NETWORK_AUTHENTICATION_REQUIRED = 511,
 
 		// custom
-		INVALID_IN_WEBSERV = 1000,
+		INVALID_IN_WEBSERV = 1000
 	};
 private:
 	static std::map<StatusCode, std::string>	StatusCodeMap_;

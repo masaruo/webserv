@@ -1,5 +1,5 @@
 server {
-    listen 80;
+    listen 8888;
     server_name _;
 
     root /webserv/www/html;

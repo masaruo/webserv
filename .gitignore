@@ -22,4 +22,5 @@ obj/*
 
 asset/*
 googletest
+config.md
 

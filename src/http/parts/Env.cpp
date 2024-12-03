@@ -56,10 +56,10 @@ void	Env::addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody 
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);
 	addEnvItem("query_string", uri.getRawQueryString());
-	addEnvItem("remote_addr", "");//!Must todo
-	addEnvItem("remote_host", "");
-	addEnvItem("remote_ident", "");
-	addEnvItem("remote_user", "");
+	// addEnvItem("remote_addr", "");//!Must todo
+	// addEnvItem("remote_host", "");
+	// addEnvItem("remote_ident", "");
+	// addEnvItem("remote_user", "");
 	addEnvItem("request_method", line.getMethod());
 	addEnvItem("script_name", scriptName);
 	addEnvItem("server_name", uri.getHost());

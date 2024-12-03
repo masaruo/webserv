@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/02 09:10:56 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/03 06:13:18 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ ClientSocket::ClientSocket(int fd, Server &server)
 
 ClientSocket::~ClientSocket()
 {
-	// delete request_;
+	return ;
 }
 
 void	ClientSocket::setData(std::string const &data)//todo delete
@@ -51,6 +51,7 @@ void	ClientSocket::handleEvent(uint32_t event)
 				{
 					server_.mod(this, 0);
 					CgiSocket	*cgi = new CgiSocket(this, factory_, server_);
+					cgi->handleCgiExecution();
 				}
 				else
 				{

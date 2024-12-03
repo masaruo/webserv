@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 09:55:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/03 06:06:56 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,26 @@ ASocket::~ASocket()
 	if (fd_ > 2)
 		close (fd_);
 	return ;
+}
+
+void	ASocket::setFd(int fd)
+{
+	fd_ = fd;
+}
+
+void	ASocket::setAddr(sockaddr_in const &addr)
+{
+	addr_ = addr;
+}
+
+void ASocket::setSocketAsClose(void)
+{
+	to_delete_ = true;
+}
+
+sockaddr_in const &ASocket::getAddr(void) const
+{
+	return (addr_);
 }
 
 int	ASocket::getFd(void) const

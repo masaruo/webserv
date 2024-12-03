@@ -14,13 +14,13 @@ def debug_print():
 
 def get_form_data():
     method = os.environ.get("request_method", "").upper()
-    print(f"Method: {method}", file=sys.stderr)
+    # print(f"Method: {method}", file=sys.stderr)
 
     if method == "POST":
         try:
             length = int(os.environ.get("content_length", 0))
             body = sys.stdin.read(length)
-            print(f"Length: {length}, Body: {body}", file=sys.stderr)
+            # print(f"Length: {length}, Body: {body}", file=sys.stderr)
             return parse_qs(body), method
         except Exception as e:
             raise RuntimeError(f"Failed to read POST data: {e}")

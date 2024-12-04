@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/03 07:52:01 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 04:33:49 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server
 ,parent_socket_(parent)
 ,factory_(factory)
 ,child_pid_(-1)
-,data_()
+,recv_buf_()
 {
 	setAddr(parent->getAddr());
 	sockfd_[ft::PARENTFD] = -1;
@@ -60,6 +60,8 @@ void	CgiSocket::handleCgiExecution(void)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 	setFd(sockfd_[ft::PARENTFD]);
+
+	send_buf_ = factory_.getBody().c_str();
 
 	child_pid_ = fork();
 	if (child_pid_ == ft::err)
@@ -123,31 +125,13 @@ void	CgiSocket::execChild(int sockfd[2])
 	{
 		std::exit(INTERNAL_SERVER_ERROR);
 	}
+
 	Env env(factory_.getRequestLine(), factory_.getHeader(), factory_.getBody());
 	uint32_t const ip = ntohl(getAddr().sin_addr.s_addr);
 	std::stringstream ip_ss;
 	ip_ss << ((ip >> 24) & 0xFF) << '.' << ((ip >> 16) & 0xFF) << '.' << ((ip >> 8) & 0xFF) << '.' << (ip & 0xFF);
 	env.addEnvItem("remote_addr", ip_ss.str());
 
-	// ft::string const &path = getCgiPath();
-	// ft::string::string_vector	split_by_slash = path.split("/");
-	// ft::string const &filename = split_by_slash.back();
-	// split_by_slash.pop_back();
-	// ft::string const &chdir_target = ft::reverse_split(split_by_slash, '/');
-
-	// std::string const &path = factory_.getRequestLine().getUri().getPath();
-	// config::ConfigFactory &loc = server_.getConfigFactory().getConfig().getConfigLocation(path);
-	// std::string chdir_target = "/webserv/cgi-bin";//todo get from config
-
-	// if (chdir(chdir_target.c_str()) == -1)
-	// {
-	// 	std::exit(INTERNAL_SERVER_ERROR);
-	// }
-
-	// Env env(factory_.getRequestLine(), factory_.getHeader(), factory_.getBody(), getAddr());
-
-	// std::string const &filename = "echo.py";//todo get from config
-	// std::string const &filename = factory_.getRequestLine().getUri().getPathInfo().fileName_;
 	char	**argv;
 	try
 	{
@@ -166,15 +150,20 @@ void	CgiSocket::execChild(int sockfd[2])
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
-	char buf[2043];
+	char buf[ft::READ_BUF_SIZE];
 	ssize_t bytes;
 
 	if (event & EPOLLOUT)
 	{
-		//todo change to chunk or large file
-		std::string const &body = factory_.getBody().c_str();
-		send(getFd(), body.c_str(), body.size(), 0);
-		server_.mod(this, EPOLLIN);
+		if (send_buf_.empty())
+		{
+			server_.mod(this, EPOLLIN);
+			return ;
+		}
+		bytes = send(getFd(), send_buf_.c_str(), send_buf_.size(), 0);
+		if (bytes <= 0)
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		send_buf_ = send_buf_.substr(bytes);
 	}
 	else if (event & (EPOLLIN | EPOLLHUP))
 	{
@@ -184,15 +173,15 @@ void	CgiSocket::handleEvent(uint32_t event)
 			int status;
 			waitpid(child_pid_, &status, WNOHANG);
 			if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-				data_ = "Status: 500 Internal Server Error\r\n\r\n";
+				recv_buf_ = "Status: 500 Internal Server Error\r\n\r\n";
 			}
 			//todo assert data from child
-			parent_socket_->setData(data_);
+			parent_socket_->setData(recv_buf_);
 			server_.mod(parent_socket_, EPOLLOUT);
 			setSocketAsClose();
 			return;
 		}
-		data_.append(buf, bytes);
+		recv_buf_.append(buf, bytes);
 	}
 	else
 	{

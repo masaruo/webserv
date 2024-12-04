@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:35:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/28 01:43:33 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:06:41 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,6 @@ private:
 public:
 	explicit ListenSocket(int port, Server &server);
 	~ListenSocket();
+	bool	isObsolete(void) const;
 	void	handleEvent(uint32_t event);
 };

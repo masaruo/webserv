@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 03:52:05 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 09:55:59 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:41:11 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ private:
 	Server();
 	Server(Server const &rhs);
 	Server &operator=(Server const &rhs);
-	void						cleanUp(void);
 public:
 	Server(std::string const &config_path);
 	~Server();
@@ -42,6 +41,5 @@ public:
 	config::ConfigFactory const	&getConfigFactory(void) const;
 	void						add(ASocket *socket, uint32_t event);
 	void						mod(ASocket *socket, uint32_t event);
-	void						del(ASocket *socket);
 	void						run(void);
 };

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/03 06:13:55 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:06:41 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ private:
 public:
 	explicit ClientSocket(int fd, Server &server);
 	virtual ~ClientSocket();
+	bool			isObsolete(void) const;
 	virtual void	handleEvent(uint32_t event);
 	void			setData(std::string const &data);
 };

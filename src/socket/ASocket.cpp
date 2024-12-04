@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/03 06:06:56 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:16:40 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 #include <unistd.h>
 
 ASocket::ASocket(int fd, Server &server)
-:fd_(fd)
+:addr_()
+,fd_(fd)
 ,server_(server)
+,last_active_time_(0)
 ,to_delete_(false)
 {
 	return ;
@@ -44,6 +46,14 @@ void ASocket::setSocketAsClose(void)
 	to_delete_ = true;
 }
 
+void	ASocket::updateLastActiveTime(void)
+{
+	time_t	now = time(NULL);
+	if (now == -1)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	last_active_time_ = now;
+}
+
 sockaddr_in const &ASocket::getAddr(void) const
 {
 	return (addr_);
@@ -52,6 +62,11 @@ sockaddr_in const &ASocket::getAddr(void) const
 int	ASocket::getFd(void) const
 {
 	return (fd_);
+}
+
+void	ASocket::markSocketDelete(void)
+{
+	to_delete_ = true;
 }
 
 bool	ASocket::toDelete(void) const

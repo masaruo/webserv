@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 09:55:59 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:53:46 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	Server::epollWait(void)
 {
 	int	const	size = holder_.getSize();
 	eventQueue_.resize(size);
-	int	ev_num = epoll_wait(epollFd_, eventQueue_.data(), size, ft::TIMEOUT);//todo timeout
+	int	ev_num = epoll_wait(epollFd_, eventQueue_.data(), size, 0);
 	if (ev_num == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
@@ -91,68 +91,18 @@ void	Server::mod(ASocket *socket, uint32_t event)
 	}
 }
 
-void	Server::del(ASocket *socket)
-{
-	int	res = epoll_ctl(epollFd_, EPOLL_CTL_DEL, socket->getFd(), NULL);
-	if (res == -1)
-	{
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	}
-	holder_.del(socket);
-}
-
-void Server::cleanUp(void)
-{
-	holder_.deleteMarkedSockets();
-}
-
 void	Server::run(void)
 {
 	while (true)
 	{
-		cleanUp();
+		holder_.cleanUpSockets();
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
 		{
 			uint32_t	ev = eventQueue_[i].events;
 			ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
 			socket->handleEvent(ev);
+			socket->updateLastActiveTime();
 		}
 	}
-
-
-	// while (true)
-	// {
-	// 	holder_.deleteMarkedSocket();
-	// 	int	event_num = epollWait();
-	// 	for (int i = 0; i < event_num; i++)
-	// 	{
-	// 		uint32_t	ev = eventQueue_[i].events;
-	// 		ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
-	// 		if (ev & EPOLLERR)
-	// 		{
-	// 			deleteSocket(socket);
-	// 		}
-	// 		else if (ev & EPOLLHUP)
-	// 		{
-	// 			if (socket->getState() == ft::CGI_COMPLETE)
-	// 			{
-	// 				socket->execute();
-	// 			}
-	// 			deleteSocket(socket);
-	// 		}
-	// 		else
-	// 		{
-	// 			try
-	// 			{
-	// 				socket->execute();
-	// 			}
-	// 			catch(const std::exception& e)
-	// 			{
-	// 				deleteSocket(socket);
-	// 				continue ;
-	// 			}
-	// 		}
-	// 	}
-	// }
 }

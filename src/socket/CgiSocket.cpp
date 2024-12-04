@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 05:06:20 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 09:12:19 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server
 	setAddr(parent->getAddr());
 	sockfd_[ft::PARENTFD] = -1;
 	sockfd_[ft::CHILDFD] = -1;
+	updateLastActiveTime();
 	return ;
 }
 
@@ -147,6 +148,16 @@ void	CgiSocket::execChild(int sockfd[2])
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
+bool	CgiSocket::isObsolete(void) const
+{
+	time_t	now = time(NULL);
+	if (now == -1)
+		return (true);
+	else if (now > last_active_time_ + ft::TIMEOUT_CGI_SEC)
+		return (true);
+	else
+		return (false);
+}
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
@@ -176,6 +187,7 @@ void	CgiSocket::handleEvent(uint32_t event)
 				recv_buf_ = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
 			recv_buf_ = "HTTP/1.1 200 OK\r\n" + recv_buf_;
 			parent_socket_->setData(recv_buf_);
+			parent_socket_->updateLastActiveTime();
 			server_.mod(parent_socket_, EPOLLOUT);
 			setSocketAsClose();
 			return;

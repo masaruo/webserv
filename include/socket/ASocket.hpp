@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/03 06:05:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:06:42 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ private:
 protected:
 	int			fd_;
 	Server		&server_;
+	time_t		last_active_time_;
 	bool		to_delete_;
 	void		setFd(int fd);
 	void		setAddr(sockaddr_in const &addr);
@@ -36,5 +37,8 @@ public:
 	sockaddr_in const &getAddr(void) const;
 	int				getFd(void) const;
 	bool			toDelete(void) const;
+	void			updateLastActiveTime(void);
+	void			markSocketDelete(void);
+	virtual bool	isObsolete(void) const = 0;
 	virtual void	handleEvent(uint32_t event) = 0;
 };

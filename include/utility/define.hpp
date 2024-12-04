@@ -11,35 +11,18 @@ namespace ft
 	int const			eof = 0;
 	int const			err = -1;
 	int			const	MAX_SOCKET_NUM = 1000;
-	std::size_t const	MAX_BODY_SIZE = 600000;
+	std::size_t const	MAX_BODY_SIZE = 600000000;
 	std::size_t const	MAX_FIELD_LEN = 4000;
 	std::size_t const	MAX_HEADERS_NUM = 100;
 	std::size_t const	URI_MAX_LEN = 8000;
 	std::size_t const	READ_BUF_SIZE = 4000;
 	std::size_t const	WRITE_BUF_SIZE = 8000;
-	std::size_t const	TIMEOUT = 20;
 	int			const	PARENTFD = 0;
 	int			const	CHILDFD = 1;
+	time_t		const	TIMEOUT_SEC = 30;
+	time_t		const	TIMEOUT_CGI_SEC = 20;
 
-	// Socket State
-	// enum State
-	// {
-	// 	PASSIVE,
-	// 	DELETE,
-	// 	RECV_REQUESTLINE,
-	// 	RECV_HEADER,
-	// 	RECV_BODY,
-	// 	SEND,
-	// 	CGI_INIT,
-	// 	CGI_RECV,
-	// 	CGI_SEND,
-	// 	CGI_COMPLETE,
-	// 	RESPONSE_READY,
-	// 	PROCESSING,
-	// 	IDLE,
-	// };
 
-	// typedef
 	typedef std::vector<std::string>			str_vec;
 	typedef std::map<std::string, std::string>	str_map;
 

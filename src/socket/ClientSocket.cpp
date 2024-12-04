@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/03 06:13:18 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:15:22 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 ClientSocket::ClientSocket(int fd, Server &server)
 :ASocket(fd, server)
 {
+	updateLastActiveTime();
 	return ;
 }
 
@@ -34,6 +35,17 @@ ClientSocket::~ClientSocket()
 void	ClientSocket::setData(std::string const &data)//todo delete
 {
 	data_ = data;
+}
+
+bool	ClientSocket::isObsolete(void) const
+{
+	time_t	now = time(NULL);
+	if (now == -1)
+		return (true);
+	else if (now > last_active_time_ + ft::TIMEOUT_SEC)
+		return (true);
+	else
+		return (false);
 }
 
 void	ClientSocket::handleEvent(uint32_t event)
@@ -85,16 +97,19 @@ void	ClientSocket::handleEvent(uint32_t event)
 			ssize_t	bytes = ::send(getFd(), data_.c_str(), sendSize, 0);
 			if (bytes == -1)
 			{
+				to_delete_ = true;
 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 			data_ = data_.substr(bytes);
 			if (data_.empty())
 			{
-				server_.mod(this, 0);
+				to_delete_ = true;
+				// server_.mod(this, 0);
 			}
 		}
 		catch (std::exception const &e)
 		{
+			to_delete_ = true;
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		to_delete_ = true;

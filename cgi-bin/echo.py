@@ -30,7 +30,6 @@ def get_form_data():
         raise RuntimeError(f"Unsupported method: {method}")
 
 def process_form():
-    print("HTTP/1.1 200 OK\r\n", flush=True)#! move to Response
     print("Content-Type: text/html\r\n\r\n", flush=True)
     try:
         # debug_print()

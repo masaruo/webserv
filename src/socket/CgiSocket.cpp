@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 04:33:49 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 05:06:20 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,8 +150,7 @@ void	CgiSocket::execChild(int sockfd[2])
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
-	char buf[ft::READ_BUF_SIZE];
-	ssize_t bytes;
+	ssize_t bytes = 0;
 
 	if (event & EPOLLOUT)
 	{
@@ -167,15 +166,15 @@ void	CgiSocket::handleEvent(uint32_t event)
 	}
 	else if (event & (EPOLLIN | EPOLLHUP))
 	{
+		char buf[ft::READ_BUF_SIZE];
 	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
 		if (bytes <= 0)
 		{
 			int status;
 			waitpid(child_pid_, &status, WNOHANG);
-			if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-				recv_buf_ = "Status: 500 Internal Server Error\r\n\r\n";
-			}
-			//todo assert data from child
+			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+				recv_buf_ = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+			recv_buf_ = "HTTP/1.1 200 OK\r\n" + recv_buf_;
 			parent_socket_->setData(recv_buf_);
 			server_.mod(parent_socket_, EPOLLOUT);
 			setSocketAsClose();

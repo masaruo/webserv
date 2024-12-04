@@ -48,10 +48,10 @@ void	Env::addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody 
 	if (body.empty())
 		contentLen = "0";
 	else
-		contentLen = body.getSizeStr();
+		contentLen = body.size();
 
 	addEnvItem("auth_type", "");
-	addEnvItem("content_length", body.getSizeStr());
+	addEnvItem("content_length", body.size());
 	addEnvItem("content_type", contentType);
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);

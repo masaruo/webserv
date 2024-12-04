@@ -98,8 +98,8 @@ void	GetRequest::generateResponseData(void)
 	HttpBody body(FileHandler::read(abspath));//! read
 
 	HttpHeader	header;
-	header.addValue(HttpHeader::CONTENT_TYPE, "text/html");
-	header.addValue(HttpHeader::CONTENT_LENGTH, body.getSizeStr());
+	header.addValue(HttpHeader::CONTENT_TYPE, "text/html");//? how to get content-type???
+	header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
 
 	HttpStatus	status(HttpCode::OK);
 

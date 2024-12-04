@@ -61,7 +61,7 @@ Response	AutoIndexException::generateResponse(void) const
 
 	HttpHeader header;
 	header.addValue(HttpHeader::CONTENT_TYPE, "text/plain");
-	header.addValue(HttpHeader::CONTENT_LENGTH, body.getSizeStr());
+	header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
 	header.addValue(HttpHeader::CONNECTION, "close");
 
 	Response	r(status, header, body);

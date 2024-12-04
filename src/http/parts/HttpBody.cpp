@@ -2,13 +2,9 @@
 #include "HttpException.hpp"
 #include "define.hpp"
 
-std::string	HttpBody::checkBodyLen(std::string const &body)
+static std::string	assertBodyLength_(std::string const &body)
 {
-	bool	is_valid = true;
-
 	if (body.size() > ft::MAX_BODY_SIZE)
-		is_valid = false;
-	if (!is_valid)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	else
 		return (body);
@@ -21,7 +17,7 @@ HttpBody::HttpBody()
 }
 
 HttpBody::HttpBody(std::string const &str)
-:data_(checkBodyLen(str))
+:data_(assertBodyLength_(str))
 {
 	return ;
 }
@@ -61,7 +57,7 @@ std::size_t	HttpBody::getSize(void) const
 	return (data_.size());
 }
 
-std::string	HttpBody::getSizeStr(void) const
+std::string	HttpBody::size(void) const
 {
 	std::size_t const	size = getSize();
 	std::string sizeStr;

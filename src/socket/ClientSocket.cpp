@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:15:22 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 23:50:20 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,6 @@ void	ClientSocket::handleEvent(uint32_t event)
 			if (data_.empty())
 			{
 				to_delete_ = true;
-				// server_.mod(this, 0);
 			}
 		}
 		catch (std::exception const &e)
@@ -112,7 +111,6 @@ void	ClientSocket::handleEvent(uint32_t event)
 			to_delete_ = true;
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
-		to_delete_ = true;
 	}
 	else
 	{

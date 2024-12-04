@@ -59,7 +59,7 @@ HttpBody	HttpException::generateBody(void) const
 	{
 		errorPath = root_ + errorPageMap_.at(errorCode_);
 	}
-	std::string contents = FileHandler::read(errorPath);//todo sstream
+	std::string contents = FileHandler::read(errorPath);
 	HttpBody body(contents);
 	return (body);
 }
@@ -71,7 +71,7 @@ Response	HttpException::generateResponse(void) const
 
 	HttpHeader	header;
 	header.addValue("content-type", "text/html");
-	header.addValue("content-length", body.getSizeStr());
+	header.addValue("content-length", body.size());
 
 	HttpStatus	status(errorCode_);
 

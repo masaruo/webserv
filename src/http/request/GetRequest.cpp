@@ -100,7 +100,7 @@ void	GetRequest::generateResponseData(void)
 
 	std::string const &abspath = setLocalPath();
 
-	HttpBody body(FileHandler::read(abspath));//! read
+	HttpBody body(FileHandler::read(abspath));
 
 	HttpHeader	header;
 	header.addValue(HttpHeader::CONTENT_TYPE, "text/html");//? how to get content-type???

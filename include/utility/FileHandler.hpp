@@ -15,7 +15,6 @@ public:
 	static int const	ISFILE = 2;
 	static int const	FILE_EXIST = 3;
 	static std::string	read(std::string const &path);
-	// static std::string	read(int fd);
 	static bool			checkPathExist(std::string const &path);
 	static bool			checkIfDirectory(std::string const &path);
 	static bool			checkIfFile(std::string const &path);

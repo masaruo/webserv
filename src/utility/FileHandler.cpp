@@ -56,7 +56,7 @@ std::string FileHandler::read(std::string const &path)
 // 	return (result);
 // }
 
-int	xstat(std::string const &path)
+static int	xstat(std::string const &path)
 {
 	struct stat	buf;
 

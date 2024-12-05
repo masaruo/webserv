@@ -224,6 +224,7 @@ ARequest	*RequestFactory::createRequest(Server &server) const
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	
 	config::Config	config = server.getConfigFactory().getConfig(line_.getUri().getHost());
+	HttpException::loadErrorPageMap(config);
 
 	if (line_.getMethod() == "GET")
 		return (new GetRequest(line_, header_, config, server));

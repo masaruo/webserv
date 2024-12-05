@@ -51,7 +51,7 @@ HttpBody	HttpException::generateBody(void) const
 	if (it == end)
 	{
 		if (isInitialized_)
-			errorPath = root_ + default_error_page_;
+			errorPath = root_ + default_error_page_;//! no data on root. init not working
 		else
 			errorPath = initial_error_page_;
 	}

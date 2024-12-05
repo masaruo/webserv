@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:06:42 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 23:57:40 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ protected:
 	void		setSocketAsClose(void);
 public:
 	explicit	ASocket(int fd, Server &server);
+	explicit	ASocket(sockaddr_in const &addr, int fd, Server &server);
 	virtual		~ASocket();
 
 	sockaddr_in const &getAddr(void) const;

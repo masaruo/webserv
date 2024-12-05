@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:16:40 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 23:57:49 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,16 @@
 
 ASocket::ASocket(int fd, Server &server)
 :addr_()
+,fd_(fd)
+,server_(server)
+,last_active_time_(0)
+,to_delete_(false)
+{
+	return ;
+}
+
+ASocket::ASocket(sockaddr_in const &addr, int fd, Server &server)
+:addr_(addr)
 ,fd_(fd)
 ,server_(server)
 ,last_active_time_(0)

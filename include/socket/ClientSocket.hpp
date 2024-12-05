@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:06:41 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 23:57:32 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ private:
 	ClientSocket(ClientSocket const &rhs);//=delete
 	ClientSocket &operator=(ClientSocket const &rhs);//=delete
 public:
-	explicit ClientSocket(int fd, Server &server);
+	explicit ClientSocket(sockaddr_in const &addr, int fd, Server &server);
 	virtual ~ClientSocket();
 	bool			isObsolete(void) const;
 	virtual void	handleEvent(uint32_t event);

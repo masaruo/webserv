@@ -32,7 +32,7 @@ def get_form_data():
 def process_form():
     print("Content-Type: text/html\r\n\r\n", flush=True)
     try:
-        # debug_print()
+        debug_print()#!
         parsed, method = get_form_data()
         name = parsed.get("name", [""])[0]
         message = parsed.get("message", [""])[0]

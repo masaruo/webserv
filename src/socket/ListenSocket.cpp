@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:06:41 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 23:58:30 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,6 @@ void	ListenSocket::handleEvent(uint32_t event)
 	{
 		throw (std::runtime_error("Socket failed"));
 	}
-	ClientSocket	*client = new ClientSocket(clientFd, server_);
+	ClientSocket	*client = new ClientSocket(addr, clientFd, server_);
 	server_.add(client, EPOLLIN);
 }

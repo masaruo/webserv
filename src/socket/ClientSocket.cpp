@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 23:50:20 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/04 23:57:25 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 
 #include <sys/epoll.h>
 
-ClientSocket::ClientSocket(int fd, Server &server)
-:ASocket(fd, server)
+ClientSocket::ClientSocket(sockaddr_in const &addr, int fd, Server &server)
+:ASocket(addr, fd, server)
 {
 	updateLastActiveTime();
 	return ;

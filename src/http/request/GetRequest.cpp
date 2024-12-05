@@ -63,7 +63,12 @@ void	GetRequest::assertAutoIndex(std::string const &path, std::string const &pat
 	config::Config::LocationConfig	const &loc = getConfig().getConfigLocation(path);
 
 	if (loc.directive_.hasKey(config::Config::INDEX))
-		return ;
+	{
+		std::string const &index_name = loc.directive_.getFirstValue(config::Config::INDEX);
+		std::string const &index_path = pathWithRoot + index_name;
+		if (FileHandler::checkIfFile(index_path))
+			return ;
+	}
 
 	if (loc.directive_.hasKey(config::Config::AUTOINDEX))
 	{

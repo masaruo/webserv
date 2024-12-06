@@ -53,7 +53,7 @@ std::string	GetRequest::setLocalPath(void) const
 		throw (HttpException(HttpCode::NOT_FOUND));
 	if (!FileHandler::checkIfFile(finalPath))
 		throw (HttpException(HttpCode::CONFLICT));
-	if (access(finalPath.c_str(), R_OK) == ft::err)
+	if (access(finalPath.c_str(), R_OK) == -1)
 		throw (HttpException(HttpCode::FORBIDDEN));
 	return (finalPath);
 }

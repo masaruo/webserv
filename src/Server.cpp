@@ -6,13 +6,16 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:53:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/05 11:18:52 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "ASocket.hpp"
 #include "ListenSocket.hpp"
+#include "AResponseException.hpp"
+#include "Response.hpp"
+#include "ClientSocket.hpp"
 #include <sys/epoll.h>
 #include <unistd.h>
 
@@ -95,14 +98,39 @@ void	Server::run(void)
 {
 	while (true)
 	{
-		holder_.cleanUpSockets();
+		holder_.deleteMarkedSockets();
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
 		{
 			uint32_t	ev = eventQueue_[i].events;
 			ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
-			socket->handleEvent(ev);
-			socket->updateLastActiveTime();
+			try
+			{
+				socket->handleEvent(ev);
+			}
+			catch (AResponseException const &e)
+			{
+				Response res = e.generateResponse();
+				ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
+				client->setData(res.to_string());
+				this->mod(socket, EPOLLOUT);
+			}
+			catch (HttpException const &e)
+			{
+				Response res = e.generateResponse();
+				ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
+				client->setData(res.to_string());
+				this->mod(socket, EPOLLOUT);
+			}
+			catch (std::exception const &e)
+			{
+				std::cerr << "Server.cpp:" << e.what() << std::endl;
+				socket->setSocketClose();
+			}
+			catch (...)
+			{
+				std::cerr << "Non Standard Error detected." << std::endl;
+			}
 		}
 	}
 }

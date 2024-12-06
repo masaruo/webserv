@@ -47,7 +47,7 @@ std::string	DeleteRequest::setLocalPath(void) const
 			throw (HttpException(HttpCode::NOT_FOUND));
 
 		std::string const &parentPath = root + uri.getPathInfo().directory_;
-		if (access(parentPath.c_str(), W_OK) == ft::err)
+		if (access(parentPath.c_str(), W_OK) == -1)
 			throw (HttpException(HttpCode::FORBIDDEN));
 	}
 	else
@@ -62,7 +62,7 @@ void	DeleteRequest::removeFile(std::string const &path) const
 	if (path.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
-	if (std::remove(path.c_str()) == ft::err)
+	if (std::remove(path.c_str()) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
 

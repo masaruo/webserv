@@ -18,5 +18,5 @@ public:
 	static bool			checkPathExist(std::string const &path);
 	static bool			checkIfDirectory(std::string const &path);
 	static bool			checkIfFile(std::string const &path);
-	static void			assertAccess(std::string const &path, int mode);
+	static bool			assertAccess(std::string const &path, int mode);
 };

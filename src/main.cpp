@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 06:06:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 05:10:59 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/05 10:08:47 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int main(void)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr << "main.cpp: " << e.what() << std::endl;
 		return (1);
 	}
 	catch (...)

@@ -34,7 +34,7 @@ static ft::str_vec	getFileNames(std::string const &path)
 	{
 		files.push_back(dp->d_name);
 	}
-	if (closedir(dirp) == ft::err)
+	if (closedir(dirp) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	return (files);
 }

@@ -43,23 +43,24 @@ void	HttpException::loadErrorPageMap(config::Config const &config)
 
 HttpBody	HttpException::generateBody(void) const
 {
-	std::string										errorPath = "";
+	std::string										errorPath = initial_error_page_;
 	config::Config::ErrorPageMap::const_iterator	it = errorPageMap_.begin();
 	config::Config::ErrorPageMap::const_iterator	end = errorPageMap_.end();
 	it = errorPageMap_.find(errorCode_);
 
-	if (it == end)
+	if (it == end && isInitialized_)
 	{
-		if (isInitialized_)
-			errorPath = root_ + default_error_page_;//! no data on root. init not working
-		else
-			errorPath = initial_error_page_;
+		errorPath = root_ + default_error_page_;
 	}
 	else
 	{
 		errorPath = root_ + errorPageMap_.at(errorCode_);
 	}
-	std::string contents = FileHandler::read(errorPath);
+	std::string contents;
+	if (FileHandler::assertAccess(errorPath, R_OK))
+		contents = FileHandler::read(errorPath);
+	else
+		contents = FileHandler::read(root_ + default_error_page_);
 	HttpBody body(contents);
 	return (body);
 }

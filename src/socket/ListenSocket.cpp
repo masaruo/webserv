@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 23:58:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/05 03:54:10 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,9 @@ ListenSocket::~ListenSocket()
 	return ;
 }
 
-bool	ListenSocket::isObsolete(void) const
+void	ListenSocket::assertTimeout(void) const
 {
-	return (false);
+	return ;
 }
 
 void	ListenSocket::handleEvent(uint32_t event)

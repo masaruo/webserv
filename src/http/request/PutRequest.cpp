@@ -62,7 +62,7 @@ std::string	PutRequest::setLocalPath(void) const
 			throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
 		if (!FileHandler::checkIfFile(pathWithRoot))
 			throw (HttpException(HttpCode::CONFLICT));
-		if (access(pathWithRoot.c_str(), W_OK) == ft::err)
+		if (access(pathWithRoot.c_str(), W_OK) == -1)
 			throw (HttpException(HttpCode::FORBIDDEN));
 	}
 	else
@@ -72,7 +72,7 @@ std::string	PutRequest::setLocalPath(void) const
 			throw (HttpException(HttpCode::NOT_FOUND));
 		if (!FileHandler::checkIfDirectory(parentPath))
 			throw (HttpException(HttpCode::CONFLICT));
-		if (access(parentPath.c_str(), W_OK) == ft::err)
+		if (access(parentPath.c_str(), W_OK) == -1)
 			throw (HttpException(HttpCode::FORBIDDEN));
 	}
 	return (pathWithRoot);

@@ -32,6 +32,7 @@ private:
 	config::Config					config_;
 	ResponseData					response_;
 	Server							&server_;
+	mutable bool					is_initialized_;
 
 	// helper function
 	config::Config::LocationConfig	setServerConfigLocation(void);
@@ -55,6 +56,7 @@ public:
 	ARequest(ARequest const &rhs);
 	ARequest &operator=(ARequest const &rhs);
 
+	void							init(void) const;
 	RequestLine 					getLine(void) const;
 	HttpHeader 						getHeader(void) const;
 	HttpBody						getBody(void) const;

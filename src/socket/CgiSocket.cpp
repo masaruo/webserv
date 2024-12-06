@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 09:12:19 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/05 06:51:27 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	CgiSocket::handleCgiExecution(void)
 	send_buf_ = factory_.getBody().c_str();
 
 	child_pid_ = fork();
-	if (child_pid_ == ft::err)
+	if (child_pid_ == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
@@ -77,7 +77,7 @@ void	CgiSocket::handleCgiExecution(void)
 	//parent
 	if (close(sockfd_[ft::CHILDFD]) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	server_.add(this, EPOLLOUT);
+	// server_.add(this, EPOLLOUT);
 }
 
 static char	**generateArgv(std::string const &uri)
@@ -148,25 +148,28 @@ void	CgiSocket::execChild(int sockfd[2])
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
-bool	CgiSocket::isObsolete(void) const
+void	CgiSocket::assertTimeout(void) const
 {
 	time_t	now = time(NULL);
 	if (now == -1)
-		return (true);
-	else if (now > last_active_time_ + ft::TIMEOUT_CGI_SEC)
-		return (true);
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	else if (now > getLastActiveTime() + ft::TIMEOUT_CGI_SEC)
+		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
 	else
-		return (false);
+		return ;
 }
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
+	#ifndef DEBUG
+	assertTimeout();
+	#endif
 	ssize_t bytes = 0;
-
 	if (event & EPOLLOUT)
 	{
 		if (send_buf_.empty())
 		{
+			updateLastActiveTime();
 			server_.mod(this, EPOLLIN);
 			return ;
 		}
@@ -185,11 +188,12 @@ void	CgiSocket::handleEvent(uint32_t event)
 			waitpid(child_pid_, &status, WNOHANG);
 			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 				recv_buf_ = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
-			recv_buf_ = "HTTP/1.1 200 OK\r\n" + recv_buf_;
+			else
+				recv_buf_ = "HTTP/1.1 200 OK\r\n" + recv_buf_;
 			parent_socket_->setData(recv_buf_);
 			parent_socket_->updateLastActiveTime();
 			server_.mod(parent_socket_, EPOLLOUT);
-			setSocketAsClose();
+			setSocketClose();
 			return;
 		}
 		recv_buf_.append(buf, bytes);

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:06:41 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/05 03:54:22 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ private:
 public:
 	explicit	CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server);
 	~CgiSocket();
-	bool	isObsolete(void) const;
+	void	assertTimeout(void) const;
 	void	handleCgiExecution(void);
 	void	handleEvent(uint32_t event);
 private:

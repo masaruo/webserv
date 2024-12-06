@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:38:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/04 08:41:34 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/05 03:46:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,6 @@ public:
 	~SocketHolder();
 
 	void		add(ASocket *socket);
-	void		cleanUpSockets(void);
+	void		deleteMarkedSockets(void);
 	int			getSize(void) const;
 };

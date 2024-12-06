@@ -7,10 +7,6 @@
 
 std::string FileHandler::read(std::string const &path)
 {
-	// int	fd = open(path.c_str(), O_RDONLY);
-	// if (fd == -1)
-	// 	throw (HttpException(HttpCode::NOT_FOUND));
-
 	std::ifstream	ifs(path.c_str(), std::ios::binary);
 	if(!ifs)
 		throw (HttpException(HttpCode::NOT_FOUND));
@@ -19,42 +15,7 @@ std::string FileHandler::read(std::string const &path)
 	ss << ifs.rdbuf();
 
 	return (ss.str());
-
-	// std::string	buf;
-	// std::streampos	size = ifs.tellg();
-	// ifs.seekg(0, std::ios::beg);
-	// buf.resize(static_cast<std::size_t>(size));
-	// if (!ifs.read(&buf[0], buf.size()))
-	// {
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// }
-	// ifs.close();
-	// return (buf);
 }
-
-// std::string	FileHandler::read(int fd)
-// {
-// 	std::string buf(ft::READ_BUF_SIZE, '\0');
-// 	std::string	result;
-
-// 	while (true)
-// 	{
-// 		ssize_t	bytesRead = ::read(fd, (void*)buf.data(), buf.size());
-// 		if (bytesRead == ft::err)
-// 		{
-// 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));//? error type
-// 		}
-// 		else if (bytesRead == ft::eof)
-// 		{
-// 			break ;
-// 		}
-// 		else
-// 		{
-// 			result.insert(result.end(), buf.begin(), buf.begin() + bytesRead);
-// 		}
-// 	}
-// 	return (result);
-// }
 
 static int	xstat(std::string const &path)
 {
@@ -62,7 +23,7 @@ static int	xstat(std::string const &path)
 
 	int res = stat(path.c_str(), &buf);
 
-	if (res == ft::err)
+	if (res == -1)
 		return (FileHandler::INVALID_PATH);
 	else if (S_ISDIR(buf.st_mode))
 		return (FileHandler::ISDIR);
@@ -100,8 +61,10 @@ bool	FileHandler::checkIfFile(std::string const &path)
 		return (false);
 }
 
-void	FileHandler::assertAccess(std::string const &path, int mode)
+bool	FileHandler::assertAccess(std::string const &path, int mode)
 {
-	if (::access(path.c_str(), mode) == ft::err)
-		throw (HttpException(HttpCode::NOT_FOUND));
+	if (::access(path.c_str(), mode) == -1)
+		return (false);
+	else
+		return (true);
 }

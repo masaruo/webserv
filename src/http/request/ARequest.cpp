@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 01:05:46 by mogawa            #+#    #+#             */
-/*   Updated: 2024/11/29 06:08:39 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/06 02:53:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,6 @@
 #include <sstream>
 #include <unistd.h>// for access
 
-// ARequest::ARequest(Request const &request, Server &server)
-// :requestLine_(request.line_)
-// ,header_(request.header_)
-// ,body_(request.body_)
-// ,config_(server.getConfigFactory().getConfig(requestLine_.getUri().getHost()))
-// ,response_()
-// {
-// 	assertAllowedMethod();
-// 	assertRedirection();
-// 	return ;
-// }
-
 ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
 :requestLine_(line)
 ,header_(header)
@@ -38,9 +26,10 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 ,config_(config)
 ,response_()
 ,server_(server)
+,is_initialized_(false)
 {
-	assertAllowedMethod();
-	assertRedirection();
+	// assertAllowedMethod();
+	// assertRedirection();
 	return ;
 }
 
@@ -51,9 +40,10 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody c
 ,config_(config)
 ,response_()
 ,server_(server)
+,is_initialized_(false)
 {
-	assertAllowedMethod();
-	assertRedirection();
+	// assertAllowedMethod();
+	// assertRedirection();
 	return ;
 }
 
@@ -64,6 +54,7 @@ ARequest::ARequest(ARequest const &rhs)
 ,config_(rhs.config_)
 ,response_(rhs.response_)
 ,server_(rhs.server_)
+,is_initialized_(rhs.is_initialized_)
 {
 	return ;
 }
@@ -82,6 +73,7 @@ ARequest	&ARequest::operator=(ARequest const &rhs)
 		body_ = rhs.body_;
 		config_ = rhs.config_;
 		response_ = rhs.response_;
+		is_initialized_ = rhs.is_initialized_;
 	}
 	return (*this);
 }
@@ -92,7 +84,6 @@ config::Config::LocationConfig	ARequest::setServerConfigLocation(void)//? detelt
 	config::Config::LocationConfig loc;
 	std::string const	&path = getLine().getUri().getPath();
 	loc = config_.getConfigLocation(path);
-	//todo if host == empty? possible? or if loc is empty?
 	return (loc);
 }
 
@@ -198,4 +189,13 @@ Response	ARequest::generateResponse(void) const
 Server	&ARequest::getServerReference(void)
 {
 	return (server_);
+}
+
+void	ARequest::init(void) const
+{
+	if (is_initialized_)
+		return ;
+	assertAllowedMethod();
+	assertRedirection();
+	is_initialized_ = true;
 }

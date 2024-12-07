@@ -45,6 +45,7 @@ public:
 	HttpHeader(HttpHeader const &rhs);
 	HttpHeader &operator=(HttpHeader const &rhs);
 	void		addValue(std::string const &key, std::string const &value);
+	void		delField(std::string const &key);
 	std::size_t	getContentLen(void) const;
 	std::string	to_string(void) const;
 };

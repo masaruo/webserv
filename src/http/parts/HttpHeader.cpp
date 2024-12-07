@@ -130,23 +130,6 @@ static void	assertHeaderValue(std::string const &a_value)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
-// HttpHeader::HttpHeader(std::istringstream &iss)
-// :vm::VecMap<std::string, std::string>()
-// {
-// 	std::string	line;
-// 	while (true)
-// 	{
-// 		std::getline(iss, line);
-// 		if (line == ft::string::CR)//!ヘッダーの最後（CRLFCRLF）だが、LFはGETLINEで削除される＝single CR
-// 			break ;
-// 		assertHeaderLine(line);
-// 		ft::string ftline = line;
-// 		ftline.trim(ft::string::CR);
-// 		addValue(ftline.str());
-// 	}
-// 	assertSemanticValue();
-// }
-
 HttpHeader::HttpHeader(std::string const &str)
 {
 	std::istringstream	iss(str);
@@ -233,6 +216,18 @@ void	HttpHeader::addValue(std::string const &key, std::string const &value)
 	if (data().size() > ft::MAX_HEADERS_NUM)
 		throw (HttpException(HttpCode::BAD_REQUEST));
 	vm::VecMap<std::string, std::string>::addValue(ftkey, ftvalue);
+}
+
+void	HttpHeader::delField(std::string const &key)
+{
+	try
+	{
+		vm::VecMap<std::string, std::string>::removeKey(key);
+	}
+	catch(VecMapException const &e)
+	{
+		return ;
+	}
 }
 
 std::size_t	HttpHeader::getContentLen(void) const

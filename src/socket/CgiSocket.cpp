@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 01:11:49 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/07 04:27:18 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "UriNormalizer.hpp"
 #include "FileHandler.hpp"
 #include "string.hpp"
+#include "Response.hpp"
 #include <sys/wait.h>
 #include <cstring>//strcpy
 #include <unistd.h>
@@ -159,6 +160,28 @@ void	CgiSocket::assertTimeout(void) const
 		return ;
 }
 
+static Response	createResponse(std::string const &buf, int exit_status)
+{
+	if (exit_status != 0)
+		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
+
+	std::string::size_type	posCRLFCRLF = buf.find("\r\n\r\n");
+	if (posCRLFCRLF == std::string::npos)
+		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
+
+	std::string const	&buf_header = buf.substr(0, posCRLFCRLF + 4);
+	std::string const	&buf_body = buf.substr(posCRLFCRLF + 4);
+
+	HttpHeader	header(buf_header);
+	if (!header.hasKey(HttpHeader::CONTENT_TYPE))
+		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
+
+	HttpBody	body(buf_body);
+	HttpStatus	status(HttpCode::OK);
+
+	return (Response(status, header, body));
+}
+
 void	CgiSocket::handleEvent(uint32_t event)
 {
 	#ifndef DEBUG
@@ -187,12 +210,13 @@ void	CgiSocket::handleEvent(uint32_t event)
 		else if (bytes == 0)
 		{
 			int status;
+			Response	res;
 			waitpid(child_pid_, &status, WNOHANG);
-			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)//! 終了ステータスの確保にもんだいがあるようだ
-				recv_buf_ = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+				res = createResponse("", 1);
 			else
-				recv_buf_ = "HTTP/1.1 200 OK\r\n" + recv_buf_;
-			parent_socket_->setData(recv_buf_);
+				res = createResponse(recv_buf_, 0);
+			parent_socket_->setData(res.to_string());
 			parent_socket_->updateLastActiveTime();
 			server_.mod(parent_socket_, EPOLLOUT);
 			setSocketClose();
@@ -206,3 +230,4 @@ void	CgiSocket::handleEvent(uint32_t event)
 		return ;
 	}
 }
+

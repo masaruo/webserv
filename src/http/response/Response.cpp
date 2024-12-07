@@ -12,13 +12,21 @@ Response::Response()
 	return ;
 }
 
+Response::Response(HttpStatus const &status)
+:status_(status)
+,header_()
+,body_()
+,has_body_(false)
+{
+	return ;
+}
+
 Response::Response(HttpStatus const &status, HttpHeader const &header)
 :status_(status)
 ,header_(header)
 ,body_()
 ,has_body_(false)
 {
-	addMandetaryHeader();
 	return ;
 }
 
@@ -28,7 +36,6 @@ Response::Response(HttpStatus const &status, HttpHeader const &header, HttpBody 
 ,body_(body)
 ,has_body_(true)
 {
-	addMandetaryHeader();
 	return ;
 }
 
@@ -79,10 +86,22 @@ void	Response::addMandetaryHeader(void)
 
 	std::string const &now = Date::time();
 	header_.addValue(HttpHeader::DATE, now);
+
+	if (status_.getCode() == HttpCode::NO_CONTENT)
+		header_.delField(HttpHeader::CONTENT_LENGTH);
+
+	if (has_body_)
+	{
+		header_.addValue(HttpHeader::CONTENT_LENGTH, body_.size());
+		if (!header_.hasKey(HttpHeader::CONTENT_TYPE))
+			header_.addValue(HttpHeader::CONTENT_TYPE, "text/html");
+	}
 }
 
-std::string	Response::to_string(void) const
+std::string	Response::to_string(void)
 {
+	addMandetaryHeader();
+
 	std::stringstream	ss;
 
 	ss << status_.to_string();

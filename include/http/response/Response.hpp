@@ -21,11 +21,12 @@ private:
 
 public:
 	Response();
+	explicit Response(HttpStatus const &status);
 	explicit Response(HttpStatus const &status, HttpHeader const &header);
 	explicit Response(HttpStatus const &status, HttpHeader const &header, HttpBody const &body);
 	~Response();
 	Response(Response const &rhs);
 	Response &operator=(Response const &rhs);
 
-	std::string		to_string(void) const;
+	std::string		to_string(void);
 };

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 01:27:53 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/07 01:55:21 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,12 @@ void	SocketHolder::deleteMarkedSockets(int epollfd)
 
 	while (it != end)
 	{
-		ASocket *socket = *it;
-		if (socket->isDelete())
+		if ((*it)->isDelete())
 		{
 			iterator tmp = it;
 			it++;
 
-			int	res = epoll_ctl(epollfd, EPOLL_CTL_DEL, socket->getFd(), NULL);
+			int	res = epoll_ctl(epollfd, EPOLL_CTL_DEL, (*tmp)->getFd(), NULL);
 			if (res == -1)
 			{
 				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));

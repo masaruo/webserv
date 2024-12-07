@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/05 11:18:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/07 01:28:35 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ void	Server::run(void)
 {
 	while (true)
 	{
-		holder_.deleteMarkedSockets();
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
 		{
@@ -132,5 +131,6 @@ void	Server::run(void)
 				std::cerr << "Non Standard Error detected." << std::endl;
 			}
 		}
+		holder_.deleteMarkedSockets(epollFd_);
 	}
 }

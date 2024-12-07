@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/05 06:51:27 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/07 01:11:49 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,15 +178,17 @@ void	CgiSocket::handleEvent(uint32_t event)
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		send_buf_ = send_buf_.substr(bytes);
 	}
-	else if (event & (EPOLLIN | EPOLLHUP))
+	else if (event & (EPOLLIN | EPOLLRDHUP))
 	{
 		char buf[ft::READ_BUF_SIZE];
 	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
-		if (bytes <= 0)
+		if (bytes == -1)
+			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		else if (bytes == 0)
 		{
 			int status;
 			waitpid(child_pid_, &status, WNOHANG);
-			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)//! 終了ステータスの確保にもんだいがあるようだ
 				recv_buf_ = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
 			else
 				recv_buf_ = "HTTP/1.1 200 OK\r\n" + recv_buf_;
@@ -196,10 +198,11 @@ void	CgiSocket::handleEvent(uint32_t event)
 			setSocketClose();
 			return;
 		}
-		recv_buf_.append(buf, bytes);
+		else
+			recv_buf_.append(buf, bytes);
 	}
 	else
 	{
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		return ;
 	}
 }

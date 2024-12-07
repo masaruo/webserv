@@ -6,7 +6,7 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/12/05 04:55:42 by mogawa           ###   ########.fr        #
+#    Updated: 2024/12/06 05:50:57 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,7 @@ DEP			:=	$(OBJ:.o=.d)
 ifdef WITH_GDB
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
 CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined -fno-limit-debug-info -fno-omit-frame-pointer -DDEBUG
+# CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined -fno-limit-debug-info -fno-omit-frame-pointer
 LDFLAGS		:=	-fsanitize=address,undefined
 endif
 

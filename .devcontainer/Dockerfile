@@ -2,9 +2,7 @@ FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get upgrade -y
-
-RUN apt-get install -y \
+RUN apt-get update && apt-get upgrade -y \
     clang \
     nginx \
     net-tools \
@@ -35,6 +33,7 @@ RUN apt-get install -y \
     vim \
     valgrind \
     man-db \
+    siege \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

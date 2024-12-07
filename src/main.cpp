@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 06:06:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/05 10:08:47 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/06 09:32:49 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 int main(void)
 {
-	signal(SIGPIPE, SIG_IGN);
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+		return (1);
 	try
 	{
 		Server	server("./config/config.md");

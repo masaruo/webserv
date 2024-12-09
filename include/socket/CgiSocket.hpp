@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/08 06:08:39 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/09 08:04:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ class CgiSocket : public ASocket
 {
 public:
 	static int const	INTERNAL_SERVER_ERROR;
+	static int const	NOT_FOUND;
+	static int const	FORBIDDEN;
 private:
 	ClientSocket	*parent_socket_;
 	RequestFactory	factory_;

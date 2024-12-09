@@ -10,13 +10,14 @@ private:
 	FileHandler(FileHandler const &rhs);//=delete
 	FileHandler &operator=(FileHandler const &rhs);//=delete
 public:
-	static int const	INVALID_PATH = -1;
-	static int const	ISDIR = 1;
-	static int const	ISFILE = 2;
-	static int const	FILE_EXIST = 3;
 	static std::string	read(std::string const &path);
-	static bool			checkPathExist(std::string const &path);
-	static bool			checkIfDirectory(std::string const &path);
-	static bool			checkIfFile(std::string const &path);
-	static bool			assertAccess(std::string const &path, int mode);
+	// static bool			checkPathExist(std::string const &path);
+	static bool			isDir(std::string const &path, int mode = F_OK);
+	static bool			isFile(std::string const &path, int mode = F_OK);
+	// static bool			assertAccess(std::string const &path, int mode);
+	static bool			isExist(std::string const &path);
+	static bool			isR_OK(std::string const &path);
+	static bool			isX_OK(std::string const &path);
+	static bool			isW_OK(std::string const &path);
+	static bool			isOK(std::string const &path, int mode);
 };

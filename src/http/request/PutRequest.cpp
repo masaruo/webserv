@@ -56,37 +56,60 @@ std::string	PutRequest::setLocalPath(void) const
 	std::string const	&root = getConfig().getRoot(dir);
 	std::string const	&pathWithRoot = root + dir + "/" + file;
 
-	if (FileHandler::checkPathExist(pathWithRoot))
+	if (FileHandler::isExist(pathWithRoot))
 	{
-		if (FileHandler::checkIfDirectory(pathWithRoot))
+		if (FileHandler::isDir(pathWithRoot))
 			throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
-		if (!FileHandler::checkIfFile(pathWithRoot))
-			throw (HttpException(HttpCode::CONFLICT));
-		if (access(pathWithRoot.c_str(), W_OK) == -1)
+		if (!FileHandler::isFile(pathWithRoot) || !FileHandler::isW_OK(pathWithRoot))
 			throw (HttpException(HttpCode::FORBIDDEN));
 	}
 	else
-	{
-		std::string const &parentPath = root + uri.getPathInfo().directory_;
-		if (!FileHandler::checkPathExist(parentPath))
+	{	std::string const &parent = root + dir;
+		if (!FileHandler::isExist(parent))
 			throw (HttpException(HttpCode::NOT_FOUND));
-		if (!FileHandler::checkIfDirectory(parentPath))
+		if (!FileHandler::isDir(parent))
 			throw (HttpException(HttpCode::CONFLICT));
-		if (access(parentPath.c_str(), W_OK) == -1)
+		if (!FileHandler::isW_OK(parent))
 			throw (HttpException(HttpCode::FORBIDDEN));
 	}
+
+	// if (FileHandler::checkPathExist(pathWithRoot))
+	// {
+	// 	if (FileHandler::checkIfDirectory(pathWithRoot))
+	// 		throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
+	// 	if (!FileHandler::checkIfFile(pathWithRoot))
+	// 		throw (HttpException(HttpCode::CONFLICT));
+	// 	if (access(pathWithRoot.c_str(), W_OK) == -1)
+	// 		throw (HttpException(HttpCode::FORBIDDEN));
+	// }
+	// else
+	// {
+	// 	std::string const &parentPath = root + uri.getPathInfo().directory_;
+	// 	if (!FileHandler::checkPathExist(parentPath))
+	// 		throw (HttpException(HttpCode::NOT_FOUND));
+	// 	if (!FileHandler::checkIfDirectory(parentPath))
+	// 		throw (HttpException(HttpCode::CONFLICT));
+	// 	if (access(parentPath.c_str(), W_OK) == -1)
+	// 		throw (HttpException(HttpCode::FORBIDDEN));
+	// }
 	return (pathWithRoot);
 }
 
 void	PutRequest::generateResponseData(void)
 {
 	std::string const &abspath = setLocalPath();
+
+	bool isOldFile = FileHandler::isFile(abspath);
+
 	uploadFile(abspath);
 
-	HttpStatus	status(HttpCode::OK);
+	HttpStatus status;
+	if (isOldFile)
+		status.setCode(HttpCode::OK);
+	else
+		status.setCode(HttpCode::CREATED);
 
 	ResponseHeader header;
-	// header.addValue(HttpHeader::CONTENT_LENGTH, "0");
 
 	setResponseStatus(status);
 	setResponseHeader(header);

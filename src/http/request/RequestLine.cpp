@@ -48,39 +48,6 @@ RequestLine::RequestLine(std::string const &line)
 	setVersion(version);	
 }
 
-// RequestLine::RequestLine(std::istringstream &iss)
-// :method_(), uri_(), version_()
-// {
-// 	std::string	buf;
-
-// 	std::getline(iss, buf);
-// 	assertRequestLine(buf);
-
-// 	ft::string	to_split(buf);
-// 	to_split.trim(ft::string::CR);
-// 	ft::string::string_vector	split_by_sp = to_split.split(ft::string::WS);
-
-// 	std::string method, uri, version;
-// 	if (split_by_sp.size() == 2 && !split_by_sp.at(0).empty() && !split_by_sp.at(1).empty())
-// 	{
-// 		method = split_by_sp.at(0);
-// 		uri = "/";
-// 		version = split_by_sp.at(1);
-// 	}
-// 	else if (split_by_sp.size() == 3 && !split_by_sp.at(0).empty() && !split_by_sp.at(1).empty() && !split_by_sp.at(2).empty())
-// 	{
-// 		method = split_by_sp.at(0);
-// 		uri = split_by_sp.at(1);
-// 		version = split_by_sp.at(2);
-// 	}
-// 	else
-// 		throw (HttpException(HttpCode::BAD_REQUEST));
-
-// 	setMethod(method);
-// 	setUri(uri);
-// 	setVersion(version);
-// }
-
 RequestLine::RequestLine()
 :method_()
 ,uri_()

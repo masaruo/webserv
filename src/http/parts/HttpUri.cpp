@@ -160,46 +160,75 @@ std::string	HttpUri::extractPort(std::string const &host)
 	return (hostWoutPort);
 }
 
-std::string	HttpUri::extractCgiInfo(std::string const &pathWoutQuery)
+std::string	HttpUri::extractCgiInfo(std::string const &pathWoQuery)
 {
-	ft::string									ftpath(pathWoutQuery);
-	ft::string::string_vector					split_by_slash = ftpath.split("/");
-	ft::string::string_vector::const_iterator	iter = split_by_slash.begin();
-	ft::string::string_vector::const_iterator	end = split_by_slash.end();
-	ft::string::string_vector					dirScriptVec;
-	std::string									scriptName;
-	ft::string::string_vector					pathInfoVec;
-	bool										isDir = true;
+	std::string::size_type	posCgiBin = pathWoQuery.find("cgi-bin");
+	ft::string const		&tillCgiBin = pathWoQuery.substr(0, posCgiBin + 7);
+	ft::string const		&afterCgiBin = pathWoQuery.substr(posCgiBin + 7);
 
-	while (true)
+	if (afterCgiBin.empty() || !afterCgiBin.start_with('/'))
+		throw (HttpException(HttpCode::BAD_REQUEST));
+
+	std::string::size_type	posSecondSlash = afterCgiBin.str().find("/", 1);
+	ft::string				fileName =	"";
+	ft::string				CgiPathInfo = "";
+	if (posSecondSlash == std::string::npos)
+		fileName = afterCgiBin;
+	else
 	{
-		std::string::size_type	posCgiBin = iter->str().find("cgi-bin");
-		if (isDir)
-		{
-			dirScriptVec.push_back(*iter);
-		}
-		else
-		{
-			pathInfoVec.push_back(*iter);
-		}
-		if (posCgiBin != std::string::npos)
-		{
-			isDir = false;
-			iter++;
-			scriptName = *iter;
-		}
-		if (iter + 1 == end)
-			break ;
-		iter++;
+		fileName = afterCgiBin.str().substr(0, posSecondSlash);
+		CgiPathInfo = afterCgiBin.str().substr(posSecondSlash + 1);
 	}
 
-	PathInfo	cgi;
-	cgi.directory_ = ft::reverse_split(dirScriptVec, '/');
-	cgi.fileName_ = scriptName;
-	cgi.cgiPathInfo_ = ft::reverse_split(pathInfoVec, '/');
+	pathInfo_.directory_ = tillCgiBin;
+	pathInfo_.fileName_ = fileName.str().substr(1);
+	pathInfo_.cgiPathInfo_ = CgiPathInfo;
 
-	pathInfo_ = cgi;
-	return (cgi.directory_ + "/" + cgi.fileName_);
+	return (tillCgiBin.str() + fileName.str());
+
+	// ft::string									ftpath(pathWoutQuery);
+	// ft::string::string_vector					split_by_slash = ftpath.split("/");
+	// ft::string::string_vector::const_iterator	iter = split_by_slash.begin();
+	// ft::string::string_vector::const_iterator	end = split_by_slash.end();
+	// ft::string::string_vector					dirScriptVec;
+	// std::string									scriptName;
+	// ft::string::string_vector					pathInfoVec;
+	// bool										isDir = true;
+
+
+
+
+	// while (true)
+	// {
+	// 	if (isDir)
+	// 	{
+	// 		dirScriptVec.push_back(*iter);
+	// 	}
+	// 	else
+	// 	{
+	// 		pathInfoVec.push_back(*iter);
+	// 	}
+	// 	std::string::size_type	posCgiBin = iter->str().find("cgi-bin");
+	// 	if (posCgiBin != std::string::npos)
+	// 	{
+	// 		isDir = false;
+	// 		if (iter + 1 == end)
+	// 			throw (HttpException(HttpCode::FORBIDDEN));
+	// 		iter++;
+	// 		scriptName = *iter;
+	// 	}
+	// 	if (iter + 1 == end)
+	// 		break ;
+	// 	iter++;
+	// }
+
+	// PathInfo	cgi;
+	// cgi.directory_ = ft::reverse_split(dirScriptVec, '/');
+	// cgi.fileName_ = scriptName;
+	// cgi.cgiPathInfo_ = ft::reverse_split(pathInfoVec, '/');
+
+	// pathInfo_ = cgi;
+	// return (cgi.directory_ + "/" + cgi.fileName_);
 }
 
 std::string	HttpUri::extractPathInfo(std::string const &pathWithoutQuery)
@@ -210,7 +239,6 @@ std::string	HttpUri::extractPathInfo(std::string const &pathWithoutQuery)
 	std::string				file = "";
 
 	std::string::size_type	findPos = path.find("cgi-bin");
-	// if CGI -> pass to extractCgiInfo()
 	if (findPos != std::string::npos)
 	{
 		isCgi_ = true;
@@ -241,8 +269,8 @@ std::string	HttpUri::extractPathInfo(std::string const &pathWithoutQuery)
 void	HttpUri::parseUriAndExtractPath(std::string const &after_scheme)
 {
 	std::string const	afterHost = extractHost(after_scheme);
-	std::string const	pathStartWoQuery = extractQuery(afterHost);
-	std::string const	path = extractPathInfo(pathStartWoQuery);
+	std::string const	pathWoQuery = extractQuery(afterHost);
+	std::string const	path = extractPathInfo(pathWoQuery);
 	
 	path_ = path;
 }

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/08 06:42:24 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/09 08:57:52 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 #include <fcntl.h>
 
 int const	CgiSocket::INTERNAL_SERVER_ERROR = 50;
+int const	CgiSocket::NOT_FOUND = 51;
+int const	CgiSocket::FORBIDDEN = 53;
 
 CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server)
 :ASocket(-1, server)
@@ -93,15 +95,18 @@ static char	**generateArgv(std::string const &uri)
 	return (argv);
 }
 
-static void assertCgiPath(std::string const &dir, std::string const &file)
+static int assertCgiPath_(std::string const &dir, std::string const &file)
 {
 	std::string const pathWithRoot = dir + "/" + file;
-	if (!FileHandler::checkPathExist(dir))
-		throw (HttpException(HttpCode::NOT_FOUND));
-	if (!FileHandler::checkIfFile(pathWithRoot))
-		throw (HttpException(HttpCode::CONFLICT));
-	if (access(pathWithRoot.c_str(), X_OK) == -1)
-		throw (HttpException(HttpCode::FORBIDDEN));
+	if (!FileHandler::isExist(dir))
+		return (CgiSocket::NOT_FOUND);
+	if (!FileHandler::isOK(dir, R_OK | X_OK))
+		return (CgiSocket::FORBIDDEN);
+	if (!FileHandler::isExist(pathWithRoot))
+		return (CgiSocket::NOT_FOUND);
+	if (!FileHandler::isOK(pathWithRoot, R_OK | X_OK))
+		return (CgiSocket::FORBIDDEN);
+	return (0);
 }
 
 void	CgiSocket::execChild(int sockfd[2])
@@ -118,14 +123,12 @@ void	CgiSocket::execChild(int sockfd[2])
 	HttpUri const &uri = factory_.getRequestLine().getUri();
 	config::Config const &config = server_.getConfigFactory().getConfig(uri.getHost());
 	std::string const &cgiPath = config.getConfigLocation(uri.getPath()).directive_.getFirstValue(config::Config::CGI_ROOT);
-	// std::string const &cgiDir = uri.getPathInfo().directory_;
-	// std::string const &cgiPath = cgiRoot + cgiDir;
 	std::string const &scriptName = uri.getPathInfo().fileName_;
-	assertCgiPath(cgiPath, scriptName);
+	int error = assertCgiPath_(cgiPath, scriptName);
+	if (error != 0)
+		std::exit(error);
 	if (chdir(cgiPath.c_str()) == -1)
-	{
 		std::exit(INTERNAL_SERVER_ERROR);
-	}
 
 	Env env(factory_.getRequestLine(), factory_.getHeader(), factory_.getBody());
 	uint32_t const ip = ntohl(getAddr().sin_addr.s_addr);
@@ -161,8 +164,12 @@ void	CgiSocket::assertTimeout(void) const
 
 static Response	createResponse(std::string const &buf, int exit_status)
 {
-	if (exit_status != 0)
+	if (exit_status == CgiSocket::INTERNAL_SERVER_ERROR)
 		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
+	if (exit_status == CgiSocket::NOT_FOUND)
+		return (Response(HttpStatus(HttpCode::NOT_FOUND)));
+	if (exit_status == CgiSocket::FORBIDDEN)
+		return (Response(HttpStatus(HttpCode::FORBIDDEN)));
 
 	std::string::size_type	posCRLFCRLF = buf.find("\r\n\r\n");
 	if (posCRLFCRLF == std::string::npos)
@@ -212,7 +219,7 @@ void	CgiSocket::handleEvent(uint32_t event)
 			Response	res;
 			waitpid(child_pid_, &status, WNOHANG);
 			if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-				res = createResponse("", 1);
+				res = createResponse("", WEXITSTATUS(status));
 			else
 				res = createResponse(recv_buf_, 0);
 			parent_socket_->setData(res.to_string());

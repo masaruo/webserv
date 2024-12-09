@@ -87,19 +87,17 @@ void	RequestFactory::parse(std::string const &data, ssize_t size)
 	}
 	if (isParseCompleted_)
 	{
-		std::string const &hostValueFromHeader = header_.getFirstValue("host");
+		std::string const &hostValueFromHeader = header_.getFirstValue(AHeader::HOST);
 		line_.getUriReference().updateWithHostHeader(hostValueFromHeader);
 		checkIsCgiRequest();
 	}
 }
 
-static RequestFactory::BodyType	isRequestBodyPresent(HttpHeader const &header)
+static RequestFactory::BodyType	isRequestBodyPresent(RequestHeader const &header)
 {
-	if (header.hasKey("content-length") && header.hasKey("transfer-encoding"))
-		throw (HttpException(HttpCode::BAD_REQUEST));
-	else if (header.hasKey("content-length") && ft::stonum<std::size_t>(header.getFirstValue("content-length")) > 0)
+	if (header.hasKey(AHeader::CONTENT_LENGTH) && ft::stonum<std::size_t>(header.getFirstValue(AHeader::CONTENT_LENGTH)) > 0)
 		return (RequestFactory::LENGTH);
-	else if (header.hasKey("transfer-encoding") && header.getLastValue("transfer-encoding") == "chunked")
+	else if (header.hasKey(AHeader::TRANSFER_ENCODING) && header.getLastValue(AHeader::TRANSFER_ENCODING) == "chunked")
 		return (RequestFactory::CHUNK);
 	else
 		return (RequestFactory::EMPTY);
@@ -124,7 +122,7 @@ bool	RequestFactory::parseHeader(void)
 	if (posCRLFCRLF == std::string::npos)
 		return (true);
 
-	header_ = HttpHeader(buf_.substr(0, posCRLFCRLF + 4));
+	header_ = RequestHeader(buf_.substr(0, posCRLFCRLF + 4));
 	buf_ = buf_.substr(posCRLFCRLF + 4);
 
 	if (isRequestBodyPresent(header_) == RequestFactory::EMPTY)
@@ -151,7 +149,7 @@ bool	RequestFactory::parseBody(void)
 	}
 	else
 	{
-		std::size_t	size = ft::stonum<std::size_t>(header_.getFirstValue("content-length"));
+		std::size_t	size = ft::stonum<std::size_t>(header_.getFirstValue(AHeader::CONTENT_LENGTH));
 		recv_required = parseBodyWithLength(size);
 	}
 	return (recv_required);
@@ -208,7 +206,7 @@ RequestLine const	&RequestFactory::getRequestLine(void) const
 	return (line_);
 }
 
-HttpHeader const	&RequestFactory::getHeader(void) const
+RequestHeader const	&RequestFactory::getHeader(void) const
 {
 	return (header_);
 }

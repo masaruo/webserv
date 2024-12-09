@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 01:28:35 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/08 22:29:21 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,15 +111,32 @@ void	Server::run(void)
 			{
 				Response res = e.generateResponse();
 				ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
+				if (client == NULL)
+					continue ;
 				client->setData(res.to_string());
 				this->mod(socket, EPOLLOUT);
 			}
 			catch (HttpException const &e)
 			{
-				Response res = e.generateResponse();
-				ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
-				client->setData(res.to_string());
-				this->mod(socket, EPOLLOUT);
+				try
+				{
+					Response res = e.generateResponse();
+					ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
+					if (client == NULL)
+						continue ;
+					client->setData(res.to_string());
+					this->mod(socket, EPOLLOUT);
+				}
+				catch (HttpException const &e)
+				{
+					ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
+					if (client == NULL)
+						continue ;
+					HttpStatus	status(HttpCode::INTERNAL_SERVER_ERROR);
+					Response	res(status);
+					client->setData(res.to_string());
+					this->mod(socket, EPOLLOUT);
+				}
 			}
 			catch (std::exception const &e)
 			{
@@ -129,6 +146,7 @@ void	Server::run(void)
 			catch (...)
 			{
 				std::cerr << "Non Standard Error detected." << std::endl;
+				socket->setSocketClose();
 			}
 		}
 		holder_.deleteMarkedSockets(epollFd_);

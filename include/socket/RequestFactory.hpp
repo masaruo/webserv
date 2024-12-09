@@ -1,6 +1,6 @@
 #pragma once
 #include "RequestLine.hpp"
-#include "HttpHeader.hpp"
+#include "RequestHeader.hpp"
 #include "HttpBody.hpp"
 #include "Server.hpp"
 
@@ -16,10 +16,10 @@ public:
 		EMPTY
 	};
 private:
-	std::string	buf_;
-	RequestLine	line_;
-	HttpHeader	header_;
-	HttpBody	body_;
+	std::string		buf_;
+	RequestLine		line_;
+	RequestHeader	header_;
+	HttpBody		body_;
 	bool		isRequestLineParsed_;
 	bool		isHeaderParsed_;
 	bool		isParseCompleted_;
@@ -40,7 +40,7 @@ public:
 	bool				isParseCompleted(void) const;
 	bool				isCgiRequest(void) const;
 	RequestLine const	&getRequestLine(void) const;
-	HttpHeader const	&getHeader(void) const;
+	RequestHeader const	&getHeader(void) const;
 	HttpBody const		&getBody(void) const;
 	ARequest			*createRequest(Server &server) const;
 };

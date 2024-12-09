@@ -19,7 +19,6 @@ private:
 	static std::string					root_;
 	static bool							isInitialized_;
 	static std::string					default_error_page_;
-	static std::string					initial_error_page_;
 	HttpException();//=delete
 	HttpException &operator=(HttpException const &rhs);//=delete
 public:

@@ -10,7 +10,7 @@ private:
 	void		uploadFile(std::string const &abspath) const;
 	PutRequest();//=delete
 public:
-	explicit PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server);
+	explicit PutRequest(RequestLine const &line, RequestHeader const &header, HttpBody const &body, config::Config const &config, Server &server);
 	explicit PutRequest(PutRequest const &rhs);
 	PutRequest &operator=(PutRequest const &rhs);
 	~PutRequest();

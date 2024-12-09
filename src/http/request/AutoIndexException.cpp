@@ -59,10 +59,10 @@ Response	AutoIndexException::generateResponse(void) const
 
 	HttpStatus status(HttpCode::OK);
 
-	HttpHeader header;
-	header.addValue(HttpHeader::CONTENT_TYPE, "text/plain");
-	header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
-	header.addValue(HttpHeader::CONNECTION, "close");
+	ResponseHeader header;
+	// header.addValue(HttpHeader::CONTENT_TYPE, "text/plain");
+	// header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
+	// header.addValue(HttpHeader::CONNECTION, "close");
 
 	Response	r(status, header, body);
 	return (r);

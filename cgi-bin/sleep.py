@@ -4,7 +4,7 @@ import sys
 
 def main():
     print('sleeping...')
-    time.sleep(10)
+    time.sleep(20)
     print('good morning')
 
 if __name__ == "__main__":

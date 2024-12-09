@@ -5,7 +5,7 @@
 #include "UriNormalizer.hpp"
 #include <sys/stat.h>
 
-GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+GetRequest::GetRequest(RequestLine const &line, RequestHeader const &header, config::Config const &config, Server &server)
 :ARequest(line, header, config, server)
 {
 	return ;
@@ -95,16 +95,19 @@ std::string	GetRequest::getIndexFileName(std::string const &path) const
 
 void	GetRequest::generateResponseData(void)
 {
-	HttpUri const		uri = getLine().getUri();
-	std::string const	path = uri.getPath();
+	HttpUri const		&uri = getLine().getUri();
+	std::string const	&ext = uri.getPath();
+	// std::string const	&pathinfo = uri.getPathInfo().fileName_;
+	std::string const	&path = uri.getPath();
 
 	std::string const &abspath = setLocalPath();
 
 	HttpBody body(FileHandler::read(abspath));
 
-	HttpHeader	header;
-	header.addValue(HttpHeader::CONTENT_TYPE, "text/html");//? how to get content-type???
-	header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
+	ResponseHeader header;
+	// HttpHeader	header;
+	// header.addValue(HttpHeader::CONTENT_TYPE, "text/html");//? how to get content-type???
+	// header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
 
 	HttpStatus	status(HttpCode::OK);
 

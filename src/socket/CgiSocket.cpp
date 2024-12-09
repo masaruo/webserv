@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 04:27:18 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/08 06:42:24 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ void	CgiSocket::handleCgiExecution(void)
 	//parent
 	if (close(sockfd_[ft::CHILDFD]) == -1)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// server_.add(this, EPOLLOUT);
 }
 
 static char	**generateArgv(std::string const &uri)
@@ -172,8 +171,8 @@ static Response	createResponse(std::string const &buf, int exit_status)
 	std::string const	&buf_header = buf.substr(0, posCRLFCRLF + 4);
 	std::string const	&buf_body = buf.substr(posCRLFCRLF + 4);
 
-	HttpHeader	header(buf_header);
-	if (!header.hasKey(HttpHeader::CONTENT_TYPE))
+	ResponseHeader header(buf_header);
+	if (!header.hasKey(AHeader::CONTENT_TYPE))
 		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
 
 	HttpBody	body(buf_body);

@@ -5,7 +5,7 @@
 #include "string.hpp"
 #include <cstdio>// for std::remove
 
-DeleteRequest::DeleteRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+DeleteRequest::DeleteRequest(RequestLine const &line, RequestHeader const &header, config::Config const &config, Server &server)
 :ARequest(line, header, config, server)
 {
 	return ;
@@ -73,8 +73,8 @@ void	DeleteRequest::generateResponseData(void)
 
 	HttpStatus	status(HttpCode::NO_CONTENT);
 
-	HttpHeader	header;
-	header.addValue(HttpHeader::CONTENT_LENGTH, "0");
+	ResponseHeader	header;
+	// header.addValue(HttpHeader::CONTENT_LENGTH, "0");
 
 	setResponseStatus(status);
 	setResponseHeader(header);

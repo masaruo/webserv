@@ -9,7 +9,6 @@ HttpException::ErrorPageMap	HttpException::errorPageMap_;
 std::string					HttpException::root_ = "";
 bool						HttpException::isInitialized_ = false;
 std::string					HttpException::default_error_page_ = "/error.html";
-std::string					HttpException::initial_error_page_ = "./www/error.html";
 
 //! HttpException
 HttpException::HttpException(HttpCode::StatusCode error_code)
@@ -43,12 +42,12 @@ void	HttpException::loadErrorPageMap(config::Config const &config)
 
 HttpBody	HttpException::generateBody(void) const
 {
-	std::string										errorPath = initial_error_page_;
+	std::string										errorPath;
 	config::Config::ErrorPageMap::const_iterator	it = errorPageMap_.begin();
 	config::Config::ErrorPageMap::const_iterator	end = errorPageMap_.end();
 	it = errorPageMap_.find(errorCode_);
 
-	if (it == end && isInitialized_)
+	if (it == end)
 	{
 		errorPath = root_ + default_error_page_;
 	}
@@ -57,10 +56,14 @@ HttpBody	HttpException::generateBody(void) const
 		errorPath = root_ + errorPageMap_.at(errorCode_);
 	}
 	std::string contents;
-	if (FileHandler::assertAccess(errorPath, R_OK))
+	try
+	{
 		contents = FileHandler::read(errorPath);
-	else
-		contents = FileHandler::read(root_ + default_error_page_);
+	}
+	catch(const std::exception& e)
+	{
+		contents = "<h1>Webserv BackStop Error Page</h1>";
+	}
 	HttpBody body(contents);
 	return (body);
 }
@@ -70,9 +73,8 @@ Response	HttpException::generateResponse(void) const
 
 	HttpBody const &body = generateBody();
 
-	HttpHeader	header;
-	header.addValue("content-type", "text/html");
-	header.addValue("content-length", body.size());
+	ResponseHeader	header;
+	header.AHeader::add(AHeader::CONTENT_TYPE, "text/html");
 
 	HttpStatus	status(errorCode_);
 

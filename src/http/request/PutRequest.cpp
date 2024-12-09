@@ -5,7 +5,7 @@
 #include "UriNormalizer.hpp"
 #include <fstream>
 
-PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
+PutRequest::PutRequest(RequestLine const &line, RequestHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
 :ARequest(line, header, body, config, server)
 {
 	return ;
@@ -85,8 +85,8 @@ void	PutRequest::generateResponseData(void)
 
 	HttpStatus	status(HttpCode::OK);
 
-	HttpHeader	header;
-	header.addValue(HttpHeader::CONTENT_LENGTH, "0");
+	ResponseHeader header;
+	// header.addValue(HttpHeader::CONTENT_LENGTH, "0");
 
 	setResponseStatus(status);
 	setResponseHeader(header);

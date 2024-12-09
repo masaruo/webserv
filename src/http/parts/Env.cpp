@@ -3,7 +3,7 @@
 #include "cstring"
 #include "HttpException.hpp"
 
-Env::Env(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
+Env::Env(RequestLine const &line, RequestHeader const &header, HttpBody const &body)
 :env_(getEnviron())
 {
 	addCGIEnv(line, header, body);
@@ -35,14 +35,15 @@ void	Env::addEnvItem(std::string const &key, std::string const &value)
 	env_.insert(std::pair<std::string, std::string>(key, value));
 }
 
-void	Env::addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
+void	Env::addCGIEnv(RequestLine const &line, RequestHeader const &header, HttpBody const &body)
 {
 	HttpUri	const	uri = line.getUri();
 	std::string const	pathInfo = uri.getPathInfo().cgiPathInfo_;
 	std::string const	scriptName = uri.getPath();
 	std::string			contentType = "";
-	if (header.hasKey("content-type"))
-		contentType = header.getFirstValue("content-type");
+
+	if (header.hasKey(AHeader::CONTENT_TYPE))
+		contentType = header.getFirstValue(AHeader::CONTENT_TYPE);
 
 	std::string			contentLen = "";
 	if (body.empty())

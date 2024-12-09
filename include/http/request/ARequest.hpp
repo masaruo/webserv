@@ -1,6 +1,7 @@
 #pragma once
 #include "RequestLine.hpp"
-#include "HttpHeader.hpp"
+#include "RequestHeader.hpp"
+#include "ResponseHeader.hpp"
 #include "HttpBody.hpp"
 #include "RequestFactory.hpp"
 #include "Config.hpp"
@@ -13,21 +14,21 @@ class ARequest
 public:
 	struct	ResponseData
 	{
-		HttpStatus	status_;
-		HttpHeader	header_;
-		HttpBody	body_;
-		bool		has_body_;
+		HttpStatus		status_;
+		ResponseHeader	header_;
+		HttpBody		body_;
+		bool			has_body_;
 		ResponseData():has_body_(false){};
 	};
 	struct Request
 	{
-		RequestLine	line_;
-		HttpHeader	header_;
-		HttpBody	body_;
+		RequestLine		line_;
+		RequestHeader	header_;
+		HttpBody		body_;
 	};
 private:
 	RequestLine						requestLine_;
-	HttpHeader						header_;
+	RequestHeader					header_;
 	HttpBody						body_;
 	config::Config					config_;
 	ResponseData					response_;
@@ -44,21 +45,21 @@ protected:
 	void							assertFileExist(std::string const &filePath) const;
 	//response structure setter / getter
 	void							setResponseStatus(HttpStatus const &response_status);
-	void							setResponseHeader(HttpHeader const &response_header);
+	void							setResponseHeader(ResponseHeader const &response_header);
 	void							setResponseBody(HttpBody const &response_body);
 	void							setResponseHasBody(bool hasBody);
 	Server							&getServerReference(void);
 public:
 	// explicit ARequest(Request const &request, Server &server);
-	explicit ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server);
-	explicit ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server);
+	explicit ARequest(RequestLine const &line, RequestHeader const &header, config::Config const &config, Server &server);
+	explicit ARequest(RequestLine const &line, RequestHeader const &header, HttpBody const &body, config::Config const &config, Server &server);
 	virtual ~ARequest();
 	ARequest(ARequest const &rhs);
 	ARequest &operator=(ARequest const &rhs);
 
 	void							init(void) const;
 	RequestLine 					getLine(void) const;
-	HttpHeader 						getHeader(void) const;
+	RequestHeader 					getHeader(void) const;
 	HttpBody						getBody(void) const;
 	config::Config					getConfig(void) const;
 
@@ -66,7 +67,7 @@ public:
 
 	//getter for response
 	HttpStatus						getResponseStatus(void) const;
-	HttpHeader						getResponseHeader(void) const;
+	ResponseHeader					getResponseHeader(void) const;
 	HttpBody						getResponseBody(void) const;
 	bool							getResponseHasBody(void) const;
 

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/05 03:54:10 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/07 22:51:14 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,16 @@ static int	getListenFd_(int port)
 	sockaddr_in	const &addr = getPassiveSockAddr_(port);
 	int	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd == -1)
-		throw (std::runtime_error("Socket failed"));
+		throw (std::runtime_error("Listen Socket failed"));
 	int	optval = 1;
 	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
-		throw (std::runtime_error("Socket failed"));
+		throw (std::runtime_error("Listen Socket failed"));
 	if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
-		throw (std::runtime_error("Socket failed"));
+		throw (std::runtime_error("Listen Socket failed"));
 	if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
-		throw (std::runtime_error("Socket failed"));
+		throw (std::runtime_error("Listen Socket failed"));
 	if (listen(fd, SOMAXCONN) == -1)
-		throw (std::runtime_error("Socket failed"));
+		throw (std::runtime_error("Listen Socket failed"));
 	return (fd);
 }
 
@@ -66,22 +66,15 @@ void	ListenSocket::assertTimeout(void) const
 void	ListenSocket::handleEvent(uint32_t event)
 {
 	if (event != EPOLLIN)
-	{
-		throw (std::runtime_error("Socket failed"));
-	}
-
+		return ;
 	sockaddr_in	addr;
 	socklen_t	addrlen = sizeof(addr);
 
 	int clientFd = accept(getFd(), (struct sockaddr*)&addr, &addrlen);
 	if (clientFd == -1)
-	{
-		throw (std::runtime_error("Socket failed"));
-	}
+		return ;
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
-	{
-		throw (std::runtime_error("Socket failed"));
-	}
+		return ;
 	ClientSocket	*client = new ClientSocket(addr, clientFd, server_);
 	server_.add(client, EPOLLIN);
 }

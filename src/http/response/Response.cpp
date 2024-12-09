@@ -21,7 +21,7 @@ Response::Response(HttpStatus const &status)
 	return ;
 }
 
-Response::Response(HttpStatus const &status, HttpHeader const &header)
+Response::Response(HttpStatus const &status, ResponseHeader const &header)
 :status_(status)
 ,header_(header)
 ,body_()
@@ -30,7 +30,7 @@ Response::Response(HttpStatus const &status, HttpHeader const &header)
 	return ;
 }
 
-Response::Response(HttpStatus const &status, HttpHeader const &header, HttpBody const &body)
+Response::Response(HttpStatus const &status, ResponseHeader const &header, HttpBody const &body)
 :status_(status)
 ,header_(header)
 ,body_(body)
@@ -70,7 +70,7 @@ void	Response::setStatus(HttpStatus const &status)
 	status_ = status;
 }
 
-void	Response::setHeader(HttpHeader const &header)
+void	Response::setHeader(ResponseHeader const &header)
 {
 	header_ = header;
 }
@@ -82,19 +82,22 @@ void	Response::setBody(HttpBody const &body)
 
 void	Response::addMandetaryHeader(void)
 {
-	header_.addValue(HttpHeader::CONNECTION, "close");
+	header_.AHeader::add(AHeader::CONNECTION, "close");
+	header_.AHeader::add(AHeader::SERVER, "42Webserv/1.0");
 
 	std::string const &now = Date::time();
-	header_.addValue(HttpHeader::DATE, now);
+	header_.AHeader::add(AHeader::DATE, now);
 
-	if (status_.getCode() == HttpCode::NO_CONTENT)
-		header_.delField(HttpHeader::CONTENT_LENGTH);
+	if (status_.getCode() == HttpCode::NO_CONTENT && header_.hasKey(AHeader::CONTENT_LENGTH))
+		header_.del(AHeader::CONTENT_LENGTH);
 
 	if (has_body_)
 	{
-		header_.addValue(HttpHeader::CONTENT_LENGTH, body_.size());
-		if (!header_.hasKey(HttpHeader::CONTENT_TYPE))
-			header_.addValue(HttpHeader::CONTENT_TYPE, "text/html");
+		if (!header_.hasKey(AHeader::CONTENT_LENGTH))
+			header_.AHeader::add(AHeader::CONTENT_LENGTH, body_.size());
+
+		if (!header_.hasKey(AHeader::CONTENT_TYPE))
+			header_.AHeader::add(AHeader::CONTENT_TYPE, "application/octet-stream");
 	}
 }
 

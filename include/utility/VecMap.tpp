@@ -175,6 +175,12 @@ typename VecMap<K, V>::vecmap_t	VecMap<K, V>::data(void) const
 	return (data_);
 }
 
+template<typename K, typename V>
+typename VecMap<K,V>::size_type	VecMap<K,V>::size(void) const
+{
+	return (data_.size());
+}
+
 }// end of namespace vm
 
 #endif

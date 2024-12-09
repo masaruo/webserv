@@ -55,6 +55,7 @@ public:
 	virtual V			getValueAtIdx(K const &key, std::size_t idx) const;
 	virtual std::size_t	getIdxOfValue(K const &key, V const &value) const;
 	vecmap_t			data(void) const;
+	typename vecmap_t::size_type	size(void) const;
 
 	// exception
 	class VecMapException : public std::runtime_error

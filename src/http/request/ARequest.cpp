@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 01:05:46 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/06 02:53:07 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/08 06:43:26 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <sstream>
 #include <unistd.h>// for access
 
-ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+ARequest::ARequest(RequestLine const &line, RequestHeader const &header, config::Config const &config, Server &server)
 :requestLine_(line)
 ,header_(header)
 ,body_()
@@ -33,7 +33,7 @@ ARequest::ARequest(RequestLine const &line, HttpHeader const &header, config::Co
 	return ;
 }
 
-ARequest::ARequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
+ARequest::ARequest(RequestLine const &line, RequestHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
 :requestLine_(line)
 ,header_(header)
 ,body_(body)
@@ -116,7 +116,7 @@ void	ARequest::setResponseStatus(HttpStatus const &response_status)
 	response_.status_ = response_status;
 }
 
-void	ARequest::setResponseHeader(HttpHeader const &response_header)
+void	ARequest::setResponseHeader(ResponseHeader const &response_header)
 {
 	response_.header_ = response_header;
 }
@@ -137,7 +137,7 @@ HttpStatus	ARequest::getResponseStatus(void) const
 	return (response_.status_);
 }
 
-HttpHeader	ARequest::getResponseHeader(void) const
+ResponseHeader	ARequest::getResponseHeader(void) const
 {
 	return (response_.header_);
 }
@@ -157,7 +157,7 @@ RequestLine	ARequest::getLine(void) const
 	return (requestLine_);
 }
 
-HttpHeader	ARequest::getHeader(void) const
+RequestHeader	ARequest::getHeader(void) const
 {
 	return (header_);
 }

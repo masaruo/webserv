@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/05 03:54:22 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/08 06:08:39 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 #include "ASocket.hpp"
 #include "RequestFactory.hpp"
 #include "ClientSocket.hpp"
-// #include "IO.hpp"
-// #include "Env.hpp"
 
 class CgiSocket : public ASocket
 {

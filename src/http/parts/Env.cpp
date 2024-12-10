@@ -3,10 +3,10 @@
 #include "cstring"
 #include "HttpException.hpp"
 
-Env::Env(RequestLine const &line, HttpHeader const &header, HttpBody const &body, std::string const &local_path)
+Env::Env(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
 :env_(getEnviron())
 {
-	addCGIEnv(line, header, body, local_path);
+	addCGIEnv(line, header, body);
 	return ;
 }
 
@@ -35,11 +35,10 @@ void	Env::addEnvItem(std::string const &key, std::string const &value)
 	env_.insert(std::pair<std::string, std::string>(key, value));
 }
 
-void	Env::addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body, std::string const &local_path)
+void	Env::addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody const &body)
 {
 	HttpUri	const	uri = line.getUri();
 	std::string const	pathInfo = uri.getPathInfo().cgiPathInfo_;
-	std::string const	pathTranslated = local_path + "/" + pathInfo;
 	std::string const	scriptName = uri.getPath();
 	std::string			contentType = "";
 	if (header.hasKey("content-type"))
@@ -56,7 +55,6 @@ void	Env::addCGIEnv(RequestLine const &line, HttpHeader const &header, HttpBody 
 	addEnvItem("content_type", contentType);
 	addEnvItem("gateway_interface", "CGI/1.1");
 	addEnvItem("path_info", pathInfo);
-	addEnvItem("path_translated", pathTranslated);
 	addEnvItem("query_string", uri.getRawQueryString());
 	addEnvItem("remote_addr", "");//!Must todo
 	addEnvItem("remote_host", "");

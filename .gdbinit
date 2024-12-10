@@ -1,10 +1,12 @@
 set listsize 25
 set confirm off
-set pagination off
+set pagination on
 set print pretty on
 set print element 0
 set logging overwrite on
 set logging redirect on
+
+wh src -5
 
 skip -gfile /usr/include/*
 skip -gfile /usr/include/c++/*/*/*

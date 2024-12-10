@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chunked Transfer Test</title>
+    <script>
+        function sendChunkedData() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/your-server-endpoint', true);
+            xhr.setRequestHeader('Transfer-Encoding', 'chunked');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            xhr.onload = function() {
+                document.getElementById('response').textContent = this.responseText;
+            };
+
+            xhr.onerror = function() {
+                document.getElementById('response').textContent = 'An error occurred';
+            };
+
+            var name = document.getElementById('name').value;
+            var message = document.getElementById('message').value;
+
+            var data = 'name=' + encodeURIComponent(name) + '&message=' + encodeURIComponent(message);
+            var chunkSize = 10; // Set chunk size to 10 bytes
+
+            for (var i = 0; i < data.length; i += chunkSize) {
+                var chunk = data.slice(i, i + chunkSize);
+                var size = chunk.length.toString(16);
+                xhr.send(size + '\r\n' + chunk + '\r\n');
+            }
+
+            xhr.send('0\r\n\r\n'); // Last chunk
+        }
+    </script>
+</head>
+<body>
+    <h1>Chunked Transfer Test</h1>
+    <form onsubmit="sendChunkedData(); return false;">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="message">Message:</label>
+        <input type="text" id="message" name="message" required><br><br>
+        <input type="submit" value="Send">
+    </form>
+    <h2>Server Response:</h2>
+    <div id="response"></div>
+</body>
+</html>

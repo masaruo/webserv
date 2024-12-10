@@ -5,10 +5,9 @@
 #include "UriNormalizer.hpp"
 #include <fstream>
 
-PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config)
-:ARequest(line, header, body, config)
+PutRequest::PutRequest(RequestLine const &line, HttpHeader const &header, HttpBody const &body, config::Config const &config, Server &server)
+:ARequest(line, header, body, config, server)
 {
-	generateResponseData();
 	return ;
 }
 

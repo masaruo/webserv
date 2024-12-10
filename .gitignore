@@ -16,6 +16,10 @@ obj/*
 !cgi-bin/*
 !nginx/webserv.conf
 !www/*
+!www/*/*
+!www/*/*/*
+!echoserver/*
+
 asset/*
 googletest
 

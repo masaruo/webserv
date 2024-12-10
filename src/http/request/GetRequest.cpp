@@ -1,14 +1,13 @@
 #include "GetRequest.hpp"
-#include "CgiRequest.hpp"
+// #include "CgiRequest.hpp"
 #include "AutoIndexException.hpp"
 #include "FileHandler.hpp"
 #include "UriNormalizer.hpp"
 #include <sys/stat.h>
 
-GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config)
-:ARequest(line, header, config)
+GetRequest::GetRequest(RequestLine const &line, HttpHeader const &header, config::Config const &config, Server &server)
+:ARequest(line, header, config, server)
 {
-	generateResponseData();
 	return ;
 }
 
@@ -48,7 +47,7 @@ std::string	GetRequest::setLocalPath(void) const
 	{
 		assertAutoIndex(path, pathWithRoot);
 		std::string const &indexFileName = getIndexFileName(path);
-		finalPath = pathWithRoot + indexFileName;
+		finalPath = pathWithRoot + "/" + indexFileName;
 	}
 	if (!FileHandler::checkPathExist(finalPath))
 		throw (HttpException(HttpCode::NOT_FOUND));
@@ -94,31 +93,19 @@ void	GetRequest::generateResponseData(void)
 	HttpUri const		uri = getLine().getUri();
 	std::string const	path = uri.getPath();
 
-	if (uri.IsCgi())
-	{
-		CgiRequest	cgi(getLine(), getHeader(), getConfig());
-		setResponseStatus(cgi.getResponseStatus());
-		setResponseHeader(cgi.getResponseHeader());
-		setResponseBody(cgi.getResponseBody());
-		setResponseHasBody(cgi.getResponseHasBody());
-		return;
-	}
-	else
-	{
-		std::string const &abspath = setLocalPath();
+	std::string const &abspath = setLocalPath();
 
-		HttpBody body(FileHandler::read(abspath));
+	HttpBody body(FileHandler::read(abspath));//! read
 
-		HttpHeader	header;
-		header.addValue(HttpHeader::CONTENT_TYPE, "text/html");
-		header.addValue(HttpHeader::CONTENT_LENGTH, body.getSizeStr());
+	HttpHeader	header;
+	header.addValue(HttpHeader::CONTENT_TYPE, "text/html");
+	header.addValue(HttpHeader::CONTENT_LENGTH, body.getSizeStr());
 
-		HttpStatus	status(HttpCode::OK);
+	HttpStatus	status(HttpCode::OK);
 
-		setResponseStatus(status);
-		setResponseHeader(header);
-		setResponseBody(body);
-		setResponseHasBody(true);
-		return ;
-	}
+	setResponseStatus(status);
+	setResponseHeader(header);
+	setResponseBody(body);
+	setResponseHasBody(true);
+	return ;
 }

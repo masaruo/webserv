@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 00:32:01 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 05:49:55 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,12 @@ ASocket::ASocket(sockaddr_in const &addr, int fd, Server &server)
 
 ASocket::~ASocket()
 {
-	if (fd_ > 2)
-		close (fd_);
 	return ;
 }
 
 void	ASocket::setFd(int fd)
 {
-	fd_ = fd;
+	fd_.set(fd);
 }
 
 void	ASocket::setAddr(sockaddr_in const &addr)
@@ -79,7 +77,7 @@ sockaddr_in const &ASocket::getAddr(void) const
 
 int	ASocket::getFd(void) const
 {
-	return (fd_);
+	return (fd_.get());
 }
 
 bool	ASocket::isDelete(void) const

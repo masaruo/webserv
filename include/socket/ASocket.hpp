@@ -6,12 +6,13 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 00:32:06 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 05:42:45 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "define.hpp"
+#include "Fd.hpp"
 #include <netinet/in.h>
 
 class Server;
@@ -20,7 +21,8 @@ class ASocket
 {
 private:
 	sockaddr_in		addr_;
-	int				fd_;
+	Fd				fd_;
+	// int				fd_;
 	mutable bool	to_delete_;
 	time_t			last_active_time_;
 protected:
@@ -38,7 +40,7 @@ public:
 	int					getFd(void) const;
 	bool				isDelete(void) const;
 	void				updateLastActiveTime(void);
-	virtual void		assertTimeout(void) const = 0;
+	virtual void		assertTimeout(void) = 0;
 	virtual void		handleEvent(uint32_t event) = 0;
 private:
 	ASocket(ASocket const &rhs);

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 03:33:00 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 05:28:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ void	Server::run(void)
 						parent->setData(res.to_string());
 						this->mod(parent, EPOLLOUT);
 						cgi->setSocketClose();
+						continue ;
 					}
 					else if (ClientSocket *client = dynamic_cast<ClientSocket*>(socket))
 					{

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 00:26:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 05:22:15 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	ClientSocket::setData(std::string const &data)
 	data_ = data;
 }
 
-void	ClientSocket::assertTimeout(void) const
+void	ClientSocket::assertTimeout(void)
 {
 	time_t	now = time(NULL);
 

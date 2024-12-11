@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:35:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/05 03:48:49 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 05:22:01 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,6 @@ private:
 public:
 	explicit ListenSocket(int port, Server &server);
 	~ListenSocket();
-	void	assertTimeout(void) const;
+	void	assertTimeout(void);
 	void	handleEvent(uint32_t event);
 };

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/10 12:42:31 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 06:27:05 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,15 @@ private:
 	pid_t			child_pid_;
 	std::string		send_buf_;
 	std::string		recv_buf_;
-	int				sockfd_[2];
-	void	closeSockFds(void);
-	void	execChild(int fd[2]);
+	// int				sockfd_[2];
+	// Fd				sockfd_[2];
+	void	killAndWait(void) const;
+	void	execChild(int sockfd[2]);
 public:
 	explicit	CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server);
 	~CgiSocket();
 	ClientSocket	*getParentSocket(void) const;
-	void	assertTimeout(void) const;
+	void	assertTimeout(void);
 	void	handleCgiExecution(void);
 	void	handleEvent(uint32_t event);
 private:

@@ -39,21 +39,21 @@ std::string	GetRequest::setLocalPath(void) const
 	std::string const	&root = getConfig().getRoot(path);
 	std::string const	&pathWithRoot = root + path;
 
-	if (!FileHandler::checkPathExist(pathWithRoot))
+	if (!FileHandler::isExist(pathWithRoot))
 		throw (HttpException(HttpCode::NOT_FOUND));
 
 	finalPath = pathWithRoot;
-	if (FileHandler::checkIfDirectory(pathWithRoot))
+	if (FileHandler::isDir(pathWithRoot))
 	{
+		if (!FileHandler::isR_OK(pathWithRoot))
+			throw (HttpException(HttpCode::FORBIDDEN));
 		assertAutoIndex(path, pathWithRoot);
 		std::string const &indexFileName = getIndexFileName(path);
 		finalPath = pathWithRoot + "/" + indexFileName;
 	}
-	if (!FileHandler::checkPathExist(finalPath))
+	if (!FileHandler::isFile(finalPath))
 		throw (HttpException(HttpCode::NOT_FOUND));
-	if (!FileHandler::checkIfFile(finalPath))
-		throw (HttpException(HttpCode::CONFLICT));
-	if (access(finalPath.c_str(), R_OK) == -1)
+	if (!FileHandler::isR_OK(finalPath))
 		throw (HttpException(HttpCode::FORBIDDEN));
 	return (finalPath);
 }
@@ -66,7 +66,7 @@ void	GetRequest::assertAutoIndex(std::string const &path, std::string const &pat
 	{
 		std::string const &index_name = loc.directive_.getFirstValue(config::Config::INDEX);
 		std::string const &index_path = pathWithRoot + index_name;
-		if (FileHandler::checkIfFile(index_path))
+		if (FileHandler::isR_OK(index_path))
 			return ;
 	}
 
@@ -93,6 +93,36 @@ std::string	GetRequest::getIndexFileName(std::string const &path) const
 	}
 }
 
+static std::string	getMimeType(std::string const &path)
+{
+	if (path == "/")
+		return ("text/html");
+
+	std::string::size_type	posDot = path.find_last_of(".");
+	if (posDot == std::string::npos)
+		return ("application/octet-stream");
+	
+	std::string const	&ext = path.substr(posDot);
+	if (ext == ".jpeg")
+		return ("image/jpeg");
+	else if (ext == ".png")
+		return ("image/png");
+	else if (ext == ".mp4")
+		return ("video/mp4");
+	else if (ext == ".html")
+		return ("text/html");
+	else if (ext == ".txt")
+		return ("text/plain");
+	else if (ext == ".pdf")
+		return ("application/pdf");
+	else if (ext == ".json")
+		return ("application/json");
+	else if (ext == ".zip")
+		return ("application/zip");
+	else
+		return ("application/octet-stream");
+}
+
 void	GetRequest::generateResponseData(void)
 {
 	HttpUri const		&uri = getLine().getUri();
@@ -105,9 +135,8 @@ void	GetRequest::generateResponseData(void)
 	HttpBody body(FileHandler::read(abspath));
 
 	ResponseHeader header;
-	// HttpHeader	header;
-	// header.addValue(HttpHeader::CONTENT_TYPE, "text/html");//? how to get content-type???
-	// header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
+	std::string const &mimetype = getMimeType(path);
+	header.AHeader::add(AHeader::CONTENT_TYPE, mimetype);
 
 	HttpStatus	status(HttpCode::OK);
 

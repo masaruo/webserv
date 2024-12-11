@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/08 08:05:22 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 00:26:46 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,18 @@ void	ClientSocket::handleRead(void)
 		updateLastActiveTime();
 		if (factory_.isCgiRequest())
 		{
-			server_.mod(this, 0);
-			CgiSocket	*cgi = new CgiSocket(this, factory_, server_);
-			cgi->handleCgiExecution();
-			server_.add(cgi, EPOLLOUT);
+			try
+			{
+				server_.mod(this, 0);
+				CgiSocket	*cgi = new CgiSocket(this, factory_, server_);
+				cgi->handleCgiExecution();
+				server_.add(cgi, EPOLLOUT);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << "ClientSocket.cpp at 91" << e.what() << std::endl;
+				throw ;
+			}
 		}
 		else
 		{

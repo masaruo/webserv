@@ -6,14 +6,23 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 06:06:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 23:34:17 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 03:55:49 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+/*
+メモ：
+* no autoindex allowed in cgi-bin
+* only jpeg, png, mp4, html, txt, pdf, json, zip allowed as an accepted mime type
+	rest will be treated as "applicatio/octet-stream"
+* 一番最初のコンフィグがデフォルト
+*/
 
 #include "Server.hpp"
 #include <signal.h>
 
-int main(void)
+//! read from argv
+int main(int argc, char **argv)//todo read from argv
 {
 	try
 	{
@@ -22,7 +31,11 @@ int main(void)
 		Server	server("./config/config.md");
 		server.run();
 	}
-	catch(const std::exception& e)
+	catch (config::Config::ConfigErrorException const &e)
+	{
+		std::cerr << "main.cpp:35 Config related fatal error detected." << std::endl;
+	}
+	catch (std::exception const &e)
 	{
 		std::cerr << "main.cpp:27 fatal error caught " << e.what() << std::endl;
 		return (1);

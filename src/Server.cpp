@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/08 22:29:21 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 03:33:00 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "AResponseException.hpp"
 #include "Response.hpp"
 #include "ClientSocket.hpp"
+#include "CgiSocket.hpp"
 #include <sys/epoll.h>
 #include <unistd.h>
 
@@ -94,6 +95,13 @@ void	Server::mod(ASocket *socket, uint32_t event)
 	}
 }
 
+void	Server::del(ASocket *socket)
+{
+	int res = epoll_ctl(epollFd_, EPOLL_CTL_DEL, socket->getFd(), NULL);
+	if (res == -1)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+}
+
 void	Server::run(void)
 {
 	while (true)
@@ -118,17 +126,34 @@ void	Server::run(void)
 			}
 			catch (HttpException const &e)
 			{
+				// try
+				// {
+				// 	Response res = e.generateResponse();
+				// 	ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
+				// 	if (client == NULL)
+				// 		continue ;
+				// 	client->setData(res.to_string());
+				// 	this->mod(socket, EPOLLOUT);
+				// }
 				try
 				{
-					Response res = e.generateResponse();
-					ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
-					if (client == NULL)
-						continue ;
-					client->setData(res.to_string());
-					this->mod(socket, EPOLLOUT);
+					Response	res = e.generateResponse();
+					if (CgiSocket *cgi = dynamic_cast<CgiSocket*>(socket))
+					{
+						ClientSocket *parent = cgi->getParentSocket();
+						parent->setData(res.to_string());
+						this->mod(parent, EPOLLOUT);
+						cgi->setSocketClose();
+					}
+					else if (ClientSocket *client = dynamic_cast<ClientSocket*>(socket))
+					{
+						client->setData(res.to_string());
+						this->mod(client, EPOLLOUT);
+					}
 				}
 				catch (HttpException const &e)
 				{
+					std::cerr << "Server.cpp:132 error" << std::endl;
 					ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
 					if (client == NULL)
 						continue ;
@@ -140,12 +165,12 @@ void	Server::run(void)
 			}
 			catch (std::exception const &e)
 			{
-				std::cerr << "Server.cpp:" << e.what() << std::endl;
+				std::cerr << "Server.cpp:144" << e.what() << std::endl;
 				socket->setSocketClose();
 			}
 			catch (...)
 			{
-				std::cerr << "Non Standard Error detected." << std::endl;
+				std::cerr << "Server.cpp:148 Non Standard Error detected." << std::endl;
 				socket->setSocketClose();
 			}
 		}

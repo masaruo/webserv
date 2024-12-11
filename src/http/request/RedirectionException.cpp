@@ -24,8 +24,6 @@ Response	RedirectionException::generateResponse(void) const
 	HttpStatus const		status(error_code);
 
 	ResponseHeader	header;
-	// header.addValue("content-length", "0");
-	// header.addValue("location", getPath());
 	header.AHeader::add(AHeader::LOCATION, getPath());
 
 	Response	r(status, header);

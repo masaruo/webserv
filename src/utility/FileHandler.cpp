@@ -17,53 +17,76 @@ std::string FileHandler::read(std::string const &path)
 	return (ss.str());
 }
 
-static int	xstat(std::string const &path)
+bool	FileHandler::isDir(std::string const &path, int mode)
 {
-	struct stat	buf;
+	struct stat buf;
 
 	int res = stat(path.c_str(), &buf);
 
+	if (res == 0 && S_ISDIR(buf.st_mode))
+	{
+		int perm = isOK(path, mode);
+		if (perm == true)
+			return (true);
+	}
+		return (false);
+}
+
+bool	FileHandler::isFile(std::string const &path, int mode)
+{
+	struct stat buf;
+
+	int res = stat(path.c_str(), &buf);
+
+	if (res == 0 && S_ISREG(buf.st_mode))
+	{
+		int perm = isOK(path, mode);
+		if (perm == true)
+			return (true);
+	}
+	return (false);
+}
+
+bool	FileHandler::isExist(std::string const &path)
+{
+	int res = access(path.c_str(), F_OK);
 	if (res == -1)
-		return (FileHandler::INVALID_PATH);
-	else if (S_ISDIR(buf.st_mode))
-		return (FileHandler::ISDIR);
-	else if (S_ISREG(buf.st_mode))
-		return (FileHandler::ISFILE);
-	else
-		return (FileHandler::FILE_EXIST);
-
-}
-
-bool	FileHandler::checkPathExist(std::string const &path)
-{
-	int res = xstat(path);
-	if (res != FileHandler::INVALID_PATH)
-		return (true);
-	else
 		return (false);
-}
-
-bool	FileHandler::checkIfDirectory(std::string const &path)
-{
-	int res = xstat(path);
-	if (res == FileHandler::ISDIR)
-		return (true);
 	else
-		return (false);
-}
-
-bool	FileHandler::checkIfFile(std::string const &path)
-{
-	int res = xstat(path);
-	if (res == FileHandler::ISFILE)
 		return (true);
-	else
-		return (false);
 }
 
-bool	FileHandler::assertAccess(std::string const &path, int mode)
+bool	FileHandler::isR_OK(std::string const &path)
 {
-	if (::access(path.c_str(), mode) == -1)
+	int res = access(path.c_str(), R_OK);
+	if (res == -1)
+		return (false);
+	else
+		return (true);
+}
+
+bool	FileHandler::isW_OK(std::string const &path)
+{
+	int res = access(path.c_str(), W_OK);
+	if (res == -1)
+		return (false);
+	else
+		return (true);
+}
+
+bool	FileHandler::isX_OK(std::string const &path)
+{
+	int res = access(path.c_str(), X_OK);
+	if (res == -1)
+		return (false);
+	else
+		return (true);
+}
+
+bool	FileHandler::isOK(std::string const &path, int mode)
+{
+	int res = access(path.c_str(), mode);
+	if (res == -1)
 		return (false);
 	else
 		return (true);

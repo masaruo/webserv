@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 03:52:05 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 01:28:04 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 00:20:12 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ public:
 
 	config::ConfigFactory const	&getConfigFactory(void) const;
 	void						add(ASocket *socket, uint32_t event);
+	void						del(ASocket *socket);
 	void						mod(ASocket *socket, uint32_t event);
 	void						run(void);
 };

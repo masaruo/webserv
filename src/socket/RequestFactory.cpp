@@ -5,8 +5,6 @@
 #include "DeleteRequest.hpp"
 #include "Server.hpp"
 
-//! todo assertion such as allowed method?
-
 RequestFactory::RequestFactory()
 :buf_()
 ,line_()
@@ -220,8 +218,12 @@ ARequest	*RequestFactory::createRequest(Server &server) const
 {
 	if (!isParseCompleted_)
 		throw (HttpException(HttpCode::BAD_REQUEST));
-	
-	config::Config	config = server.getConfigFactory().getConfig(line_.getUri().getHost());
+
+	HttpUri const		&uri = line_.getUri();
+	std::string const	&host = uri.getHost();
+	std::size_t const	&port = uri.getPort();
+
+	config::Config	config = server.getConfigFactory().getConfig(host, port);
 	HttpException::loadErrorPageMap(config);
 
 	if (line_.getMethod() == "GET")

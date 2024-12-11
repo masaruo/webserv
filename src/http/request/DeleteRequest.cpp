@@ -39,11 +39,11 @@ std::string	DeleteRequest::setLocalPath(void) const
 	std::string const	&root = getConfig().getRoot(dir);
 	std::string const	&pathWithRoot = root + dir + "/" + file;
 
-	if (FileHandler::checkPathExist(pathWithRoot))
+	if (FileHandler::isExist(pathWithRoot))
 	{
-		if (FileHandler::checkIfDirectory(pathWithRoot))
+		if (FileHandler::isDir(pathWithRoot))
 			throw (HttpException(HttpCode::METHOD_NOT_ALLOWED));
-		if (!FileHandler::checkIfFile(pathWithRoot))
+		if (!FileHandler::isFile(pathWithRoot))
 			throw (HttpException(HttpCode::NOT_FOUND));
 
 		std::string const &parentPath = root + uri.getPathInfo().directory_;
@@ -74,7 +74,6 @@ void	DeleteRequest::generateResponseData(void)
 	HttpStatus	status(HttpCode::NO_CONTENT);
 
 	ResponseHeader	header;
-	// header.addValue(HttpHeader::CONTENT_LENGTH, "0");
 
 	setResponseStatus(status);
 	setResponseHeader(header);

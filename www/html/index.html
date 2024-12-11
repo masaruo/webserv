@@ -64,20 +64,43 @@
         </div>
     </form>
 
+    <body>
+        <div class="section">
+            <h2>GETリクエスト</h2>
+            <form id="getForm" onsubmit="handleSubmit(event)" class="upload-form">
+                <input type="text" id="pathInput" class="input-field" placeholder="パスを入力" required>
+                <button type="submit" class="button">GETリクエスト送信</button>
+            </form>
+        </div>
+        <!-- rest of the content remains same -->
+    
+        <script>
+            function handleSubmit(event) {
+                event.preventDefault();
+                const path = document.getElementById('pathInput').value;
+                window.location.href = path;
+            }
+        </script>
+    </body>
+    </html>
+
+
+
     <h1>File Upload</h1>
     <form id="uploadForm">
         <input type="file" id="fileInput" name="file">
         <button type="button" onclick="uploadFile()">Upload</button>
     </form>
     <br>
+    <h1>File Delete</h1>
     <form id="deleteForm">
         <input type="text" id="fileNameInput" name="fileName" placeholder="Enter file name to delete">
         <button type="button" onclick="deleteFile()">Delete</button>
     </form>
 
-    <h2>GET Request with Custom Path</h2>
+    <h2>GET Request to show response</h2>
     <form id="getForm">
-        <input type="text" id="getPath" placeholder="Enter path (e.g., /api/data)">
+        <input type="text" id="getPath" placeholder="Enter path (/storage/uploads)">
         <button type="button" onclick="sendGetRequest()">Send GET Request</button>
     </form>
     <div id="getResponse"></div>
@@ -94,7 +117,7 @@
             
             xhr.open('PUT', "/uploads/" + encodeURIComponent(file.name), true);
             xhr.onload = function() {
-                if (xhr.status === 200) {
+                if (xhr.status >= 200 && xhr.status <=300) {
                     alert('File "' + file.name + '" uploaded successfully.');
                     xhr.open('PUT', "/uploads?filename=" + encodeURIComponent(file.name), true);
                 } else {

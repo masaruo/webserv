@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 01:55:21 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/11 00:26:44 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	SocketHolder::add(ASocket *socket)
 	vec_sockets_.push_back(socket);
 }
 
+#include <iostream>
 void	SocketHolder::deleteMarkedSockets(int epollfd)
 {
 	iterator		it = vec_sockets_.begin();
@@ -50,7 +51,6 @@ void	SocketHolder::deleteMarkedSockets(int epollfd)
 		{
 			iterator tmp = it;
 			it++;
-
 			int	res = epoll_ctl(epollfd, EPOLL_CTL_DEL, (*tmp)->getFd(), NULL);
 			if (res == -1)
 			{

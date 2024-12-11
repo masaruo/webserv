@@ -18,7 +18,7 @@ namespace ft
 	int			const	PARENTFD = 0;
 	int			const	CHILDFD = 1;
 	time_t		const	TIMEOUT_SEC = 30;
-	time_t		const	TIMEOUT_CGI_SEC = 20;
+	time_t		const	TIMEOUT_CGI_SEC = 10;
 
 
 	typedef std::vector<std::string>			str_vec;

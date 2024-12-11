@@ -6,7 +6,7 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/12/06 05:50:57 by mogawa           ###   ########.fr        #
+#    Updated: 2024/12/10 12:29:12 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,12 +27,18 @@ OBJDIR		:=	obj
 OBJ			:=	$(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 DEP			:=	$(OBJ:.o=.d)
 
+ifdef WITH_DEBUG
+CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
+CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined -fno-limit-debug-info -fno-omit-frame-pointer
+LDFLAGS		:=	-fsanitize=address,undefined
+endif
+
 ifdef WITH_GDB
 CXXFLAGS	:=	$(filter-out -Werror, $(CXXFLAGS))
 CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined -fno-limit-debug-info -fno-omit-frame-pointer -DDEBUG
-# CXXFLAGS	+=	-ggdb -O0 -fsanitize=address,undefined -fno-limit-debug-info -fno-omit-frame-pointer
 LDFLAGS		:=	-fsanitize=address,undefined
 endif
+
 
 
 all: $(TARGET)
@@ -45,10 +51,10 @@ $(TARGET):	$(OBJ)
 	$(CXX) $(LDFLAGS) $^ -o $@
 
 debug: fclean
-	$(MAKE) all WITH_GDB=1
+	$(MAKE) all WITH_DEBUG=1
 
-gdb: debug
-	gdb ./$(TARGET)
+gdb: fclean
+	$(MAKE) all WITH_GDB=1
 
 clean:
 	$(RM) -r $(OBJDIR)
@@ -66,11 +72,11 @@ docker:
 down:
 	docker compose -f .devcontainer/docker-compose.yml down
 
-val:
-	valgrind ./$(TARGET)
+valgrind:
+	valgrind --leak-check=full --track-fds=yes -s ./$(TARGET)
 
 -include $(DEP)
 
-.PHONY: clean fclean re docker val up down
+.PHONY: clean fclean gdb debug re docker val up down
 
 # $(info SRC=$(SRC))

@@ -60,9 +60,7 @@ Response	AutoIndexException::generateResponse(void) const
 	HttpStatus status(HttpCode::OK);
 
 	ResponseHeader header;
-	// header.addValue(HttpHeader::CONTENT_TYPE, "text/plain");
-	// header.addValue(HttpHeader::CONTENT_LENGTH, body.size());
-	// header.addValue(HttpHeader::CONNECTION, "close");
+	header.AHeader::add(AHeader::CONTENT_TYPE, "text/plain");
 
 	Response	r(status, header, body);
 	return (r);

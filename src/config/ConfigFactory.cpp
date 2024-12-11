@@ -56,7 +56,7 @@ config::Config	config::ConfigFactory::getDefaultConfig(void) const
 	return (configs_.front());
 }
 
-config::Config	config::ConfigFactory::getConfig(std::string const &server_name) const
+config::Config	config::ConfigFactory::getConfig(std::string const &server_name, std::size_t port) const
 {
 	std::vector<Config>::const_iterator	iter = configs_.begin();
 	std::vector<Config>::const_iterator	end = configs_.end();
@@ -64,10 +64,10 @@ config::Config	config::ConfigFactory::getConfig(std::string const &server_name) 
 	while (iter != end)
 	{
 		std::string	this_server_name = iter->getServerName();
-		if (this_server_name == server_name)
+		std::size_t	this_port = iter->getPort();
+		if (this_server_name == server_name && this_port == port)
 		{
 			return (*iter);
-			break ;
 		}
 		iter++;
 	}

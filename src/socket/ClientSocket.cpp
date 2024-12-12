@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:12:10 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:33:48 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,22 +37,21 @@ void	ClientSocket::setData(std::string const &data)
 	data_ = data;
 }
 
-// void	ClientSocket::assertTimeout(void)
-// {
-	// std::cerr << "ClientSocket timeout assertion" << std::endl;
-	// time_t	now = time(NULL);
-	// if (now == -1)
-	// {
-	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	// }
-	// else if (now > getLastActiveTime() + ft::TIMEOUT_SEC)
-	// {
-	// 	throw (HttpException(HttpCode::REQUEST_TIMEOUT));
-	// }
-	// else
-	// 	return ;
-	// return ;
-// }
+void	ClientSocket::assertTimeout(void)
+{
+	std::cerr << "ClientSocket timeout assertion" << std::endl;
+	time_t	now = time(NULL);
+	if (now == -1)
+	{
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
+	else if (now > getLastActiveTime() + ft::TIMEOUT)
+	{
+		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
+	}
+	else
+		return ;
+}
 
 time_t	ClientSocket::getLastActiveTime(void) const
 {
@@ -61,9 +60,9 @@ time_t	ClientSocket::getLastActiveTime(void) const
 
 void	ClientSocket::handleEvent(uint32_t event)
 {
-	// #ifndef DEBUG
-	// assertTimeout();
-	// #endif
+	#ifndef DEBUG
+	assertTimeout();
+	#endif
 	updateLastActiveTime();
 	if (event == EPOLLIN)
 	{

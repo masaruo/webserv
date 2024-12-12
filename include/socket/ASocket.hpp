@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:12:05 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:32:26 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ public:
 	int					getFd(void) const;
 	bool				isDelete(void) const;
 	void				updateLastActiveTime(void);
+	virtual	void		assertTimeout(void) = 0;
 	virtual void		handleEvent(uint32_t event) = 0;
 private:
 	ASocket(ASocket const &rhs);

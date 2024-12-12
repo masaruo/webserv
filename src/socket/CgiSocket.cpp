@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:21:40 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:34:04 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,23 +157,24 @@ void	CgiSocket::execChild(int sockfd[2])
 
 	std::exit(INTERNAL_SERVER_ERROR);
 }
-// void	CgiSocket::assertTimeout(void)
-// {
-// 	std::cerr << "assert CGI Timeout" << std::endl;
-// 	time_t	now = time(NULL);
-// 	if (now == -1)
-// 	{
-// 		setSocketClose();
-// 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-// 	}
-// 	if (now > getLastActiveTime() + ft::TIMEOUT_CGI_SEC)
-// 	{
-// 		setSocketClose();
-// 		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
-// 	}
-// 	else
-// 		return ;
-// }
+
+void	CgiSocket::assertTimeout(void)
+{
+	std::cerr << "assert CGI Timeout" << std::endl;
+	time_t	now = time(NULL);
+	if (now == -1)
+	{
+		setSocketClose();
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
+	if (now > getLastActiveTime() + ft::TIMEOUT)
+	{
+		setSocketClose();
+		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
+	}
+	else
+		return ;
+}
 
 static Response	createResponse(std::string const &buf, int exit_status)
 {
@@ -203,9 +204,9 @@ static Response	createResponse(std::string const &buf, int exit_status)
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
-	// #ifndef DEBUG
-	// assertTimeout();
-	// #endif
+	#ifndef DEBUG
+	assertTimeout();
+	#endif
 	updateLastActiveTime();
 	parent_socket_->updateLastActiveTime();
 	ssize_t bytes = 0;

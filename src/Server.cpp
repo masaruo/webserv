@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 04:41:55 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:34:56 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ void	Server::del(ASocket *socket)
 
 void	signal_handler(int signum)
 {
+	(void) signum;
 	std::exit(EXIT_SUCCESS);
 }
 
@@ -169,7 +170,7 @@ void	Server::run(void)
 				socket->setSocketClose();
 			}
 		}
-		holder_.markInactieSocketsDelete();
+		// holder_.markInactieSocketsDelete();
 		holder_.deleteMarkedSockets(epollFd_);
 	}
 }

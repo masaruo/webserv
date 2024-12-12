@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 06:28:44 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:21:40 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,12 @@ CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server
 
 CgiSocket::~CgiSocket()
 {
-	return ;;
+	if (child_pid_ > 0)
+	{
+		kill (child_pid_, SIGKILL);
+		waitpid(child_pid_, NULL, 0);
+	}
+	return ;
 }
 
 void	CgiSocket::handleCgiExecution(void)
@@ -152,32 +157,23 @@ void	CgiSocket::execChild(int sockfd[2])
 
 	std::exit(INTERNAL_SERVER_ERROR);
 }
-
-void	CgiSocket::killAndWait(void) const
-{
-	kill(child_pid_, SIGKILL);
-	waitpid(child_pid_, NULL, WNOHANG);
-}
-
-void	CgiSocket::assertTimeout(void)
-{
-	std::cerr << "assert CGI Timeout" << std::endl;
-	time_t	now = time(NULL);
-	if (now == -1)
-	{
-		// setSocketClose();
-		killAndWait();
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	}
-	if (now > getLastActiveTime() + ft::TIMEOUT_CGI_SEC)
-	{
-		// setSocketClose();
-		killAndWait();
-		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
-	}
-	else
-		return ;
-}
+// void	CgiSocket::assertTimeout(void)
+// {
+// 	std::cerr << "assert CGI Timeout" << std::endl;
+// 	time_t	now = time(NULL);
+// 	if (now == -1)
+// 	{
+// 		setSocketClose();
+// 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+// 	}
+// 	if (now > getLastActiveTime() + ft::TIMEOUT_CGI_SEC)
+// 	{
+// 		setSocketClose();
+// 		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
+// 	}
+// 	else
+// 		return ;
+// }
 
 static Response	createResponse(std::string const &buf, int exit_status)
 {
@@ -207,15 +203,16 @@ static Response	createResponse(std::string const &buf, int exit_status)
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
-	#ifndef DEBUG
-	assertTimeout();
-	#endif
+	// #ifndef DEBUG
+	// assertTimeout();
+	// #endif
+	updateLastActiveTime();
+	parent_socket_->updateLastActiveTime();
 	ssize_t bytes = 0;
 	if (event & EPOLLOUT)
 	{
 		if (send_buf_.empty())
 		{
-			updateLastActiveTime();
 			server_.mod(this, EPOLLIN);
 			return ;
 		}
@@ -223,7 +220,6 @@ void	CgiSocket::handleEvent(uint32_t event)
 		if (bytes <= 0)
 		{
 			setSocketClose();
-			std::cerr << "event1" << std::endl;
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		send_buf_ = send_buf_.substr(bytes);
@@ -235,7 +231,6 @@ void	CgiSocket::handleEvent(uint32_t event)
 		if (bytes == -1)
 		{
 			setSocketClose();
-			std::cerr << "event2" << std::endl;
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		else if (bytes == 0)
@@ -248,8 +243,8 @@ void	CgiSocket::handleEvent(uint32_t event)
 			else
 				res = createResponse(recv_buf_, 0);
 			parent_socket_->setData(res.to_string());
-			parent_socket_->updateLastActiveTime();
 			server_.mod(parent_socket_, EPOLLOUT);
+			child_pid_ = -1;
 			setSocketClose();
 			return;
 		}
@@ -265,4 +260,9 @@ void	CgiSocket::handleEvent(uint32_t event)
 ClientSocket	*CgiSocket::getParentSocket(void) const
 {
 	return (parent_socket_);
+}
+
+time_t	CgiSocket::getLastActiveTime(void) const
+{
+	return (last_active_time_);
 }

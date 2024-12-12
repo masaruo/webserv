@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 05:22:15 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:12:10 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,32 +37,46 @@ void	ClientSocket::setData(std::string const &data)
 	data_ = data;
 }
 
-void	ClientSocket::assertTimeout(void)
-{
-	time_t	now = time(NULL);
+// void	ClientSocket::assertTimeout(void)
+// {
+	// std::cerr << "ClientSocket timeout assertion" << std::endl;
+	// time_t	now = time(NULL);
+	// if (now == -1)
+	// {
+	// 	throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	// }
+	// else if (now > getLastActiveTime() + ft::TIMEOUT_SEC)
+	// {
+	// 	throw (HttpException(HttpCode::REQUEST_TIMEOUT));
+	// }
+	// else
+	// 	return ;
+	// return ;
+// }
 
-	if (now == -1)
-	{
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-	}
-	else if (now > getLastActiveTime() + ft::TIMEOUT_SEC)
-	{
-		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
-	}
-	else
-		return ;
+time_t	ClientSocket::getLastActiveTime(void) const
+{
+	return (last_active_time_);
 }
 
 void	ClientSocket::handleEvent(uint32_t event)
 {
-	#ifndef DEBUG
-	assertTimeout();
-	#endif
-
+	// #ifndef DEBUG
+	// assertTimeout();
+	// #endif
+	updateLastActiveTime();
 	if (event == EPOLLIN)
+	{
 		handleRead();
+	}
 	else if (event == EPOLLOUT)
+	{
 		handleSend();
+	}
+	else if (event & (EPOLLERR | EPOLLHUP | EPOLLRDHUP))
+	{
+		setSocketClose();
+	}
 	else
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
@@ -76,7 +90,6 @@ void	ClientSocket::handleRead(void)
 	factory_.parse(buf, bytes);
 	if (factory_.isParseCompleted())
 	{
-		updateLastActiveTime();
 		if (factory_.isCgiRequest())
 		{
 			try

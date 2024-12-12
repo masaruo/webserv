@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 05:49:55 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:09:05 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,6 @@ void	ASocket::setAddr(sockaddr_in const &addr)
 void ASocket::setSocketClose(void) const
 {
 	to_delete_ = true;
-}
-
-time_t	ASocket::getLastActiveTime(void) const
-{
-	return (last_active_time_);
 }
 
 void	ASocket::updateLastActiveTime(void)

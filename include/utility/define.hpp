@@ -13,12 +13,11 @@ namespace ft
 	std::size_t const	MAX_FIELD_LEN = 4000;
 	std::size_t const	MAX_HEADERS_NUM = 100;
 	std::size_t const	URI_MAX_LEN = 8000;
-	std::size_t const	READ_BUF_SIZE = 4000;
+	std::size_t const	READ_BUF_SIZE = 4;
 	std::size_t const	WRITE_BUF_SIZE = 8000;
 	int			const	PARENTFD = 0;
 	int			const	CHILDFD = 1;
-	time_t		const	TIMEOUT_SEC = 30;
-	time_t		const	TIMEOUT_CGI_SEC = 10;
+	time_t		const	TIMEOUT = 10;
 
 
 	typedef std::vector<std::string>			str_vec;

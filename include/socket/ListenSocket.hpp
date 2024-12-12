@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:35:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 05:22:01 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 05:09:51 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,5 @@ public:
 	~ListenSocket();
 	void	assertTimeout(void);
 	void	handleEvent(uint32_t event);
+	time_t	getLastActiveTime(void) const;
 };

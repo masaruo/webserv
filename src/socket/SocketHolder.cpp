@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 00:26:44 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:19:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 #include "define.hpp"
 #include "HttpException.hpp"
 #include "ASocket.hpp"
+#include "ClientSocket.hpp"
+#include "CgiSocket.hpp"
+#include "Response.hpp"
 
 SocketHolder::SocketHolder()
 :vec_sockets_()
@@ -39,7 +42,6 @@ void	SocketHolder::add(ASocket *socket)
 	vec_sockets_.push_back(socket);
 }
 
-#include <iostream>
 void	SocketHolder::deleteMarkedSockets(int epollfd)
 {
 	iterator		it = vec_sockets_.begin();

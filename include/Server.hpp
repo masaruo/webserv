@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 03:52:05 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 00:20:12 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 06:38:12 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@ private:
 	event_vec				eventQueue_;
 	SocketHolder			holder_;
 
-	int	epollWait(void);
-
+	int		epollWait(void);
+	void	markInactieSocketsDelete(void);
 	Server();
 	Server(Server const &rhs);
 	Server &operator=(Server const &rhs);

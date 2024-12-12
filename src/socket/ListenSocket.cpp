@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/07 22:51:14 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:29:54 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ ListenSocket::~ListenSocket()
 	return ;
 }
 
-void	ListenSocket::assertTimeout(void) const
+void	ListenSocket::assertTimeout(void)
 {
 	return ;
 }

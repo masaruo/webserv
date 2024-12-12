@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 00:26:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:21:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,15 +37,14 @@ void	ClientSocket::setData(std::string const &data)
 	data_ = data;
 }
 
-void	ClientSocket::assertTimeout(void) const
+void	ClientSocket::assertTimeout(void)
 {
 	time_t	now = time(NULL);
-
 	if (now == -1)
 	{
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
-	else if (now > getLastActiveTime() + ft::TIMEOUT_SEC)
+	else if (now > getLastActiveTime() + ft::TIMEOUT)
 	{
 		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
 	}
@@ -55,14 +54,23 @@ void	ClientSocket::assertTimeout(void) const
 
 void	ClientSocket::handleEvent(uint32_t event)
 {
-	#ifndef DEBUG
-	assertTimeout();
-	#endif
-
 	if (event == EPOLLIN)
+	{
+		#ifndef DEBUG
+		assertTimeout();
+		#endif
+		updateLastActiveTime();
 		handleRead();
+	}
 	else if (event == EPOLLOUT)
+	{
+		updateLastActiveTime();
 		handleSend();
+	}
+	else if (event & (EPOLLERR | EPOLLHUP | EPOLLRDHUP))
+	{
+		setSocketClose();
+	}
 	else
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
@@ -76,7 +84,6 @@ void	ClientSocket::handleRead(void)
 	factory_.parse(buf, bytes);
 	if (factory_.isParseCompleted())
 	{
-		updateLastActiveTime();
 		if (factory_.isCgiRequest())
 		{
 			try
@@ -88,7 +95,7 @@ void	ClientSocket::handleRead(void)
 			}
 			catch(const std::exception& e)
 			{
-				std::cerr << "ClientSocket.cpp at 91" << e.what() << std::endl;
+				std::cerr << "ClientSocket.cpp: " << e.what() << std::endl;
 				throw ;
 			}
 		}

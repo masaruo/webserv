@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 03:33:00 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:19:03 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,12 @@
 #include "Response.hpp"
 #include "ClientSocket.hpp"
 #include "CgiSocket.hpp"
+#include "define.hpp"
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <signal.h>
+
+volatile	sig_atomic_t	g_server_running = true;
 
 Server::Server(std::string const &config_path)
 :config_factory_(config_path)
@@ -71,7 +75,7 @@ void	Server::add(ASocket *socket, uint32_t event)
 		throw (HttpException(HttpCode::SERVICE_UNAVAILABLE));
 
 	epoll_event	ev;
-	ev.events = event;
+	ev.events = event | EPOLLRDHUP;
 	ev.data.ptr = socket;
 
 	int	res = epoll_ctl(epollFd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
@@ -85,7 +89,7 @@ void	Server::add(ASocket *socket, uint32_t event)
 void	Server::mod(ASocket *socket, uint32_t event)
 {
 	epoll_event	ev;
-	ev.events = event;
+	ev.events = event | EPOLLRDHUP;
 	ev.data.ptr = socket;
 
 	int	res = epoll_ctl(epollFd_, EPOLL_CTL_MOD, socket->getFd(), &ev);
@@ -102,9 +106,26 @@ void	Server::del(ASocket *socket)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
 
+static void	signal_handler(int signum)
+{
+	if (signum == SIGINT || signum == SIGTERM)
+		g_server_running = false;
+}
+
+static void	init_signal_handling_(void)
+{
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+		throw (std::runtime_error("Signal Setup Failed"));
+	if (signal(SIGINT,  signal_handler) == SIG_ERR)
+		throw (std::runtime_error("Signal Setup Failed"));
+	if (signal(SIGTERM, signal_handler) == SIG_ERR)
+		throw (std::runtime_error("Signal Setup Failed"));
+}
+
 void	Server::run(void)
 {
-	while (true)
+	init_signal_handling_();
+	while (g_server_running == true)
 	{
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
@@ -126,41 +147,19 @@ void	Server::run(void)
 			}
 			catch (HttpException const &e)
 			{
-				// try
-				// {
-				// 	Response res = e.generateResponse();
-				// 	ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
-				// 	if (client == NULL)
-				// 		continue ;
-				// 	client->setData(res.to_string());
-				// 	this->mod(socket, EPOLLOUT);
-				// }
-				try
+				Response	res = e.generateResponse();
+				if (CgiSocket *cgi = dynamic_cast<CgiSocket*>(socket))
 				{
-					Response	res = e.generateResponse();
-					if (CgiSocket *cgi = dynamic_cast<CgiSocket*>(socket))
-					{
-						ClientSocket *parent = cgi->getParentSocket();
-						parent->setData(res.to_string());
-						this->mod(parent, EPOLLOUT);
-						cgi->setSocketClose();
-					}
-					else if (ClientSocket *client = dynamic_cast<ClientSocket*>(socket))
-					{
-						client->setData(res.to_string());
-						this->mod(client, EPOLLOUT);
-					}
+					ClientSocket *parent = cgi->getParentSocket();
+					parent->setData(res.to_string());
+					this->mod(parent, EPOLLOUT);
+					cgi->setSocketClose();
+					continue ;
 				}
-				catch (HttpException const &e)
+				else if (ClientSocket *client = dynamic_cast<ClientSocket*>(socket))
 				{
-					std::cerr << "Server.cpp:132 error" << std::endl;
-					ClientSocket *client = dynamic_cast<ClientSocket*>(socket);
-					if (client == NULL)
-						continue ;
-					HttpStatus	status(HttpCode::INTERNAL_SERVER_ERROR);
-					Response	res(status);
 					client->setData(res.to_string());
-					this->mod(socket, EPOLLOUT);
+					this->mod(client, EPOLLOUT);
 				}
 			}
 			catch (std::exception const &e)

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/11 04:02:55 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:29:48 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,47 +36,34 @@ CgiSocket::CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server
 ,recv_buf_()
 {
 	setAddr(parent->getAddr());
-	sockfd_[ft::PARENTFD] = -1;
-	sockfd_[ft::CHILDFD] = -1;
 	updateLastActiveTime();
 	return ;
 }
 
 CgiSocket::~CgiSocket()
 {
-	closeSockFds();
-}
-
-void	CgiSocket::closeSockFds(void)
-{
-	if (sockfd_[ft::PARENTFD] > 2)
+	if (child_pid_ > 0)
 	{
-		close(sockfd_[ft::PARENTFD]);
-		sockfd_[ft::PARENTFD] = -1;
-		// setFd(-1);
-	}
-	if (sockfd_[ft::CHILDFD] > 2)
-	{
-		close(sockfd_[ft::CHILDFD]);
-		sockfd_[ft::CHILDFD] = -1;
+		kill (child_pid_, SIGKILL);
+		waitpid(child_pid_, NULL, 0);
 	}
 	return ;
-	
 }
 
 void	CgiSocket::handleCgiExecution(void)
 {
+	int	sockfds[2];
 	try
 	{
-		if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfd_) == -1)
+		if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfds) == -1)
 		{
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
-		if (fcntl(sockfd_[ft::PARENTFD], F_SETFL, O_NONBLOCK) == -1)
+		setFd(sockfds[ft::PARENTFD]);
+		if (fcntl(getFd(), F_SETFL, O_NONBLOCK) == -1)
 		{
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
-		setFd(sockfd_[ft::PARENTFD]);
 
 		send_buf_ = factory_.getBody().c_str();
 
@@ -87,17 +74,16 @@ void	CgiSocket::handleCgiExecution(void)
 		}
 		else if (child_pid_ == 0)
 		{
-			execChild(sockfd_);
+			execChild(sockfds);
 		}
 
 		//parent
-		if (close(sockfd_[ft::CHILDFD]) == -1)
+		if (close(sockfds[ft::CHILDFD]) == -1)
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << "CgiSocket::88 rethrow: " << e.what() << std::endl;
-		closeSockFds();
 		setSocketClose();
 		throw ;
 	}
@@ -172,15 +158,17 @@ void	CgiSocket::execChild(int sockfd[2])
 	std::exit(INTERNAL_SERVER_ERROR);
 }
 
-void	CgiSocket::assertTimeout(void) const
+void	CgiSocket::assertTimeout(void)
 {
-	std::cerr << "assert CGI Timeout" << std::endl;
 	time_t	now = time(NULL);
-	if (now == -1 || now > getLastActiveTime() + ft::TIMEOUT_CGI_SEC)
+	if (now == -1)
 	{
 		setSocketClose();
-		kill(child_pid_, SIGKILL);
-		waitpid(child_pid_, NULL, WNOHANG);
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+	}
+	if (now > getLastActiveTime() + ft::TIMEOUT)
+	{
+		setSocketClose();
 		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
 	}
 	else
@@ -215,37 +203,35 @@ static Response	createResponse(std::string const &buf, int exit_status)
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
-	#ifndef DEBUG
-	assertTimeout();
-	#endif
 	ssize_t bytes = 0;
 	if (event & EPOLLOUT)
 	{
+		updateLastActiveTime();
+		parent_socket_->updateLastActiveTime();
 		if (send_buf_.empty())
 		{
-			updateLastActiveTime();
 			server_.mod(this, EPOLLIN);
 			return ;
 		}
 		bytes = send(getFd(), send_buf_.c_str(), send_buf_.size(), 0);
 		if (bytes <= 0)
 		{
-			closeSockFds();
 			setSocketClose();
-			std::cerr << "event1" << std::endl;
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		send_buf_ = send_buf_.substr(bytes);
 	}
 	else if (event & (EPOLLIN | EPOLLRDHUP))
 	{
+		#ifndef DEBUG
+		assertTimeout();
+		#endif
+		parent_socket_->updateLastActiveTime();
 		char buf[ft::READ_BUF_SIZE];
 	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
 		if (bytes == -1)
 		{
-			closeSockFds();
 			setSocketClose();
-			std::cerr << "event2" << std::endl;
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		else if (bytes == 0)
@@ -258,8 +244,8 @@ void	CgiSocket::handleEvent(uint32_t event)
 			else
 				res = createResponse(recv_buf_, 0);
 			parent_socket_->setData(res.to_string());
-			parent_socket_->updateLastActiveTime();
 			server_.mod(parent_socket_, EPOLLOUT);
+			child_pid_ = -1;
 			setSocketClose();
 			return;
 		}

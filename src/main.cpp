@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 06:06:23 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 02:55:36 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 06:37:47 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 */
 
 #include "Server.hpp"
-#include <signal.h>
 
 //! read from argv
 int main(int argc, char **argv)//todo read from argv

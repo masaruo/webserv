@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:34:56 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:01:26 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,12 @@
 #include "Response.hpp"
 #include "ClientSocket.hpp"
 #include "CgiSocket.hpp"
+#include "define.hpp"
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <signal.h>
+
+volatile	sig_atomic_t	g_server_running = true;
 
 Server::Server(std::string const &config_path)
 :config_factory_(config_path)
@@ -103,13 +106,13 @@ void	Server::del(ASocket *socket)
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
 
-void	signal_handler(int signum)
+static void	signal_handler(int signum)
 {
-	(void) signum;
-	std::exit(EXIT_SUCCESS);
+	if (signum == SIGINT || signum == SIGTERM)
+		g_server_running = false;
 }
 
-void	init_signal_handling(void)
+static void	init_signal_handling_(void)
 {
 	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 		throw (std::runtime_error("Signal Setup Failed"));
@@ -121,8 +124,8 @@ void	init_signal_handling(void)
 
 void	Server::run(void)
 {
-	init_signal_handling();
-	while (true)
+	init_signal_handling_();
+	while (g_server_running == true)
 	{
 		int	event_num = epollWait();
 		for (int i = 0; i < event_num; i++)
@@ -170,7 +173,6 @@ void	Server::run(void)
 				socket->setSocketClose();
 			}
 		}
-		// holder_.markInactieSocketsDelete();
 		holder_.deleteMarkedSockets(epollFd_);
 	}
 }

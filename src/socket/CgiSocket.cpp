@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:34:04 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 06:34:47 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,14 +204,11 @@ static Response	createResponse(std::string const &buf, int exit_status)
 
 void	CgiSocket::handleEvent(uint32_t event)
 {
-	#ifndef DEBUG
-	assertTimeout();
-	#endif
-	updateLastActiveTime();
-	parent_socket_->updateLastActiveTime();
 	ssize_t bytes = 0;
 	if (event & EPOLLOUT)
 	{
+		updateLastActiveTime();
+		parent_socket_->updateLastActiveTime();
 		if (send_buf_.empty())
 		{
 			server_.mod(this, EPOLLIN);
@@ -227,6 +224,11 @@ void	CgiSocket::handleEvent(uint32_t event)
 	}
 	else if (event & (EPOLLIN | EPOLLRDHUP))
 	{
+		#ifndef DEBUG
+		assertTimeout();
+		#endif
+		// updateLastActiveTime();
+		parent_socket_->updateLastActiveTime();
 		char buf[ft::READ_BUF_SIZE];
 	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
 		if (bytes == -1)

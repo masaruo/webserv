@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:33:48 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 06:21:21 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,16 +60,17 @@ time_t	ClientSocket::getLastActiveTime(void) const
 
 void	ClientSocket::handleEvent(uint32_t event)
 {
-	#ifndef DEBUG
-	assertTimeout();
-	#endif
-	updateLastActiveTime();
 	if (event == EPOLLIN)
 	{
+		#ifndef DEBUG
+		assertTimeout();
+		#endif
+		updateLastActiveTime();
 		handleRead();
 	}
 	else if (event == EPOLLOUT)
 	{
+		updateLastActiveTime();
 		handleSend();
 	}
 	else if (event & (EPOLLERR | EPOLLHUP | EPOLLRDHUP))

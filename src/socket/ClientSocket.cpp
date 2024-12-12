@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 06:21:21 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:21:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	ClientSocket::setData(std::string const &data)
 
 void	ClientSocket::assertTimeout(void)
 {
-	std::cerr << "ClientSocket timeout assertion" << std::endl;
 	time_t	now = time(NULL);
 	if (now == -1)
 	{
@@ -51,11 +50,6 @@ void	ClientSocket::assertTimeout(void)
 	}
 	else
 		return ;
-}
-
-time_t	ClientSocket::getLastActiveTime(void) const
-{
-	return (last_active_time_);
 }
 
 void	ClientSocket::handleEvent(uint32_t event)
@@ -101,7 +95,7 @@ void	ClientSocket::handleRead(void)
 			}
 			catch(const std::exception& e)
 			{
-				std::cerr << "ClientSocket.cpp at 91" << e.what() << std::endl;
+				std::cerr << "ClientSocket.cpp: " << e.what() << std::endl;
 				throw ;
 			}
 		}

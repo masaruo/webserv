@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 06:34:47 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:29:48 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,6 @@ void	CgiSocket::execChild(int sockfd[2])
 
 void	CgiSocket::assertTimeout(void)
 {
-	std::cerr << "assert CGI Timeout" << std::endl;
 	time_t	now = time(NULL);
 	if (now == -1)
 	{
@@ -227,7 +226,6 @@ void	CgiSocket::handleEvent(uint32_t event)
 		#ifndef DEBUG
 		assertTimeout();
 		#endif
-		// updateLastActiveTime();
 		parent_socket_->updateLastActiveTime();
 		char buf[ft::READ_BUF_SIZE];
 	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
@@ -263,9 +261,4 @@ void	CgiSocket::handleEvent(uint32_t event)
 ClientSocket	*CgiSocket::getParentSocket(void) const
 {
 	return (parent_socket_);
-}
-
-time_t	CgiSocket::getLastActiveTime(void) const
-{
-	return (last_active_time_);
 }

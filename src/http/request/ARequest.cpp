@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 01:05:46 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/08 06:43:26 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:29:04 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ ARequest::ARequest(RequestLine const &line, RequestHeader const &header, config:
 ,server_(server)
 ,is_initialized_(false)
 {
-	// assertAllowedMethod();
-	// assertRedirection();
 	return ;
 }
 
@@ -42,8 +40,6 @@ ARequest::ARequest(RequestLine const &line, RequestHeader const &header, HttpBod
 ,server_(server)
 ,is_initialized_(false)
 {
-	// assertAllowedMethod();
-	// assertRedirection();
 	return ;
 }
 

@@ -127,7 +127,6 @@ void	GetRequest::generateResponseData(void)
 {
 	HttpUri const		&uri = getLine().getUri();
 	std::string const	&ext = uri.getPath();
-	// std::string const	&pathinfo = uri.getPathInfo().fileName_;
 	std::string const	&path = uri.getPath();
 
 	std::string const &abspath = setLocalPath();

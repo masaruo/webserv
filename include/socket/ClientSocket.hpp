@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:32:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:23:21 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,5 @@ public:
 	virtual ~ClientSocket();
 	void			assertTimeout(void);
 	virtual void	handleEvent(uint32_t event);
-	time_t			getLastActiveTime(void) const;
 	void			setData(std::string const &data);
 };

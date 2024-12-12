@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:30:43 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:19:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,27 +41,6 @@ void	SocketHolder::add(ASocket *socket)
 {
 	vec_sockets_.push_back(socket);
 }
-
-// void	SocketHolder::markInactieSocketsDelete(void)
-// {
-// 	time_t	now = time(NULL);
-// 	if (now == -1)
-// 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
-
-// 	iterator	iter = vec_sockets_.begin();
-// 	while (iter != vec_sockets_.end())
-// 	{
-// 		ASocket *socket = *iter;
-// 		time_t	lastActive = socket->getLastActiveTime();
-// 		if (lastActive != 0 && now > lastActive + ft::TIMEOUT)
-// 		{
-// 			// socket->setSocketClose();
-// 			Response	res = HttpException(HttpCode::REQUEST_TIMEOUT).generateResponse();
-			
-// 		}
-// 		iter++;
-// 	}
-// }
 
 void	SocketHolder::deleteMarkedSockets(int epollfd)
 {

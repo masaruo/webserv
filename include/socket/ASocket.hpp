@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 06:59:43 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 05:32:26 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/12 07:24:32 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,12 @@ protected:
 	Server		&server_;
 	void		setFd(int fd);
 	void		setAddr(sockaddr_in const &addr);
+	time_t		getLastActiveTime(void) const;
 public:
 	explicit	ASocket(int fd, Server &server);
 	explicit	ASocket(sockaddr_in const &addr, int fd, Server &server);
 	virtual		~ASocket();
 
-	virtual time_t		getLastActiveTime(void) const = 0;
 	void				setSocketClose(void) const;
 	sockaddr_in const	&getAddr(void) const;
 	int					getFd(void) const;

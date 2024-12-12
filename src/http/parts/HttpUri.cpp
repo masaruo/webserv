@@ -59,11 +59,7 @@ void	HttpUri::init(std::string const &raw)
 	else if (raw.empty())
 		throw (HttpException(HttpCode::BAD_REQUEST));
 
-	// std::string slashUniformStr = UriNormalizer::uniformSlash(raw);// windows type \ -> /
-	// std::string dotsDecodedStr = UriNormalizer::decodeDots(slashUniformStr);// ../などを対応
-	// rawUri_ = dotsDecodedStr;
-	std::string	backslash_normalized = raw;
-	std::replace(backslash_normalized.begin(), backslash_normalized.end(), '\\', '/');
+	std::string	backslash_normalized = UriNormalizer::uniformSlash(raw);
 	rawUri_ = backslash_normalized;
 }
 

@@ -21,16 +21,6 @@ config::ConfigFactory::ConfigFactory(std::string const &config_path)
 	return ;
 }
 
-config::ConfigFactory::ConfigFactory(int flag)//todo delete mock only
-{
-	(void) flag;
-	Config	mockdefault(1);
-	Config	mockexample(2);
-	configs_.push_back(mockdefault);
-	configs_.push_back(mockexample);
-	return ;
-}
-
 config::ConfigFactory::~ConfigFactory()
 {
 	return ;

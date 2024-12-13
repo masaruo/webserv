@@ -92,8 +92,7 @@ private:
 	bool	isRedirect(Parser& parse, LocationConfig& location);
 public:
 	// consturctor and destructor
-	Config(int flag);//todo delete mock only = mogawa to delete
-	Config(std::string const &block);//todo = add default path
+	Config(std::string const &block);
 	Config(Parser& parse);
 	Config(Config const &rhs);
 	Config &operator=(Config const &rhs);

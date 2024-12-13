@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 21:59:43 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 22:29:18 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	CgiSocket::handleCgiExecution(void)
 	catch(const std::exception& e)
 	{
 		std::cerr << "CgiSocket::88 rethrow: " << e.what() << std::endl;
-		setSocketClose();
+		// setSocketClose();
 		throw ;
 	}
 }
@@ -164,12 +164,12 @@ void	CgiSocket::assertTimeout(void)
 	time_t	now = time(NULL);
 	if (now == -1)
 	{
-		setSocketClose();
+		// setSocketClose();
 		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 	}
 	if (now > getLastActiveTime() + ft::TIMEOUT)
 	{
-		setSocketClose();
+		// setSocketClose();
 		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
 	}
 	else
@@ -217,7 +217,7 @@ void	CgiSocket::handleEvent(uint32_t event)
 		bytes = send(getFd(), send_buf_.c_str(), send_buf_.size(), 0);
 		if (bytes <= 0)
 		{
-			setSocketClose();
+			// setSocketClose();
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		send_buf_ = send_buf_.substr(bytes);
@@ -232,7 +232,7 @@ void	CgiSocket::handleEvent(uint32_t event)
 	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
 		if (bytes == -1)
 		{
-			setSocketClose();
+			// setSocketClose();
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		else if (bytes == 0)
@@ -247,7 +247,7 @@ void	CgiSocket::handleEvent(uint32_t event)
 			parent_socket_->setData(res.to_string());
 			server_.mod(parent_socket_, EPOLLOUT);
 			child_pid_ = -1;
-			setSocketClose();
+			// setSocketClose();
 			return;
 		}
 		else

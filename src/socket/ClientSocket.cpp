@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 22:18:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 22:35:59 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,11 @@ ClientSocket::ClientSocket(sockaddr_in const &addr, int fd, Server &server)
 
 ClientSocket::~ClientSocket()
 {
-	return ;
+	if (cgi_socket_)
+	{
+		cgi_socket_->setSocketClose();
+		cgi_socket_ = NULL;
+	}
 }
 
 void	ClientSocket::setData(std::string const &data)
@@ -97,6 +101,7 @@ void	ClientSocket::handleRead(void)
 			}
 			catch(const std::exception& e)
 			{
+				//todo rethrow from ClietSocket
 				std::cerr << "ClientSocket.cpp: " << e.what() << std::endl;
 				throw ;
 			}

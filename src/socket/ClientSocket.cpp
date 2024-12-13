@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 23:03:57 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 23:09:08 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,12 +103,12 @@ void	ClientSocket::handleRead(void)
 			catch(HttpException const &e)
 			{
 				std::cerr << "ClientSocket.cpp HttpException catch block: " << e.what() << std::endl;
-				throw (HttpException(e.))
+				throw (HttpException(e.getErrorCode()));
 			}
 			catch(std::exception const &e)
 			{
-				//bad alloc
 				std::cerr << "ClientSocket.cpp std::exception catch block: " << e.what() << std::endl;
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		else

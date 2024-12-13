@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 22:36:04 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 23:11:55 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,8 @@ void	Server::run(void)
 			ASocket		*socket = static_cast<ASocket*>(eventQueue_[i].data.ptr);
 			try
 			{
+				if (socket->isDelete())
+					continue ;
 				socket->handleEvent(ev);
 			}
 			catch (AResponseException const &e)

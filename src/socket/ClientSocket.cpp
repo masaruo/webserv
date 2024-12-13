@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 22:35:59 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 23:03:57 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "Response.hpp"
 #include "CgiSocket.hpp"
 #include "unique_ptr.hpp"
+#include "Response.hpp"
 
 #include <sys/epoll.h>
 
@@ -99,11 +100,15 @@ void	ClientSocket::handleRead(void)
 				cgi->handleCgiExecution();
 				server_.add(cgi, EPOLLOUT);
 			}
-			catch(const std::exception& e)
+			catch(HttpException const &e)
 			{
-				//todo rethrow from ClietSocket
-				std::cerr << "ClientSocket.cpp: " << e.what() << std::endl;
-				throw ;
+				std::cerr << "ClientSocket.cpp HttpException catch block: " << e.what() << std::endl;
+				throw (HttpException(e.))
+			}
+			catch(std::exception const &e)
+			{
+				//bad alloc
+				std::cerr << "ClientSocket.cpp std::exception catch block: " << e.what() << std::endl;
 			}
 		}
 		else

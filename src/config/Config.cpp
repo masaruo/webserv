@@ -6,68 +6,6 @@
 namespace config
 {
 
-Config::Config(int flag)//!this is MOCK!
-{
-	(void) flag;
-
-	// main directives
-	port_ = 80;
-	server_name_ = "_";
-	root_ = "/webserv/www/html";
-	others_.addValue(MAX_BODY_SIZE, "60000000");
-	error_pages_.insert(std::make_pair(HttpCode::NOT_FOUND, "/404.html"));
-	error_pages_.insert(std::make_pair(HttpCode::METHOD_NOT_ALLOWED, "/405.html"));
-	error_pages_.insert(std::make_pair(HttpCode::INTERNAL_SERVER_ERROR, "/50x.html"));
-	error_pages_.insert(std::make_pair(HttpCode::BAD_GATEWAY, "/50x.html"));
-	error_pages_.insert(std::make_pair(HttpCode::SERVICE_UNAVAILABLE, "/50x.html"));
-	error_pages_.insert(std::make_pair(HttpCode::GATEWAY_TIMEOUT, "/50x.html"));
-
-	// locations
-	DirectiveMap	slash;
-	slash.addValue(INDEX, "index.html");
-	slash.addValue(ALLOWED_METHOD, "GET");
-	// slash.addValue(ALLOWED_METHOD, "POST");
-	// slash.addValue(ALLOWED_METHOD, "DELETE");
-	slash.addValue(AUTOINDEX, "on");
-	LocationConfig	root;
-	root.pathType_ = ROOT_PATH;
-	root.directive_ = slash;
-	location_.insert(std::make_pair("/", root));
-
-	DirectiveMap	upload;
-	upload.addValue(ALLOWED_METHOD, "PUT");
-	upload.addValue(ALLOWED_METHOD, "DELETE");
-	upload.addValue(ALLOWED_METHOD, "GET");
-	upload.addValue(AUTOINDEX, "on");
-	upload.addValue(UPLOAD_ROOT, "/storage");//? have to create folder?
-	LocationConfig	uploader;
-	uploader.pathType_ = UPLOAD_PATH;
-	uploader.directive_ = upload;
-	location_.insert(std::make_pair("/uploads", uploader));
-
-	DirectiveMap	cgi;
-	cgi.addValue(ALLOWED_METHOD, "GET");
-	cgi.addValue(ALLOWED_METHOD, "POST");
-	cgi.addValue(AUTOINDEX, "off");
-	cgi.addValue(CGI_ROOT, "/webserv/cgi-bin");
-	LocationConfig cgier;
-	cgier.pathType_ = CGI_PATH;
-	cgier.directive_ = cgi;
-	location_.insert(std::make_pair("/cgi-bin", cgier));
-
-	DirectiveMap	re;
-	re.addValue(ALLOWED_METHOD, "GET");
-	re.addValue(ALLOWED_METHOD, "PUT");
-	re.addValue(ALLOWED_METHOD, "POST");
-	re.addValue(ALLOWED_METHOD, "DELETE");
-	re.addValue(REDIRECT_TO, "301");
-	re.addValue(REDIRECT_TO, "http://example.com");
-	LocationConfig redir;
-	redir.pathType_ = REDIRECTION_PATH;
-	redir.directive_ = re;
-	location_.insert(std::make_pair("/redirect", redir));
-}
-
 Config::~Config()
 {
 	return ;
@@ -162,17 +100,6 @@ Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 	{
 		return (location_.at(bestMatch));
 	}
-
-	// LocationConfig	loc;
-	// ft::string const	ftpath(path);
-
-	// if (ftpath.end_with_str(".py"))
-	// 	loc = location_.at("/py");
-	// else if (location_.find(path) == location_.end())
-	// 	loc = location_.at("/");
-	// else
-	// 	loc = location_.at(path);
-	// return (loc);
 }
 
 config::Config::Config(Parser& parse) : port_(80)

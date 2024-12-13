@@ -24,7 +24,7 @@ public:
 		STATIC_PATH,
 		UPLOAD_PATH,
 		CGI_PATH,
-		REDIRECTION_PATH,
+		REDIRECTION_PATH
 	};
 
 	enum	DirectiveType
@@ -39,7 +39,7 @@ public:
 		UPLOAD_ROOT,
 		CGI_ROOT,
 		REDIRECT_TO,
-		MAX_BODY_SIZE,
+		MAX_BODY_SIZE
 	};
 
 	typedef vm::VecMap<DirectiveType, std::string>	DirectiveMap;

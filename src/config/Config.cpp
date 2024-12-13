@@ -366,10 +366,10 @@ bool	config::Config::isLocation(Parser& parse)
 	location.pathType_ = STATIC_PATH;
     if (parse.consume_token() != "{")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \"{\":");
-	setLocation(parse, location, location_path);
+    setLocation(parse, location, location_path);
     if (parse.consume_token() != "}")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \"}\":");
-	return true;
+    return true;
 }
 
 bool	config::Config::isIndex(Parser& parse, LocationConfig& location)
@@ -392,7 +392,7 @@ bool	config::Config::isMethod(Parser& parse, LocationConfig& location)
     	setMethod(parse.consume_token(), location);
     if (parse.consume_token() != ";")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
-	return true;
+    return true;
 }
 
 bool	config::Config::isAoutIndex(Parser& parse, LocationConfig& location)
@@ -403,7 +403,7 @@ bool	config::Config::isAoutIndex(Parser& parse, LocationConfig& location)
     setAoutIndex(parse.consume_token(), location);
     if (parse.consume_token() != ";")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
-	return true;
+    return true;
 }
 
 bool	config::Config::isUploadRoot(Parser& parse, LocationConfig& location)
@@ -414,7 +414,7 @@ bool	config::Config::isUploadRoot(Parser& parse, LocationConfig& location)
     setUploadRoot(parse.consume_token(), location);
     if (parse.consume_token() != ";")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
-	return true;
+    return true;
 }
 
 bool	config::Config::isCgiRoot(Parser& parse, LocationConfig& location)
@@ -425,7 +425,7 @@ bool	config::Config::isCgiRoot(Parser& parse, LocationConfig& location)
     setCgiRoot(parse.consume_token(), location);
     if (parse.consume_token() != ";")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
-	return true;
+    return true;
 }
 
 bool	config::Config::isRedirect(Parser& parse, LocationConfig& location)
@@ -437,7 +437,7 @@ bool	config::Config::isRedirect(Parser& parse, LocationConfig& location)
     setRedirect(parse.consume_token(), location);
     if (parse.consume_token() != ";")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");
-	return true;
+    return true;
 }
 
 }// end of namespace config

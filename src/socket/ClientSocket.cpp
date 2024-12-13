@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:21:07 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 22:18:30 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 ClientSocket::ClientSocket(sockaddr_in const &addr, int fd, Server &server)
 :ASocket(addr, fd, server)
+,cgi_socket_(NULL)
 {
 	updateLastActiveTime();
 	return ;
@@ -90,6 +91,7 @@ void	ClientSocket::handleRead(void)
 			{
 				server_.mod(this, 0);
 				CgiSocket	*cgi = new CgiSocket(this, factory_, server_);
+				setCgiSocket(cgi);
 				cgi->handleCgiExecution();
 				server_.add(cgi, EPOLLOUT);
 			}
@@ -124,4 +126,9 @@ void	ClientSocket::handleSend(void)
 	{
 		setSocketClose();
 	}
+}
+
+void	ClientSocket::setCgiSocket(CgiSocket *cgi)
+{
+	cgi_socket_ = cgi;
 }

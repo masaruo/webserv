@@ -6,11 +6,12 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:29:48 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 21:59:43 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiSocket.hpp"
+#include "ClientSocket.hpp"
 #include "define.hpp"
 #include "Server.hpp"
 #include "Env.hpp"

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 03:52:05 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 06:38:12 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 01:30:48 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ public:
 	~Server();
 
 	config::ConfigFactory const	&getConfigFactory(void) const;
+	int							getSocketHolderSize(void) const;
 	void						add(ASocket *socket, uint32_t event);
 	void						del(ASocket *socket);
 	void						mod(ASocket *socket, uint32_t event);

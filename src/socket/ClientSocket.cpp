@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 23:09:08 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 01:32:25 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,11 @@ void	ClientSocket::assertTimeout(void)
 
 void	ClientSocket::handleEvent(uint32_t event)
 {
-	if (event == EPOLLIN)
+	if (server_.getSocketHolderSize() > ft::MAX_SOCKET_NUM)
+	{
+		throw (HttpException(HttpCode::SERVICE_UNAVAILABLE));
+	}
+	else if (event == EPOLLIN)
 	{
 		#ifndef DEBUG
 		assertTimeout();

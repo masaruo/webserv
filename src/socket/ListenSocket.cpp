@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:29:54 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 01:03:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <stdexcept>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <unistd.h>
 
 static sockaddr_in	getPassiveSockAddr_(int port)
 {
@@ -74,7 +75,10 @@ void	ListenSocket::handleEvent(uint32_t event)
 	if (clientFd == -1)
 		return ;
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+	{
+		close (clientFd);
 		return ;
+	}
 	ClientSocket	*client = new ClientSocket(addr, clientFd, server_);
 	server_.add(client, EPOLLIN);
 }

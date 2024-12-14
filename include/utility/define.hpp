@@ -8,7 +8,7 @@
 namespace ft
 {
 	// constants
-	int			const	MAX_SOCKET_NUM = 255;
+	int			const	MAX_SOCKET_NUM = 100;
 	std::size_t const	MAX_BODY_SIZE = 60000;
 	std::size_t const	MAX_FIELD_LEN = 4000;
 	std::size_t const	MAX_HEADERS_NUM = 100;
@@ -23,12 +23,16 @@ namespace ft
 	typedef std::map<std::string, std::string>	str_map;
 
 	// communal functions
-	template <typename SocketT>
-	SocketT stonum(std::string const &str)
+	template <typename T>
+	T stonum(std::string const &str, int base = 10)
 	{
-		std::stringstream	ss(str);
-		SocketT				num = 0;
-		ss >> num;
+		std::stringstream	ss;
+		T				num = 0;
+		ss << str;
+		if (base == 16)
+			ss >> std::hex >> num;
+		else
+			ss >> num;
 		if (ss.fail() || !ss.eof())
 		{
 			throw (std::invalid_argument("Conversion error in stonum (define.hpp at line 51)."));
@@ -36,8 +40,8 @@ namespace ft
 		return (num);
 	}
 
-	template <typename SocketT>
-	std::string	to_string(SocketT num)
+	template <typename T>
+	std::string	to_string(T num)
 	{
 		std::stringstream	numStr;
 		numStr << num;

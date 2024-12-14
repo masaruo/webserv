@@ -93,12 +93,20 @@ void	RequestFactory::parse(std::string const &data, ssize_t size)
 
 static RequestFactory::BodyType	isRequestBodyPresent(RequestHeader const &header)
 {
-	if (header.hasKey(AHeader::CONTENT_LENGTH) && ft::stonum<std::size_t>(header.getFirstValue(AHeader::CONTENT_LENGTH)) > 0)
-		return (RequestFactory::LENGTH);
-	else if (header.hasKey(AHeader::TRANSFER_ENCODING) && header.getLastValue(AHeader::TRANSFER_ENCODING) == "chunked")
-		return (RequestFactory::CHUNK);
-	else
-		return (RequestFactory::EMPTY);
+	try
+	{
+		if (header.hasKey(AHeader::CONTENT_LENGTH) && ft::stonum<std::size_t>(header.getFirstValue(AHeader::CONTENT_LENGTH)) > 0)
+			return (RequestFactory::LENGTH);
+		else if (header.hasKey(AHeader::TRANSFER_ENCODING) && header.getLastValue(AHeader::TRANSFER_ENCODING) == "chunked")
+			return (RequestFactory::CHUNK);
+		else
+			return (RequestFactory::EMPTY);
+	}
+	catch(const std::exception& e)
+	{
+		throw (HttpException(HttpCode::BAD_REQUEST));
+	}
+	
 }
 
 bool	RequestFactory::parseRequestLine(void)
@@ -147,8 +155,15 @@ bool	RequestFactory::parseBody(void)
 	}
 	else
 	{
-		std::size_t	size = ft::stonum<std::size_t>(header_.getFirstValue(AHeader::CONTENT_LENGTH));
-		recv_required = parseBodyWithLength(size);
+		try
+		{
+			std::size_t	size = ft::stonum<std::size_t>(header_.getFirstValue(AHeader::CONTENT_LENGTH));
+			recv_required = parseBodyWithLength(size);
+		}
+		catch(const std::exception& e)
+		{
+			throw (HttpException(HttpCode::BAD_REQUEST));
+		}
 	}
 	return (recv_required);
 }
@@ -172,24 +187,31 @@ bool	RequestFactory::parseBodyWithChunk(void)
 		return (true);
 
 	std::string const	&sizeStr = buf_.substr(0, pos);
-	std::size_t			size = ft::stonum<std::size_t>(sizeStr);
+	std::size_t	size;
+	try
+	{
+		size = ft::stonum<std::size_t>(sizeStr, 16);
+	}
+	catch(const std::exception& e)
+	{
+		throw (HttpException(HttpCode::BAD_REQUEST));
+	}
 
 	if (size == 0)
 	{
 		buf_ = buf_.substr(pos + 2);
 		if (buf_ != "\r\n")
 			throw (HttpException(HttpCode::BAD_REQUEST));
-		body_ = HttpBody(buf_);
 		buf_.clear();
 		isParseCompleted_ = true;
 		return (false);
 	}
-	else if (buf_.size() < pos + 2 + size + 2)
-	{
-		return (true);
-	}
+	// else if (buf_.size() < pos + 2 + size + 2)
+	// {
+	// 	return (true);
+	// }
 
-	body_ = HttpBody(buf_.substr(pos + 2, size));
+	body_ += HttpBody(buf_.substr(pos + 2, size));
 	buf_ = buf_.substr(pos + 2 + size + 2);
 	return (false);
 }

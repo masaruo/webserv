@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 03:20:38 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 06:21:58 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,13 @@ void	ClientSocket::handleEvent(uint32_t event)
 		#ifndef DEBUG
 		assertTimeout();
 		#endif
-		updateLastActiveTime();
 		handleRead();
 	}
 	else if (event == EPOLLOUT)
 	{
+		#ifndef DEBUG
+		assertTimeout();
+		#endif
 		updateLastActiveTime();
 		handleSend();
 	}
@@ -90,6 +92,7 @@ void	ClientSocket::handleRead(void)
 	factory_.parse(buf, bytes);
 	if (factory_.isParseCompleted())
 	{
+		updateLastActiveTime();
 		if (factory_.isCgiRequest())
 		{
 			try

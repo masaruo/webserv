@@ -93,10 +93,17 @@ std::string	HttpCode::getMessage(StatusCode code)
 
 std::string	HttpCode::str(StatusCode code)
 {
-	std::string const	codeStr = ft::to_string<int>(code);
-	std::string	const	msg = getMessage(code);
-
-	return (codeStr + " " + msg + "\r\n");
+	try
+	{
+		std::string const	codeStr = ft::to_string<int>(code);
+		std::string	const	msg = getMessage(code);
+		return (codeStr + " " + msg + "\r\n");
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+	
 }
 
 HttpCode::StatusCode	HttpCode::getStatusCode(std::size_t codeNum)
@@ -115,6 +122,13 @@ HttpCode::StatusCode	HttpCode::getStatusCode(std::size_t codeNum)
 
 HttpCode::StatusCode	HttpCode::getStatusCode(std::string const &codeNumStr)
 {
-	std::size_t	codeNum = ft::stonum<std::size_t>(codeNumStr);
-	return (getStatusCode(codeNum));
+	try
+	{
+		std::size_t	codeNum = ft::stonum<std::size_t>(codeNumStr);
+		return (getStatusCode(codeNum));
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
 }

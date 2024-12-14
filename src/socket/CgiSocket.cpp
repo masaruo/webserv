@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 04:06:20 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 06:35:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,8 +205,9 @@ void	CgiSocket::handleEvent(uint32_t event)
 	ssize_t bytes = 0;
 	if (event & EPOLLOUT)
 	{
-		updateLastActiveTime();
-		parent_socket_->updateLastActiveTime();
+		#ifndef DEBUG
+		assertTimeout();
+		#endif
 		if (send_buf_.empty())
 		{
 			server_.mod(this, EPOLLIN);
@@ -218,13 +219,14 @@ void	CgiSocket::handleEvent(uint32_t event)
 			throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 		}
 		send_buf_ = send_buf_.substr(bytes);
+		updateLastActiveTime();
+		parent_socket_->updateLastActiveTime();
 	}
 	else if (event & (EPOLLIN | EPOLLRDHUP))
 	{
 		#ifndef DEBUG
 		assertTimeout();
 		#endif
-		parent_socket_->updateLastActiveTime();
 		char buf[ft::READ_BUF_SIZE];
 	 	bytes = recv(getFd(), buf, sizeof(buf), 0);
 		if (bytes == -1)
@@ -243,10 +245,16 @@ void	CgiSocket::handleEvent(uint32_t event)
 			parent_socket_->setData(res.to_string());
 			server_.mod(parent_socket_, EPOLLOUT);
 			child_pid_ = -1;
+			updateLastActiveTime();
+			parent_socket_->updateLastActiveTime();
 			return;
 		}
 		else
+		{
 			recv_buf_.append(buf, bytes);
+			updateLastActiveTime();
+			parent_socket_->updateLastActiveTime();
+		}
 	}
 	else
 	{

@@ -42,6 +42,15 @@ HttpBody &HttpBody::operator=(HttpBody const &rhs)
 	return (*this);
 }
 
+HttpBody &HttpBody::operator+=(HttpBody const &rhs)
+{
+	if (this != &rhs)
+	{
+		data_ += rhs.data_;
+	}
+	return (*this);
+}
+
 std::string	HttpBody::to_string(void) const
 {
 	return (data_);
@@ -62,8 +71,16 @@ std::string	HttpBody::size(void) const
 	std::size_t const	size = getSize();
 	std::string sizeStr;
 
-	sizeStr = ft::to_string<std::size_t>(size);
-	return (sizeStr);
+	try
+	{
+			sizeStr = ft::to_string<std::size_t>(size);
+			return (sizeStr);
+	}
+	catch(const std::exception& e)
+	{
+		throw (HttpException(HttpCode::BAD_REQUEST));
+	}
+	
 }
 
 bool	HttpBody::empty(void) const

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/25 19:47:20 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/08 07:17:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 07:40:48 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ namespace ft
  *
  * @tparam T 管理対象のオブジェクトの型
  */
-template <typename SocketT>
+template <typename T>
 class unique_ptr
 {
 private:
-	SocketT	*ptr_;
+	T	*ptr_;
 	unique_ptr &operator=(unique_ptr const &rhs){ (void) rhs; return (*this); }// hidden
 	unique_ptr(unique_ptr const &rhs){ (void)rhs ;}
 public:
 	unique_ptr();
-	explicit unique_ptr(SocketT *inPtr);
+	explicit unique_ptr(T *inPtr);
 	~unique_ptr();
 	unique_ptr(unique_ptr &rhs);
 	unique_ptr &operator=(unique_ptr &rhs);
@@ -44,13 +44,13 @@ public:
 	* @brief デリファレンス演算子
 	* @return T& 管理対象オブジェクトへの参照
 	*/
-	SocketT &operator*(void) const;
+	T &operator*(void) const;
 	/**
 	 * @brief メンバアクセス演算子
 	 *
 	 * @return T* 管理対象オブジェクトへのポインタ
 	*/
-	SocketT *operator->(void) const;
+	T *operator->(void) const;
 
 	// class functions
 	/**
@@ -58,7 +58,7 @@ public:
 	 *
 	 * @return T* 管理対象オブジェクトへのポインタ
 	*/
-	SocketT		*get(void) const;
+	T		*get(void) const;
 
 	/**
 	 * @brief 管理しているポインタをリセット
@@ -69,7 +69,7 @@ public:
 	 *
 	 * @param inPtr 新しく管理対象とするポインタ（デフォルトはNULL）
 	 */
-	void	reset(SocketT *inPtr = NULL);
+	void	reset(T *inPtr = NULL);
 
 	/**
 	 * @brief 管理しているポインタの所有権を放棄
@@ -80,61 +80,61 @@ public:
 	 *
 	 * @return T* 以前管理していたポインタ
 	 */
-	SocketT		*release(void);
+	T		*release(void);
 };
 
-template <typename SocketT>
-void	unique_ptr<SocketT>::reset(SocketT *inPtr)
+template <typename T>
+void	unique_ptr<T>::reset(T *inPtr)
 {
-	SocketT	*old;
+	T	*old;
 	old = ptr_;
 	ptr_ = inPtr;
 	delete old;
 }
 
-template <typename SocketT>
-SocketT	*unique_ptr<SocketT>::release(void)
+template <typename T>
+T	*unique_ptr<T>::release(void)
 {
-	SocketT *tmp = ptr_;
+	T *tmp = ptr_;
 	ptr_ = NULL;
 	return (tmp);
 }
 
-template <typename SocketT>
-SocketT	*unique_ptr<SocketT>::get(void) const
+template <typename T>
+T	*unique_ptr<T>::get(void) const
 {
 	return (ptr_);
 }
 
-template <typename SocketT>
-unique_ptr<SocketT>::unique_ptr(void)
+template <typename T>
+unique_ptr<T>::unique_ptr(void)
 :ptr_(NULL)
 {
 	return ;
 }
 
-template <typename SocketT>
-unique_ptr<SocketT>::unique_ptr(SocketT *inPtr)
+template <typename T>
+unique_ptr<T>::unique_ptr(T *inPtr)
 :ptr_(inPtr)
 {
 	return ;
 }
 
-template <typename SocketT>
-unique_ptr<SocketT>::~unique_ptr(void)
+template <typename T>
+unique_ptr<T>::~unique_ptr(void)
 {
 	delete ptr_;
 }
 
-template <typename SocketT>
-unique_ptr<SocketT>::unique_ptr(unique_ptr &rhs)
+template <typename T>
+unique_ptr<T>::unique_ptr(unique_ptr &rhs)
 :ptr_(rhs.release())
 {
 	return ;
 }
 
-template <typename SocketT>
-unique_ptr<SocketT>	&unique_ptr<SocketT>::operator=(unique_ptr &rhs)
+template <typename T>
+unique_ptr<T>	&unique_ptr<T>::operator=(unique_ptr &rhs)
 {
 	if (this != &rhs)
 	{
@@ -143,14 +143,14 @@ unique_ptr<SocketT>	&unique_ptr<SocketT>::operator=(unique_ptr &rhs)
 	return (*this);
 }
 
-template <typename SocketT>
-SocketT	&unique_ptr<SocketT>::operator*(void) const
+template <typename T>
+T	&unique_ptr<T>::operator*(void) const
 {
 	return (*ptr_);
 }
 
-template <typename SocketT>
-SocketT	*unique_ptr<SocketT>::operator->(void) const
+template <typename T>
+T	*unique_ptr<T>::operator->(void) const
 {
 	return (ptr_);
 }

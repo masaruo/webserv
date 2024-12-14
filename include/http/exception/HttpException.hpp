@@ -25,7 +25,8 @@ public:
 	explicit HttpException(HttpCode::StatusCode error_code);
 	HttpException(HttpException const &rhs);
 	~HttpException() throw();
-	static void		loadErrorPageMap(config::Config const &config);
-	HttpBody		generateBody(void) const;
-	Response		generateResponse(void) const;
+	static void				loadErrorPageMap(config::Config const &config);
+	HttpBody				generateBody(void) const;
+	Response				generateResponse(void) const;
+	HttpCode::StatusCode	getErrorCode(void) const;
 };

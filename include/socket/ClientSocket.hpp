@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:23:21 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 22:00:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,14 @@
 #include "ASocket.hpp"
 #include "RequestFactory.hpp"
 
+class CgiSocket;
+
 class ClientSocket : public ASocket
 {
 private:
 	RequestFactory	factory_;
 	std::string		data_;
-
+	CgiSocket		*cgi_socket_;
 	void	handleRead(void);
 	void	handleSend(void);
 
@@ -32,4 +34,5 @@ public:
 	void			assertTimeout(void);
 	virtual void	handleEvent(uint32_t event);
 	void			setData(std::string const &data);
+	void			setCgiSocket(CgiSocket *cgi);
 };

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:21:07 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 03:20:38 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,13 @@
 #include "Response.hpp"
 #include "CgiSocket.hpp"
 #include "unique_ptr.hpp"
+#include "Response.hpp"
 
 #include <sys/epoll.h>
 
 ClientSocket::ClientSocket(sockaddr_in const &addr, int fd, Server &server)
 :ASocket(addr, fd, server)
+,cgi_socket_(NULL)
 {
 	updateLastActiveTime();
 	return ;
@@ -29,7 +31,11 @@ ClientSocket::ClientSocket(sockaddr_in const &addr, int fd, Server &server)
 
 ClientSocket::~ClientSocket()
 {
-	return ;
+	if (cgi_socket_)
+	{
+		cgi_socket_->setSocketClose();
+		cgi_socket_ = NULL;
+	}
 }
 
 void	ClientSocket::setData(std::string const &data)
@@ -90,13 +96,19 @@ void	ClientSocket::handleRead(void)
 			{
 				server_.mod(this, 0);
 				CgiSocket	*cgi = new CgiSocket(this, factory_, server_);
+				setCgiSocket(cgi);
 				cgi->handleCgiExecution();
 				server_.add(cgi, EPOLLOUT);
 			}
-			catch(const std::exception& e)
+			catch(HttpException const &e)
 			{
-				std::cerr << "ClientSocket.cpp: " << e.what() << std::endl;
-				throw ;
+				std::cerr << "ClientSocket.cpp HttpException catch block: " << e.what() << std::endl;
+				throw (HttpException(e.getErrorCode()));
+			}
+			catch(std::exception const &e)
+			{
+				std::cerr << "ClientSocket.cpp std::exception catch block: " << e.what() << std::endl;
+				throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 			}
 		}
 		else
@@ -115,13 +127,19 @@ void	ClientSocket::handleSend(void)
 {
 	std::size_t	sendSize = std::min(data_.size(), ft::WRITE_BUF_SIZE);
 	ssize_t	bytes = ::send(getFd(), data_.c_str(), sendSize, 0);
-	if (bytes == -1)
+	if (bytes == 0 || bytes == -1)
 	{
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		setSocketClose();
+		return ;
 	}
 	data_ = data_.substr(bytes);
 	if (data_.empty())
 	{
 		setSocketClose();
 	}
+}
+
+void	ClientSocket::setCgiSocket(CgiSocket *cgi)
+{
+	cgi_socket_ = cgi;
 }

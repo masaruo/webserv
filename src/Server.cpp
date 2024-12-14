@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 04:15:11 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:19:03 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 03:35:23 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,13 @@ config::ConfigFactory const	&Server::getConfigFactory(void) const
 	return (config_factory_);
 }
 
+int		Server::getSocketHolderSize(void) const
+{
+	return (holder_.getSize());
+}
+
 void	Server::add(ASocket *socket, uint32_t event)
 {
-	if (holder_.getSize() > ft::MAX_SOCKET_NUM)
-		throw (HttpException(HttpCode::SERVICE_UNAVAILABLE));
-
 	epoll_event	ev;
 	ev.events = event | EPOLLRDHUP;
 	ev.data.ptr = socket;
@@ -81,7 +83,8 @@ void	Server::add(ASocket *socket, uint32_t event)
 	int	res = epoll_ctl(epollFd_, EPOLL_CTL_ADD, socket->getFd(), &ev);
 	if (res == -1)
 	{
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		delete socket;
+		return ;
 	}
 	holder_.add(socket);
 }
@@ -153,8 +156,6 @@ void	Server::run(void)
 					ClientSocket *parent = cgi->getParentSocket();
 					parent->setData(res.to_string());
 					this->mod(parent, EPOLLOUT);
-					cgi->setSocketClose();
-					continue ;
 				}
 				else if (ClientSocket *client = dynamic_cast<ClientSocket*>(socket))
 				{

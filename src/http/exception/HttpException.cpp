@@ -82,3 +82,8 @@ Response	HttpException::generateResponse(void) const
 
 	return (response);
 }
+
+HttpCode::StatusCode	HttpException::getErrorCode(void) const
+{
+	return (errorCode_);
+}

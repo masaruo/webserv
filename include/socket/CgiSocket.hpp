@@ -6,14 +6,15 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:23:30 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/13 21:57:39 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "ASocket.hpp"
 #include "RequestFactory.hpp"
-#include "ClientSocket.hpp"
+
+class ClientSocket;
 
 class CgiSocket : public ASocket
 {
@@ -27,9 +28,6 @@ private:
 	pid_t			child_pid_;
 	std::string		send_buf_;
 	std::string		recv_buf_;
-	// int				sockfd_[2];
-	// Fd				sockfd_[2];
-	// void	killAndWait(void) const;
 	void	execChild(int sockfd[2]);
 public:
 	explicit	CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server);

@@ -175,7 +175,12 @@ Config::LocationConfig	Config::getConfigLocation(std::string const &path) const
 	// return (loc);
 }
 
-config::Config::Config(Parser& parse) : port_(80)
+size_t	Config::getMaxBodySize() const
+{
+	return (max_body_size_);
+}
+
+config::Config::Config(Parser& parse) : port_(80), max_body_size_(10000)
 {
 	Config::setConfig(parse);
 }
@@ -229,9 +234,9 @@ void	config::Config::setRoot(std::string root)
 	root_ = root;
 }
 
-void	config::Config::setMaxBodySize(std::string size)
+void	config::Config::setMaxBodySize(size_t size)
 {
-	others_.addValue(MAX_BODY_SIZE, size);
+	max_body_size_ = size;
 }
 
 void	config::Config::setErrorPage(HttpCode::StatusCode code, std::string page)
@@ -283,8 +288,10 @@ bool	config::Config::isMaxBodySize(Parser& parse)
     parse.consume_token();
 	if (!isnums(parse.get_token()))
 		return false;
-	std::string size;
-    size = parse.consume_token();
+    std::stringstream ss;
+	size_t size;
+    ss << parse.consume_token();
+    ss >> size;
 	setMaxBodySize(size);
     if (parse.consume_token() != ";")
         throw ConfigErrorException(parse.get_new_lile_num(), "unexpected \";\":");

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 01:32:25 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 03:20:38 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,7 @@ void	ClientSocket::assertTimeout(void)
 
 void	ClientSocket::handleEvent(uint32_t event)
 {
-	if (server_.getSocketHolderSize() > ft::MAX_SOCKET_NUM)
-	{
-		throw (HttpException(HttpCode::SERVICE_UNAVAILABLE));
-	}
-	else if (event == EPOLLIN)
+	if (event == EPOLLIN)
 	{
 		#ifndef DEBUG
 		assertTimeout();
@@ -131,9 +127,10 @@ void	ClientSocket::handleSend(void)
 {
 	std::size_t	sendSize = std::min(data_.size(), ft::WRITE_BUF_SIZE);
 	ssize_t	bytes = ::send(getFd(), data_.c_str(), sendSize, 0);
-	if (bytes == -1)
+	if (bytes == 0 || bytes == -1)
 	{
-		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+		setSocketClose();
+		return ;
 	}
 	data_ = data_.substr(bytes);
 	if (data_.empty())

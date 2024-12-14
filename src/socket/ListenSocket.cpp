@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 01:03:13 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 03:21:01 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,9 @@ void	ListenSocket::assertTimeout(void)
 
 void	ListenSocket::handleEvent(uint32_t event)
 {
+	if (server_.getSocketHolderSize() > ft::MAX_SOCKET_NUM)
+		return ;
+
 	if (event != EPOLLIN)
 		return ;
 	sockaddr_in	addr;

@@ -5,7 +5,7 @@
 static std::string	assertBodyLength_(std::string const &body)
 {
 	if (body.size() > ft::MAX_BODY_SIZE)
-		throw (HttpException(HttpCode::BAD_REQUEST));
+		throw (HttpException(HttpCode::CONTENT_TOO_LARGE));
 	else
 		return (body);
 }

@@ -126,7 +126,6 @@ static std::string	getMimeType(std::string const &path)
 void	GetRequest::generateResponseData(void)
 {
 	HttpUri const		&uri = getLine().getUri();
-	std::string const	&ext = uri.getPath();
 	std::string const	&path = uri.getPath();
 
 	std::string const &abspath = setLocalPath();

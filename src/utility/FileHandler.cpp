@@ -58,17 +58,6 @@ bool	FileHandler::isFile(std::string const &path, int mode)
 
 bool	FileHandler::isExist(std::string const &path)
 {
-	// int res = access(path.c_str(), F_OK);
-	// if (res == -1)
-	// 	return (false);
-	// else
-	// 	return (true);
-	// struct stat st;
-	// int res = stat(path.c_str(), &st);
-	// if (res == -1)
-	// 	return (false);
-	// else
-	// 	return (true);
 	if (path.empty())
 		return (false);
 
@@ -107,19 +96,11 @@ bool	FileHandler::isW_OK(std::string const &path)
 
 bool	FileHandler::isX_OK(std::string const &path)
 {
-	if (path.empty())
+	int res = access(path.c_str(), X_OK);
+	if (res == -1)
 		return (false);
-
-	struct stat	st;
-	if (stat(path.c_str(), &st) == -1)
-		return (false);
-
-	return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH));
-	// int res = access(path.c_str(), X_OK);
-	// if (res == -1)
-	// 	return (false);
-	// else
-	// 	return (true);
+	else
+		return (true);
 }
 
 bool	FileHandler::isOK(std::string const &path, int mode)

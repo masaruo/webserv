@@ -60,6 +60,7 @@ private:
 	ErrorPageMap		error_pages_;
 	DirectiveMap		others_;
 	LocationConfigMap	location_;
+	std::size_t			max_body_size_;
 	Config();//=delete
 
 	// setter
@@ -67,7 +68,7 @@ private:
 	void	setServerName(std::string name);
 	void	setPort(size_t port);
 	void	setRoot(std::string root);
-	void	setMaxBodySize(std::string size);
+	void	setMaxBodySize(size_t size);
 	void	setErrorPage(HttpCode::StatusCode code, std::string page);
 	void	setLocation(Parser& parse, LocationConfig& location, std::string location_path);
 	void	setIndex(std::string index, LocationConfig& location);
@@ -100,6 +101,7 @@ public:
 
 	// getter for attributes (ex location)
 	std::size_t		getPort(void) const;
+	std::size_t		getMaxBodySize(void) const;
 	std::string		getServerName(void) const;
 	std::string		getRoot(std::string const &path = "") const;
 	ErrorPageMap	getErrorPageMap(void) const;

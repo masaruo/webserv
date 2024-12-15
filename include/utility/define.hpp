@@ -9,7 +9,6 @@ namespace ft
 {
 	// constants
 	int			const	MAX_SOCKET_NUM = 100;
-	std::size_t const	MAX_BODY_SIZE = 60000000;
 	std::size_t const	MAX_FIELD_LEN = 4000;
 	std::size_t const	MAX_HEADERS_NUM = 100;
 	std::size_t const	URI_MAX_LEN = 8000;

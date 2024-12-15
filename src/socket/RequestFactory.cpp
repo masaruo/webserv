@@ -4,16 +4,19 @@
 #include "PutRequest.hpp"
 #include "DeleteRequest.hpp"
 #include "Server.hpp"
+#include <limits>
 
-RequestFactory::RequestFactory()
+RequestFactory::RequestFactory(Server &server)
 :buf_()
 ,line_()
 ,header_()
 ,body_()
+,server_(server)
 ,isRequestLineParsed_(false)
 ,isHeaderParsed_(false)
 ,isParseCompleted_(false)
 ,isCgiRequest_(false)
+,max_body_size_(0)
 {
 	return ;
 }
@@ -28,10 +31,12 @@ RequestFactory::RequestFactory(RequestFactory const &rhs)
 ,line_(rhs.line_)
 ,header_(rhs.header_)
 ,body_(rhs.body_)
+,server_(rhs.server_)
 ,isRequestLineParsed_(rhs.isRequestLineParsed_)
 ,isHeaderParsed_(rhs.isHeaderParsed_)
 ,isParseCompleted_(rhs.isParseCompleted_)
 ,isCgiRequest_(rhs.isCgiRequest_)
+,max_body_size_(rhs.max_body_size_)
 {
 	return ;
 }
@@ -48,6 +53,7 @@ RequestFactory &RequestFactory::operator=(RequestFactory const &rhs)
 		isHeaderParsed_ = rhs.isHeaderParsed_;
 		isParseCompleted_ = rhs.isParseCompleted_;
 		isCgiRequest_ = rhs.isCgiRequest_;
+		max_body_size_ = rhs.max_body_size_;
 	}
 	return (*this);
 }
@@ -85,8 +91,8 @@ void	RequestFactory::parse(std::string const &data, ssize_t size)
 	}
 	if (isParseCompleted_)
 	{
-		std::string const &hostValueFromHeader = header_.getFirstValue(AHeader::HOST);
-		line_.getUriReference().updateWithHostHeader(hostValueFromHeader);
+		// std::string const &hostValueFromHeader = header_.getFirstValue(AHeader::HOST);
+		// line_.getUriReference().updateWithHostHeader(hostValueFromHeader);
 		checkIsCgiRequest();
 	}
 }
@@ -121,6 +127,21 @@ bool	RequestFactory::parseRequestLine(void)
 	return (false);
 }
 
+void	RequestFactory::configRelatedInitialization(void)
+{
+	HttpUri const		&uri = line_.getUri();
+	std::string const	&host = uri.getHost();
+	std::size_t const	&port = uri.getPort();
+	config::Config const &config = server_.getConfigFactory().getConfig(host, port);
+	std::string const	&hostValueFromHeader = header_.getFirstValue(AHeader::HOST);
+
+	line_.getUriReference().updateWithHostHeader(hostValueFromHeader);
+
+	HttpException::loadErrorPageMap(config);
+
+	max_body_size_ = config.getMaxBodySize();
+}
+
 bool	RequestFactory::parseHeader(void)
 {
 	std::string::size_type	posCRLFCRLF = buf_.find("\r\n\r\n");
@@ -141,6 +162,7 @@ bool	RequestFactory::parseHeader(void)
 		isHeaderParsed_ = true;
 		isParseCompleted_ = false;
 	}
+	configRelatedInitialization();
 	return (false);
 }
 
@@ -160,7 +182,11 @@ bool	RequestFactory::parseBody(void)
 			std::size_t	size = ft::stonum<std::size_t>(header_.getFirstValue(AHeader::CONTENT_LENGTH));
 			recv_required = parseBodyWithLength(size);
 		}
-		catch(const std::exception& e)
+		catch(HttpException const &e)
+		{
+			throw ;
+		}
+		catch(std::exception const &e)
 		{
 			throw (HttpException(HttpCode::BAD_REQUEST));
 		}
@@ -170,6 +196,9 @@ bool	RequestFactory::parseBody(void)
 
 bool	RequestFactory::parseBodyWithLength(std::size_t size)
 {
+	if (size > max_body_size_)
+		throw (HttpException(HttpCode::CONTENT_TOO_LARGE));
+
 	if (buf_.size() < size)
 		return (true);
 
@@ -211,6 +240,10 @@ bool	RequestFactory::parseBodyWithChunk(void)
 	}
 
 	body_ += HttpBody(buf_.substr(pos + 2, size));
+
+	if (body_.getSize() > max_body_size_)
+		throw (HttpException(HttpCode::CONTENT_TOO_LARGE));
+
 	buf_ = buf_.substr(pos + 2 + size + 2);
 	return (false);
 }
@@ -245,7 +278,7 @@ ARequest	*RequestFactory::createRequest(Server &server) const
 	std::size_t const	&port = uri.getPort();
 
 	config::Config	config = server.getConfigFactory().getConfig(host, port);
-	HttpException::loadErrorPageMap(config);
+	// HttpException::loadErrorPageMap(config);
 
 	if (line_.getMethod() == "GET")
 		return (new GetRequest(line_, header_, config, server));

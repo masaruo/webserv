@@ -88,8 +88,6 @@ void	Response::addMandetaryHeader(void)
 	std::string const &now = Date::time();
 	header_.AHeader::add(AHeader::DATE, now);
 
-	if (status_.getCode() == HttpCode::NO_CONTENT && header_.hasKey(AHeader::CONTENT_LENGTH))
-		header_.del(AHeader::CONTENT_LENGTH);
 
 	if (has_body_)
 	{
@@ -99,6 +97,12 @@ void	Response::addMandetaryHeader(void)
 		if (!header_.hasKey(AHeader::CONTENT_TYPE))
 			header_.AHeader::add(AHeader::CONTENT_TYPE, "application/octet-stream");
 	}
+	else 
+	{
+		header_.AHeader::add(AHeader::CONTENT_LENGTH, "0");
+	}
+	if (status_.getCode() == HttpCode::NO_CONTENT && header_.hasKey(AHeader::CONTENT_LENGTH))
+		header_.del(AHeader::CONTENT_LENGTH);
 }
 
 std::string	Response::to_string(void)

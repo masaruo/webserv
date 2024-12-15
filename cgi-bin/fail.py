@@ -7,4 +7,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    print("Content-Type: text/html\r\n\r\n", flush=True)
     sys.exit(53)

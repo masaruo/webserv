@@ -6,12 +6,12 @@
 #    By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/04 14:12:23 by mogawa            #+#    #+#              #
-#    Updated: 2024/12/15 03:36:23 by mogawa           ###   ########.fr        #
+#    Updated: 2024/12/15 09:04:11 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 TARGET		:=	webserv
-CXX			:=	clang++
+CXX			:=	c++
 CXXFLAGS	:=	-Wall -Wextra -Werror -std=c++98 -MMD -MP 
 LDFLAGS		:=	
 INCDIRS		:=	$(shell find include -type d)

@@ -139,9 +139,7 @@ void	RequestFactory::configRelatedInitialization(void)
 
 	HttpException::loadErrorPageMap(config);
 
-	//! change to getMaxBodySize()
-	// max_body_size_ = config.getMaxBodySize();
-	max_body_size_ = 60000000000;
+	max_body_size_ = config.getMaxBodySize();
 }
 
 bool	RequestFactory::parseHeader(void)

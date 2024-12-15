@@ -7,6 +7,11 @@
 
 std::string FileHandler::read(std::string const &path)
 {
+	if (!isExist(path))
+		throw (HttpException(HttpCode::NOT_FOUND));
+	if (!isOK(path, R_OK))
+		throw (HttpException(HttpCode::FORBIDDEN));
+
 	std::ifstream	ifs(path.c_str(), std::ios::binary);
 	if(!ifs)
 		throw (HttpException(HttpCode::NOT_FOUND));
@@ -19,8 +24,9 @@ std::string FileHandler::read(std::string const &path)
 
 bool	FileHandler::isDir(std::string const &path, int mode)
 {
+	if (path.empty())
+		return (false);
 	struct stat buf;
-
 	int res = stat(path.c_str(), &buf);
 
 	if (res == 0 && S_ISDIR(buf.st_mode))
@@ -34,6 +40,9 @@ bool	FileHandler::isDir(std::string const &path, int mode)
 
 bool	FileHandler::isFile(std::string const &path, int mode)
 {
+	if (path.empty())
+		return (false);
+
 	struct stat buf;
 
 	int res = stat(path.c_str(), &buf);
@@ -49,15 +58,34 @@ bool	FileHandler::isFile(std::string const &path, int mode)
 
 bool	FileHandler::isExist(std::string const &path)
 {
-	int res = access(path.c_str(), F_OK);
+	// int res = access(path.c_str(), F_OK);
+	// if (res == -1)
+	// 	return (false);
+	// else
+	// 	return (true);
+	// struct stat st;
+	// int res = stat(path.c_str(), &st);
+	// if (res == -1)
+	// 	return (false);
+	// else
+	// 	return (true);
+	if (path.empty())
+		return (false);
+
+	struct stat	st;
+	int res = stat(path.c_str(), &st);
+	if (res == -1 && errno == EACCES)
+		return (true);
 	if (res == -1)
 		return (false);
-	else
-		return (true);
+	return (true);
 }
 
 bool	FileHandler::isR_OK(std::string const &path)
 {
+	if (path.empty())
+		return (false);
+
 	int res = access(path.c_str(), R_OK);
 	if (res == -1)
 		return (false);
@@ -67,6 +95,9 @@ bool	FileHandler::isR_OK(std::string const &path)
 
 bool	FileHandler::isW_OK(std::string const &path)
 {
+	if (path.empty())
+		return (false);
+
 	int res = access(path.c_str(), W_OK);
 	if (res == -1)
 		return (false);
@@ -76,15 +107,26 @@ bool	FileHandler::isW_OK(std::string const &path)
 
 bool	FileHandler::isX_OK(std::string const &path)
 {
-	int res = access(path.c_str(), X_OK);
-	if (res == -1)
+	if (path.empty())
 		return (false);
-	else
-		return (true);
+
+	struct stat	st;
+	if (stat(path.c_str(), &st) == -1)
+		return (false);
+
+	return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH));
+	// int res = access(path.c_str(), X_OK);
+	// if (res == -1)
+	// 	return (false);
+	// else
+	// 	return (true);
 }
 
 bool	FileHandler::isOK(std::string const &path, int mode)
 {
+	if (path.empty())
+		return (false);
+
 	int res = access(path.c_str(), mode);
 	if (res == -1)
 		return (false);

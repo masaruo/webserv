@@ -199,17 +199,16 @@ bool	RequestFactory::parseBodyWithChunk(void)
 
 	if (size == 0)
 	{
-		buf_ = buf_.substr(pos + 2);
-		if (buf_ != "\r\n")
-			throw (HttpException(HttpCode::BAD_REQUEST));
+		if (buf_ != "0\r\n\r\n")
+			return (true);
 		buf_.clear();
 		isParseCompleted_ = true;
 		return (false);
 	}
-	// else if (buf_.size() < pos + 2 + size + 2)
-	// {
-	// 	return (true);
-	// }
+	else if (buf_.size() < pos + 2 + size + 2)
+	{
+		return (true);
+	}
 
 	body_ += HttpBody(buf_.substr(pos + 2, size));
 	buf_ = buf_.substr(pos + 2 + size + 2);

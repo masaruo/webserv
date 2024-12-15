@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:40:19 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 03:21:01 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:54:43 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,4 +84,9 @@ void	ListenSocket::handleEvent(uint32_t event)
 	}
 	ClientSocket	*client = new ClientSocket(addr, clientFd, server_);
 	server_.add(client, EPOLLIN);
+}
+
+time_t	ListenSocket::getLastActiveTime(void) const
+{
+	return (0);
 }

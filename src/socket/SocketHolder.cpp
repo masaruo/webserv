@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 22:36:58 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 01:30:54 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 03:54:15 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "ClientSocket.hpp"
 #include "CgiSocket.hpp"
 #include "Response.hpp"
+#include "Server.hpp"
 
 SocketHolder::SocketHolder()
 :vec_sockets_()
@@ -44,6 +45,10 @@ void	SocketHolder::add(ASocket *socket)
 
 void	SocketHolder::deleteMarkedSockets(int epollfd)
 {
+	#ifndef DEBUG
+	markInactiveDelete();
+	#endif
+
 	iterator		it = vec_sockets_.begin();
 
 	while (it != vec_sockets_.end())
@@ -68,4 +73,26 @@ void	SocketHolder::deleteMarkedSockets(int epollfd)
 int	SocketHolder::getSize() const
 {
 	return (static_cast<int>(vec_sockets_.size()));
+}
+
+void	SocketHolder::markInactiveDelete(void)
+{
+	iterator	it = vec_sockets_.begin();
+
+	while (it != vec_sockets_.end())
+	{
+		ASocket *socket = *it;
+		time_t	now = time(NULL);
+		time_t	last = socket->getLastActiveTime();
+		if (now == -1)
+			socket->setSocketClose();
+		else if (last == 0)
+		{
+			it++;
+			continue ;
+		}
+		else if (now > (last + ft::TIMEOUT + 10))
+			socket->setSocketClose();
+		it++;
+	}
 }

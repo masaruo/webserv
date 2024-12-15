@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 06:35:33 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:57:05 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,10 +168,10 @@ void	CgiSocket::assertTimeout(void)
 	}
 	if (now > getLastActiveTime() + ft::TIMEOUT)
 	{
+		updateLastActiveTime();
+		parent_socket_->updateLastActiveTime();
 		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
 	}
-	else
-		return ;
 }
 
 static Response	createResponse(std::string const &buf, int exit_status)
@@ -265,4 +265,9 @@ void	CgiSocket::handleEvent(uint32_t event)
 ClientSocket	*CgiSocket::getParentSocket(void) const
 {
 	return (parent_socket_);
+}
+
+time_t	CgiSocket::getLastActiveTime(void) const
+{
+	return (last_active_time_);
 }

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/02 03:52:05 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 01:30:48 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/14 08:45:59 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ private:
 	SocketHolder			holder_;
 
 	int		epollWait(void);
-	void	markInactieSocketsDelete(void);
+	void	markInactiveDelete(void);
 	Server();
 	Server(Server const &rhs);
 	Server &operator=(Server const &rhs);

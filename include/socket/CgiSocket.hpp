@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 21:57:39 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:56:26 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ public:
 	void	assertTimeout(void);
 	void	handleCgiExecution(void);
 	void	handleEvent(uint32_t event);
+	time_t	getLastActiveTime(void) const;
 private:
 	CgiSocket(CgiSocket const &rhs);
 	CgiSocket &operator=(CgiSocket const &rhs);

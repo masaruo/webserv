@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/14 06:21:58 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:55:35 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,9 @@ void	ClientSocket::assertTimeout(void)
 	}
 	else if (now > getLastActiveTime() + ft::TIMEOUT)
 	{
+		updateLastActiveTime();
 		throw (HttpException(HttpCode::REQUEST_TIMEOUT));
 	}
-	else
-		return ;
 }
 
 void	ClientSocket::handleEvent(uint32_t event)
@@ -69,9 +68,6 @@ void	ClientSocket::handleEvent(uint32_t event)
 	}
 	else if (event == EPOLLOUT)
 	{
-		#ifndef DEBUG
-		assertTimeout();
-		#endif
 		updateLastActiveTime();
 		handleSend();
 	}
@@ -145,4 +141,9 @@ void	ClientSocket::handleSend(void)
 void	ClientSocket::setCgiSocket(CgiSocket *cgi)
 {
 	cgi_socket_ = cgi;
+}
+
+time_t	ClientSocket::getLastActiveTime(void) const
+{
+	return (last_active_time_);
 }

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:24:44 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/12 07:22:42 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:52:44 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,4 @@ int	ASocket::getFd(void) const
 bool	ASocket::isDelete(void) const
 {
 	return (to_delete_);
-}
-
-time_t	ASocket::getLastActiveTime(void) const
-{
-	return (last_active_time_);
 }

@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/13 22:00:33 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:53:58 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,5 @@ public:
 	virtual void	handleEvent(uint32_t event);
 	void			setData(std::string const &data);
 	void			setCgiSocket(CgiSocket *cgi);
+	time_t			getLastActiveTime(void) const;
 };

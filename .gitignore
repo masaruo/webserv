@@ -16,4 +16,6 @@ obj/*
 !www/*
 !www/*/*
 !www/*/*/*
+!www/*/*/*/
 !asset/*
+!.gitkeep

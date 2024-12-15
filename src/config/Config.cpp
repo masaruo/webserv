@@ -18,6 +18,7 @@ Config::Config(Config const &rhs)
 ,error_pages_(rhs.error_pages_)
 ,others_(rhs.others_)
 ,location_(rhs.location_)
+,max_body_size_(rhs.max_body_size_)
 {
 	return ;
 }
@@ -32,6 +33,7 @@ Config &Config::operator=(Config const &rhs)
 		error_pages_ = rhs.error_pages_;
 		others_ = rhs.others_;
 		location_ = rhs.location_;
+		max_body_size_ = rhs.max_body_size_;
 	}
 	return (*this);
 }
@@ -175,6 +177,8 @@ bool	config::Config::isPort(Parser& parse)
 {
     if (parse.get_token() != "listen")
         return false;
+	if (!isnums(parse.get_token()))
+		return false;
     parse.consume_token();
     std::stringstream ss;
 	size_t port;

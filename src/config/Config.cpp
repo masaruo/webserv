@@ -250,9 +250,9 @@ bool	config::Config::isPort(Parser& parse)
 {
     if (parse.get_token() != "listen")
         return false;
+    parse.consume_token();
 	if (!isnums(parse.get_token()))
 		return false;
-    parse.consume_token();
     std::stringstream ss;
 	size_t port;
     ss << parse.consume_token();

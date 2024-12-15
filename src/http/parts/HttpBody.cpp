@@ -2,13 +2,13 @@
 #include "HttpException.hpp"
 #include "define.hpp"
 
-static std::string	assertBodyLength_(std::string const &body)
-{
-	if (body.size() > ft::MAX_BODY_SIZE)
-		throw (HttpException(HttpCode::CONTENT_TOO_LARGE));
-	else
-		return (body);
-}
+// static std::string	assertBodyLength_(std::string const &body)
+// {
+// 	if (body.size() > ft::MAX_BODY_SIZE)
+// 		throw (HttpException(HttpCode::CONTENT_TOO_LARGE));
+// 	else
+// 		return (body);
+// }
 
 HttpBody::HttpBody()
 :data_()
@@ -17,7 +17,8 @@ HttpBody::HttpBody()
 }
 
 HttpBody::HttpBody(std::string const &str)
-:data_(assertBodyLength_(str))
+:data_(str)
+// :data_(assertBodyLength_(str))
 {
 	return ;
 }

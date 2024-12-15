@@ -5,6 +5,7 @@
 #include "Server.hpp"
 
 class ARequest;
+class Server;
 
 class RequestFactory
 {
@@ -20,10 +21,12 @@ private:
 	RequestLine		line_;
 	RequestHeader	header_;
 	HttpBody		body_;
-	bool		isRequestLineParsed_;
-	bool		isHeaderParsed_;
-	bool		isParseCompleted_;
-	bool		isCgiRequest_;
+	Server			&server_;
+	bool			isRequestLineParsed_;
+	bool			isHeaderParsed_;
+	bool			isParseCompleted_;
+	bool			isCgiRequest_;
+	std::size_t		max_body_size_;
 
 	void		checkIsCgiRequest(void);
 	bool		parseRequestLine(void);
@@ -31,8 +34,10 @@ private:
 	bool		parseBody(void);
 	bool		parseBodyWithLength(std::size_t size);
 	bool		parseBodyWithChunk(void);
+	void		configRelatedInitialization(void);
+	RequestFactory();//=delete
 public:
-	RequestFactory();
+	explicit	RequestFactory(Server &server);
 	~RequestFactory();
 	RequestFactory(RequestFactory const &rhs);
 	RequestFactory &operator=(RequestFactory const &rhs);

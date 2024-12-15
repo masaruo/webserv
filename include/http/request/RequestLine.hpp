@@ -14,13 +14,12 @@ private:
 	void		setVersion(std::string const &inVer);
 public:
 	RequestLine();
-	// explicit RequestLine(std::istringstream &iss);
 	explicit RequestLine(std::string const &line);
 	~RequestLine();
 	RequestLine(RequestLine const &rhs);
 	RequestLine &operator=(RequestLine const &rhs);
 	void		setUri(std::string const &inUri);
-	void		constructUri(std::string const &host_value);
+	// void		constructUri(std::string const &host_value);
 	std::string	getMethod(void) const;
 	HttpUri		getUri(void) const;
 	HttpUri		&getUriReference(void);

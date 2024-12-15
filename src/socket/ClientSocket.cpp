@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/15 02:55:35 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 06:03:41 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 
 ClientSocket::ClientSocket(sockaddr_in const &addr, int fd, Server &server)
 :ASocket(addr, fd, server)
+,factory_(server)
+,data_()
 ,cgi_socket_(NULL)
 {
 	updateLastActiveTime();

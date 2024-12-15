@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/15 02:57:05 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/15 04:33:42 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,6 @@ void	CgiSocket::handleCgiExecution(void)
 	catch(const std::exception& e)
 	{
 		std::cerr << "CgiSocket::88 rethrow: " << e.what() << std::endl;
-		// setSocketClose();
 		throw ;
 	}
 }

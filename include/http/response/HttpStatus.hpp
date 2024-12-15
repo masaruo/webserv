@@ -13,7 +13,7 @@ public:
 	~HttpStatus();
 	HttpStatus(HttpStatus const &rhs);
 	HttpStatus &operator=(HttpStatus const &rhs);
-	void				setCode(HttpCode::StatusCode code);
+	void					setCode(HttpCode::StatusCode code);
 	HttpCode::StatusCode	getCode(void) const;
-	std::string			to_string(void) const;
+	std::string				to_string(void) const;
 };

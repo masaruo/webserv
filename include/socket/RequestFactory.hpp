@@ -17,6 +17,7 @@ public:
 		EMPTY
 	};
 private:
+	std::size_t		port_;
 	std::string		buf_;
 	RequestLine		line_;
 	RequestHeader	header_;
@@ -37,7 +38,7 @@ private:
 	void		configRelatedInitialization(void);
 	RequestFactory();//=delete
 public:
-	explicit	RequestFactory(Server &server);
+	explicit	RequestFactory(Server &server, std::size_t port);
 	~RequestFactory();
 	RequestFactory(RequestFactory const &rhs);
 	RequestFactory &operator=(RequestFactory const &rhs);

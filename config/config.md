@@ -50,3 +50,17 @@ server {
         autoindex on;
     }
 }
+
+server {
+    listen 7777;
+    server_name _;
+
+    root /webserv/www/test;
+    max_body_size 500000;
+
+    location / {
+        index index.html;  
+        allowed_methods GET;
+        autoindex on;
+    }
+}

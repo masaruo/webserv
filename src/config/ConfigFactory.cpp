@@ -1,4 +1,5 @@
 #include "ConfigFactory.hpp"
+#include <algorithm>
 
 config::ConfigFactory::ConfigFactory(std::string const &config_path)
 {
@@ -49,27 +50,39 @@ config::Config	config::ConfigFactory::getDefaultConfig(void) const
 config::Config	config::ConfigFactory::getConfig(std::string const &server_name, std::size_t port) const
 {
 	std::vector<Config>::const_iterator	iter = configs_.begin();
-	std::vector<Config>::const_iterator	end = configs_.end();
+	std::vector<Config>::const_iterator	wildcard_config = configs_.end();
+	std::vector<Config>::const_iterator	default_config = configs_.end();
 
-	while (iter != end)
+	while (iter != configs_.end())
 	{
-		std::string	this_server_name = iter->getServerName();
-		std::size_t	this_port = iter->getPort();
-		if (this_server_name == server_name && this_port == port)
+		std::string	const &this_name = iter->getServerName();
+		if (iter->getPort() == port)
 		{
-			return (*iter);
+			if (this_name == server_name)
+				return (*iter);
+			if (this_name == "_")
+				wildcard_config = iter;
+			if (default_config == configs_.end())
+				default_config = iter;
 		}
 		iter++;
 	}
-	return (configs_.front());
+
+	if (wildcard_config != configs_.end())
+		return (*wildcard_config);
+	if (default_config != configs_.end())
+		return (*default_config);
+	throw (HttpException(HttpCode::BAD_REQUEST));
 }
 
 std::vector<std::size_t> config::ConfigFactory::getAcceptedPorts(void) const
 {
-	std::vector<size_t> ports;
+	std::vector<size_t>			ports;
+
 	for(size_t i = 0; i < configs_.size(); i++)
 		ports.push_back(configs_[i].getPort());
-
+	std::vector<std::size_t>::iterator new_end = std::unique(ports.begin(), ports.end());
+	ports.erase(new_end, ports.end());
 	return (ports);
 }
 

@@ -6,8 +6,9 @@
 #include "Server.hpp"
 #include <limits>
 
-RequestFactory::RequestFactory(Server &server)
-:buf_()
+RequestFactory::RequestFactory(Server &server, std::size_t port)
+:port_(port)
+,buf_()
 ,line_()
 ,header_()
 ,body_()
@@ -27,7 +28,8 @@ RequestFactory::~RequestFactory()
 }
 
 RequestFactory::RequestFactory(RequestFactory const &rhs)
-:buf_(rhs.buf_)
+:port_(rhs.port_)
+,buf_(rhs.buf_)
 ,line_(rhs.line_)
 ,header_(rhs.header_)
 ,body_(rhs.body_)
@@ -45,6 +47,7 @@ RequestFactory &RequestFactory::operator=(RequestFactory const &rhs)
 {
 	if (this != &rhs)
 	{
+		port_ = rhs.port_;
 		buf_ = rhs.buf_;
 		line_ = rhs.line_;
 		header_ = rhs.header_;
@@ -91,8 +94,6 @@ void	RequestFactory::parse(std::string const &data, ssize_t size)
 	}
 	if (isParseCompleted_)
 	{
-		// std::string const &hostValueFromHeader = header_.getFirstValue(AHeader::HOST);
-		// line_.getUriReference().updateWithHostHeader(hostValueFromHeader);
 		checkIsCgiRequest();
 	}
 }
@@ -129,14 +130,13 @@ bool	RequestFactory::parseRequestLine(void)
 
 void	RequestFactory::configRelatedInitialization(void)
 {
-	HttpUri const		&uri = line_.getUri();
-	std::string const	&host = uri.getHost();
-	std::size_t const	&port = uri.getPort();
-	config::Config const &config = server_.getConfigFactory().getConfig(host, port);
 	std::string const	&hostValueFromHeader = header_.getFirstValue(AHeader::HOST);
-
 	line_.getUriReference().updateWithHostHeader(hostValueFromHeader);
 
+	HttpUri const		&uri = line_.getUri();
+	std::string const	&host = uri.getHost();
+
+	config::Config const &config = server_.getConfigFactory().getConfig(host, port_);
 	HttpException::loadErrorPageMap(config);
 
 	max_body_size_ = config.getMaxBodySize();
@@ -275,10 +275,8 @@ ARequest	*RequestFactory::createRequest(Server &server) const
 
 	HttpUri const		&uri = line_.getUri();
 	std::string const	&host = uri.getHost();
-	std::size_t const	&port = uri.getPort();
 
-	config::Config	config = server.getConfigFactory().getConfig(host, port);
-	// HttpException::loadErrorPageMap(config);
+	config::Config	config = server.getConfigFactory().getConfig(host, port_);
 
 	if (line_.getMethod() == "GET")
 		return (new GetRequest(line_, header_, config, server));

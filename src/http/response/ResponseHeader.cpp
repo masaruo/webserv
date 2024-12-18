@@ -53,10 +53,7 @@ static void	assertLine_(ft::string const &line)
 {
 	bool	is_invalid = false;
 
-	int cnt = std::count(line.begin(), line.end(), ':');
-	if (cnt != 1)
-		is_invalid = true;
-	else if (line.empty())
+	if (line.empty())
 		is_invalid = true;
 	else if (line.start_with(ft::string::WS))
 		is_invalid = true;

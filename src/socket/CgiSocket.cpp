@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/15 04:33:42 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/18 05:08:58 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,20 +183,27 @@ static Response	createResponse(std::string const &buf, int exit_status)
 		return (Response(HttpStatus(HttpCode::FORBIDDEN)));
 
 	std::string::size_type	posCRLFCRLF = buf.find("\r\n\r\n");
-	if (posCRLFCRLF == std::string::npos)
+	if (buf.empty() || posCRLFCRLF == std::string::npos)
 		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
 
 	std::string const	&buf_header = buf.substr(0, posCRLFCRLF + 4);
 	std::string const	&buf_body = buf.substr(posCRLFCRLF + 4);
 
 	ResponseHeader header(buf_header);
-	if (!header.hasKey(AHeader::CONTENT_TYPE))
-		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
-
-	HttpBody	body(buf_body);
-	HttpStatus	status(HttpCode::OK);
-
-	return (Response(status, header, body));
+	if (header.hasKey(AHeader::CONTENT_TYPE))
+	{
+		HttpBody	body(buf_body);
+		HttpStatus	status(HttpCode::OK);
+		return (Response(status, header, body));
+	}
+	else if (header.hasKey(AHeader::LOCATION))
+	{
+		HttpBody	body(buf_body);
+		HttpStatus	status(HttpCode::FOUND);
+		return (Response(status, header, body));
+	}
+	else
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
 
 void	CgiSocket::handleEvent(uint32_t event)

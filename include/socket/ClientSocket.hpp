@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 07:57:36 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/15 06:02:16 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/18 03:18:11 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,13 @@ class CgiSocket;
 class ClientSocket : public ASocket
 {
 private:
+	std::size_t		port_;
 	RequestFactory	factory_;
 	std::string		data_;
 	CgiSocket		*cgi_socket_;
-	void	handleRead(void);
-	void	handleSend(void);
+	void		handleRead(void);
+	void		handleSend(void);
+	std::size_t	setPort(void);
 
 	ClientSocket();//=delete
 	ClientSocket(ClientSocket const &rhs);//=delete

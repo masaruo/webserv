@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 08:52:30 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/15 06:03:41 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/18 03:19:50 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@
 
 ClientSocket::ClientSocket(sockaddr_in const &addr, int fd, Server &server)
 :ASocket(addr, fd, server)
-,factory_(server)
+,port_(setPort())
+,factory_(server, port_)
 ,data_()
 ,cgi_socket_(NULL)
 {
@@ -38,6 +39,19 @@ ClientSocket::~ClientSocket()
 		cgi_socket_->setSocketClose();
 		cgi_socket_ = NULL;
 	}
+}
+
+std::size_t	ClientSocket::setPort(void)
+{
+	struct sockaddr_in	addr;
+	socklen_t			len = sizeof(addr);
+
+	int	res = getsockname(getFd(), (struct sockaddr*)&addr, &len);
+	if (res == -1)
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
+
+	std::size_t port = static_cast<std::size_t>(ntohs(addr.sin_port));
+	return (port);
 }
 
 void	ClientSocket::setData(std::string const &data)

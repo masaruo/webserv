@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 01:53:40 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/15 02:56:26 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/19 02:12:09 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,9 @@ private:
 	pid_t			child_pid_;
 	std::string		send_buf_;
 	std::string		recv_buf_;
-	void	execChild(int sockfd[2]);
+	void		execChild(int sockfd[2]);
+	Response	createResponse(std::string const &buf, int exit_status);
+	Response	handleInternalRedirect(std::string const &path);
 public:
 	explicit	CgiSocket(ClientSocket *parent, RequestFactory const &factory, Server &server);
 	~CgiSocket();

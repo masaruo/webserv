@@ -6,7 +6,7 @@
 /*   By: mogawa <masaruo@gmail.com>                 +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 02:08:55 by mogawa            #+#    #+#             */
-/*   Updated: 2024/12/15 04:33:42 by mogawa           ###   ########.fr       */
+/*   Updated: 2024/12/19 02:15:27 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,23 @@ void	CgiSocket::assertTimeout(void)
 	}
 }
 
-static Response	createResponse(std::string const &buf, int exit_status)
+Response	CgiSocket::handleInternalRedirect(std::string const &path)
+{
+	try
+	{
+		std::string const &bodyStr = FileHandler::read(path);
+		HttpBody	body(bodyStr);
+		HttpStatus	status(HttpCode::OK);
+		ResponseHeader	header;
+		return (Response(status, header, body));
+	}
+	catch(HttpException const &e)
+	{
+		return (Response(HttpStatus(e.getErrorCode())));
+	}
+}
+
+Response	CgiSocket::createResponse(std::string const &buf, int exit_status)
 {
 	if (exit_status == CgiSocket::INTERNAL_SERVER_ERROR)
 		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
@@ -183,20 +199,33 @@ static Response	createResponse(std::string const &buf, int exit_status)
 		return (Response(HttpStatus(HttpCode::FORBIDDEN)));
 
 	std::string::size_type	posCRLFCRLF = buf.find("\r\n\r\n");
-	if (posCRLFCRLF == std::string::npos)
+	if (buf.empty() || posCRLFCRLF == std::string::npos)
 		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
 
 	std::string const	&buf_header = buf.substr(0, posCRLFCRLF + 4);
 	std::string const	&buf_body = buf.substr(posCRLFCRLF + 4);
 
 	ResponseHeader header(buf_header);
-	if (!header.hasKey(AHeader::CONTENT_TYPE))
-		return (Response(HttpStatus(HttpCode::INTERNAL_SERVER_ERROR)));
-
-	HttpBody	body(buf_body);
-	HttpStatus	status(HttpCode::OK);
-
-	return (Response(status, header, body));
+	if (header.hasKey(AHeader::CONTENT_TYPE))
+	{
+		HttpBody	body(buf_body);
+		HttpStatus	status(HttpCode::OK);
+		return (Response(status, header, body));
+	}
+	else if (header.hasKey(AHeader::LOCATION))
+	{
+		std::string const &path = header.getFirstValue(AHeader::LOCATION);
+		if (path[0] == '/')
+			return (handleInternalRedirect(path));
+		else
+		{
+			HttpBody	body(buf_body);
+			HttpStatus	status(HttpCode::FOUND);
+			return (Response(status, header, body));
+		}
+	}
+	else
+		throw (HttpException(HttpCode::INTERNAL_SERVER_ERROR));
 }
 
 void	CgiSocket::handleEvent(uint32_t event)

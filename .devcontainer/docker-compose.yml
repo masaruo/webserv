@@ -1,0 +1,17 @@
+services:
+  dev:
+    container_name: webserv
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    ports:
+      - "8888:8888"
+      - "7777:7777"
+    volumes:
+      - type: bind
+        source: "../"
+        target: "/webserv"
+      - type: bind
+        source: "../nginx/webserv.conf"
+        target: "/etc/nginx/conf.d/webserv.conf"
+    command: /bin/sh -c "tail -f /dev/null"

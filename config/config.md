@@ -2,7 +2,7 @@ server {
     listen 8888;
     server_name _;
 
-    root /webserv/www/html;
+    root ./www/html;
     max_body_size 50000000000;
 
     error_page 403 /403.html;
@@ -22,13 +22,13 @@ server {
 
     location /uploads {
         allowed_methods PUT DELETE GET;
-        upload_store /storage;
+        upload_store ./storage;
         autoindex on;
     }
 
     location /cgi-bin {
         allowed_methods GET POST;
-        cgi_root /webserv/cgi-bin;
+        cgi_root ./cgi-bin;
     }
 
     location /redirect {
@@ -41,11 +41,11 @@ server {
     listen 7777;
     server_name example.com;
 
-    root /webserv/www/example;
+    root ./www/example;
     max_body_size 500000;
 
     location / {
-        index index.html;  
+        index index.html;
         allowed_methods GET;
         autoindex on;
     }
@@ -55,11 +55,11 @@ server {
     listen 7777;
     server_name _;
 
-    root /webserv/www/test;
+    root ./www/test;
     max_body_size 500000;
 
     location / {
-        index index.html;  
+        index index.html;
         allowed_methods GET;
         autoindex on;
     }

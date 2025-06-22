@@ -20,4 +20,4 @@ obj/*
 !asset/*
 !.gitkeep
 !README.md
-
+!.devcontainer/*

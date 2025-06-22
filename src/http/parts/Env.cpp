@@ -75,7 +75,10 @@ ft::str_map	Env::getEnviron(void) const
 	{
 		ft::string	line(environ[i]);
 		ft::string::string_vector	split_by_equal = line.split("=");
-		env_map.insert(std::make_pair(split_by_equal.at(0), split_by_equal.at(1)));
+		if (split_by_equal.size() >= 2)
+		{
+			env_map.insert(std::make_pair(split_by_equal.at(0), split_by_equal.at(1)));
+		}
 		i++;
 	}
 	return (env_map);

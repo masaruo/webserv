@@ -9,6 +9,20 @@
 * run `make` then access `http://localhost:8888`
 * access port can be altered by ./config/config.md
 
+in `config.md`, uploads and cgi-bin root;
+```
+    location /uploads {
+        allowed_methods PUT DELETE GET;
+        upload_store /storage;// Do NOT add . before / ./storage
+        autoindex on;
+    }
+
+    location /cgi-bin {
+        allowed_methods GET POST;
+        cgi_root ./cgi-bin;// Add . before /
+    }
+```
+
 ### environment
 * run on ubuntu (use vscode devcontainer for mac)
 * using epoll hence this will not compile in mac

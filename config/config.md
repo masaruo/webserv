@@ -22,7 +22,7 @@ server {
 
     location /uploads {
         allowed_methods PUT DELETE GET;
-        upload_store ./storage;
+        upload_store /storage;
         autoindex on;
     }
 
